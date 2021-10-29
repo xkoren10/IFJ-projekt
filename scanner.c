@@ -1,8 +1,25 @@
+/**
+* Project - Compiler for IFJ21
+* 
+* @brief Scanner for IFJ21 - Lexical analysis
+* 
+* @author Matej Koreň <xkoren10
+* @author Matej Hložek <xhloze02>
+* @file scanner.c
+*
+**/
+
 #include "scanner.h"
 
 char next_char;
 int state = START;
 
+
+/*
+Fixed enough to be without errors. 
+In special cases we need to check for the succeeding character to determine token type 
+Function to choose keywords would be useful
+*/
 
 int main() {
 
@@ -26,47 +43,38 @@ while (1) {
         switch (next_char) {
 
         case '+':
-            return ADD;
+            return PLUS;
         case '-':
-            return SUB;
+            return MINUS;
         case '*':
-            return MUL;
+            return MULTIPLY;
         case '(':
-            return L_PAR;
+            return LEFT_PARENTHESIS;
         case ')':
-            return R_PAR;
+            return RIGHT_PARENTHESIS;
         case ',':
             return COMMA;
-        case ';':
-            return SEMICOL;
-        case '{':
-            return L_BR;
-        case '}':
-            return R_BR;
         case '\n':
             return EOL;
         case EOF:
-            return ENDFILE;
+            return STATE_EOF;
 
 
 
         case '/':
-            state = S_DIV;
+            state = DIVIDE;
             break;
         case '=':
-            state = S_ASSIGN;
+            state = ASSIGN;
             break;
         case '<':
-            state = S_L;
+            state = LESS_THAN;
             break;
         case '>':
-            state = S_G;
-            break;
-        case '!':
-            state = S_NEG;
+            state = GREATER_THAN;
             break;
         case ':':
-            state = S_VAR_DEF;
+            state = COLON;
             break;
         }
     }
