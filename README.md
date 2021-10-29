@@ -13,3 +13,6 @@ Datum odevzdání: středa 8. prosince 2021, 23:59.
 - xhloze02 Matej Hložek
 - xkriza08 Marek Križan
 - xpyczl00 Lukasz Pycz
+
+
+# Lexikálny analyzátor - Scanner
