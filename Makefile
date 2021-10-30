@@ -1,15 +1,16 @@
 CFLAGS=-std=gnu99 -Wall -Wextra -Werror
 CC=gcc
-LIBS=-lm
-FILES=scanner.c scanner.h
-PROJ=ifj20
+
+
+
 
 .PHONY: clean 
 
-
-$(PROJ) : $(FILES)
-	$(CC) $(CFLAGS) -o $(PROJ) $(FILES) $(LIBS)
-
+test: scanner_tests.c dyn_string.c
+	$(CC) $(CFLAGS) scanner_tests.c dyn_string.c -o scanner_tests
+	./scanner_tests
+	rm -f scanner_tests
 
 clean:
-	rm -f *.o $(PROJ)
+	rm -f *.o 
+

@@ -10,9 +10,14 @@
 **/
 
 #include "scanner.h"
+#include <ctype.h>
 
 char next_char;
 int state = START;
+Token *token;
+
+FILE *source;                       // Source file that will be scanned
+Dyn_string *dynamic_string;         // Dynamic string that will be written into
 
 
 /*
@@ -21,7 +26,7 @@ In special cases we need to check for the succeeding character to determine toke
 Function to choose keywords would be useful
 */
 
-int main() {
+int get_token(Token *token ) {
 
 while (1) {
 
@@ -42,8 +47,9 @@ while (1) {
 
         switch (next_char) {
 
-        case '+':
-            return PLUS;
+        case '+':{
+            token->type=PLUS;
+            return PLUS;}
         case '-':
             return MINUS;
         case '*':

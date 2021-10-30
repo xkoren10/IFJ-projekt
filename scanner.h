@@ -15,7 +15,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <dyn_string.h>
+#include "dyn_string.h"
+#include <error.h>
 
 
 /**
@@ -110,7 +111,7 @@ typedef enum
  */
 
 typedef struct {
-    //dyn_string value;//                                                     -- needs header and .c file to define actual value from stdin 
+    Dyn_string value;
     Token_type type;
     int line, lenght, start, end;
 } Token;
@@ -121,8 +122,18 @@ typedef struct {
 
 /**
  * @brief Main function to get tokens
- * @return -something-
+ * @param token Structure
+ * @return Function 'free_token'
  */
-Token get_token();
+int get_token(Token *token);
+
+
+/**
+ * @brief Function to free allocated space and return error codes
+ * @param token Structure
+ * @param Exit_code Integer value of error defined in error.h
+ * @return Error 0 if success, else Error 1
+ */
+int free_token(Token *token, int Exit_code);
 
 #endif /* SCANNER_H*/
