@@ -46,8 +46,15 @@ typedef enum
 
 
 /**
+ * @brief Array of keywords to compare with found word
+ */
+const char* keywords_array[] = { "do", "else", "end", "function", "global", "if", "integer","local",
+                                 "nil", "number", "require", "return", "string", "then", "while" };
+
+
+/**
  * @enum Token_types
- * @brief Token types, also used as states of finite automata.
+ * @brief Token types, also used as states of finite automata
  */
 
 typedef enum
@@ -106,12 +113,27 @@ typedef enum
 
 
 /**
+ * @union Token_value
+ * @brief Definition of token values - word (id), keyword, integer or float
+ */
+typedef union
+{
+	Dyn_string *string;
+	Keyword keyword; 
+	int integer_value;
+    double decimal_value; 
+
+} Token_value;
+
+
+
+/**
  * @struct Token
  * @brief Definition of token with its value, type and other information
  */
 
 typedef struct {
-    Dyn_string value;
+    Token_value value;
     Token_type type;
     int line, lenght, start, end;
 } Token;
@@ -129,11 +151,11 @@ int get_token(Token *token);
 
 
 /**
- * @brief Function to free allocated space and return error codes
- * @param token Structure
+ * @brief Function to free allocated string space and return error codes
+ * @param string Dynamic string
  * @param Exit_code Integer value of error defined in error.h
  * @return Error 0 if success, else Error 1
  */
-int free_token(Token *token, int Exit_code);
+int free_dynamic_string(Dyn_string *string, int Exit_code);
 
 #endif /* SCANNER_H*/

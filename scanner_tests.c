@@ -13,11 +13,14 @@
 #include <stdlib.h>
 #include "error_codes.h"
 #include "dyn_string.h"
+#include "scanner.h"
 #include <stdio.h>
 #include <assert.h>
+#include <unistd.h>
 
 Dyn_string s;
 Dyn_string z;
+Token *token;
 
 
 int main(){
@@ -48,6 +51,20 @@ assert(dyn_string_copy(&s, &z)==true);
 assert(s.length==z.length);
 
 assert(dyn_string_compare(&s, "iahoj")==0);
+
+
+
+    fprintf(stdout,"                     PASSED                    \n"); 
+    fprintf(stdout,"-----------------------------------------------\n");
+    fprintf(stdout,"------------ Lexical analysis tests -----------\n");
+
+putc('<',stdin);
+//in main program define source as argv[1] and 'r'
+putc('=',stdin);
+
+
+
+
 
 
 
