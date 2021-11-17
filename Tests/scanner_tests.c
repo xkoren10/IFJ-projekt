@@ -11,16 +11,17 @@
 
 
 #include <stdlib.h>
-#include "error_codes.h"
-#include "dyn_string.h"
-#include "scanner.h"
+#include "../error_codes.h"
+#include "../dyn_string.h"
+#include "../scanner.h"
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
 
 Dyn_string s;
 Dyn_string z;
-Token *token;
+Token token;
+FILE *file;
 
 
 int main(){
@@ -58,13 +59,48 @@ assert(dyn_string_compare(&s, "iahoj")==0);
     fprintf(stdout,"-----------------------------------------------\n");
     fprintf(stdout,"------------ Lexical analysis tests -----------\n");
 
-putc('<',stdin);
-//in main program define source as argv[1] and 'r'
-putc('=',stdin);
+file = fopen("../IFJ21_codes", "r");
+get_token(&token);
+assert(token.line==1);
+assert(token.start==0);
+assert(token.end==4);
+assert(token.lenght==5);
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_LOCAL);
 
+get_token(&token);
+assert(token.line==1);
+assert(token.start==6);
+assert(token.end==6);
+assert(token.lenght==1);
+assert(token.type==ID);
+//assert(strcmp((token.value.string),"x")==0);
 
+get_token(&token);
+assert(token.line==1);
+assert(token.start==7);
+assert(token.end==7);
+assert(token.lenght==1);
+assert(token.type==COLON);
 
+get_token(&token);
+assert(token.line==1);
+assert(token.start==9);
+assert(token.end==14);
+assert(token.lenght==6);
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_NUMBER);
 
+get_token(&token);
+assert(token.type==ASSIGN);
+get_token(&token);
+assert(token.type==NUMBER);
+assert(token.value.decimal_value==0.5);
+get_token(&token);
+assert(token.type==EOL);
+get_token(&token);
+assert(token.type==STATE_EOF);
+//?assert(token.type==ERROR);
 
 
 

@@ -6,8 +6,8 @@ CC=gcc
 
 .PHONY: clean 
 
-test: scanner_tests.c dyn_string.c scanner.c
-	$(CC) $(CFLAGS) scanner_tests.c dyn_string.c scanner.c -o scanner_tests
+test: Tests/scanner_tests.c dyn_string.c scanner.c
+	$(CC) $(CFLAGS) Tests/scanner_tests.c dyn_string.c scanner.c -o scanner_tests
 	./scanner_tests
 	rm -f scanner_tests
 

@@ -30,7 +30,7 @@ int identifier_check(Dyn_string *dynamic_string, Token *token)
 {
     for (int i=0; i<=14; i++)
     {
-       if(strcmp(dynamic_string,keywords_array[i])==0)
+       if(strcmp(dynamic_string->string,keywords_array[i])==0)
        {
            switch(i){
                case 0:token->value.keyword = KEYWORD_DO;break;
@@ -57,9 +57,9 @@ int identifier_check(Dyn_string *dynamic_string, Token *token)
 
     }
 
-        if (!dynamic_string_copy(dynamic_string, token->value.string))
+        if (!dyn_string_copy(dynamic_string, token->value.string))
 	    {
-		    return free_resources(dynamic_string,ERROR_INTERN);
+		    return free_dynamic_string(dynamic_string,ERROR_INTERN);
 	    }
 
     return free_dynamic_string(dynamic_string,ERROR_OK);
@@ -194,7 +194,7 @@ case (ID_or_KEYWORD):
 				{
 					if (!dyn_string_add_char(dynamic_string, (char) tolower(next_char)))
 					{
-						return free_resources(dynamic_string,ERROR_INTERN);
+						return free_dynamic_string(dynamic_string,ERROR_INTERN);
 					}
 				}
 				else
@@ -284,9 +284,9 @@ case (ID_or_KEYWORD):
         //if number is int -> strtoi, if decimal -> check after point for another number and back to decimal state, in both check for E
 				if (isdigit(next_char))
 				{
-					if (!dynamic_string_add_char(dynamic_string, next_char))
+					if (!dyn_string_add_char(dynamic_string, next_char))
 					{
-						return free_resources(dynamic_string,ERROR_INTERN);
+						return free_dynamic_string(dynamic_string,ERROR_INTERN);
 					}
 				}
 				else if (next_char == '.')
@@ -294,15 +294,15 @@ case (ID_or_KEYWORD):
 					/*state = DECIMAL_POINT;
 					if (!dynamic_string_add_char(dynamic_string, next_char))
 					{
-						return free_resources(dynamic_string,ERROR_INTERN);
+						return free_dynamic_string(dynamic_string,ERROR_INTERN);
 					}*/
 				}
 				else if (tolower(next_char) == 'e')
 				{
 					state = INDEX_CHAR;
-					if (!dynamic_string_add_char(dynamic_string, next_char))
+					if (!dyn_string_add_char(dynamic_string, next_char))
 					{
-						return free_resources(dynamic_string,ERROR_INTERN);
+						return free_dynamic_string(dynamic_string,ERROR_INTERN);
 					}
 				}
 				else
