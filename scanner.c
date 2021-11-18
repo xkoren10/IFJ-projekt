@@ -26,43 +26,31 @@ In special cases we need to check for the succeeding character to determine toke
 Function to choose keywords would be useful
 */
 
-int identifier_check(Dyn_string *dynamic_string, Token *token)
-{
-    for (int i=0; i<=14; i++)
-    {
-       if(strcmp(dynamic_string->string,keywords_array[i])==0)
-       {
-           switch(i){
-               case 0:token->value.keyword = KEYWORD_DO;break;
-               case 1:token->value.keyword = KEYWORD_ELSE;break;
-               case 2:token->value.keyword = KEYWORD_END;break;
-               case 3:token->value.keyword = KEYWORD_FUNCTION;break;
-               case 4:token->value.keyword = KEYWORD_GLOBAL;break;
-               case 5:token->value.keyword = KEYWORD_IF;break;
-               case 6:token->value.keyword = KEYWORD_INTEGER;break;
-               case 7:token->value.keyword = KEYWORD_LOCAL;break;
-               case 8:token->value.keyword = KEYWORD_NIL;break;
-               case 9:token->value.keyword = KEYWORD_NUMBER;break;
-               case 10:token->value.keyword = KEYWORD_REQUIRE;break;
-               case 11:token->value.keyword = KEYWORD_RETURN;break;
-               case 12:token->value.keyword = KEYWORD_STRING;break;
-               case 13:token->value.keyword = KEYWORD_THEN;break;
-               case 14:token->value.keyword = KEYWORD_WHILE;break;
-                default: break;
-           }
-           token->type = KEYWORD;
-           return free_dynamic_string(dynamic_string, ERROR_OK);
-        }
-        else token->type = ID;
-
+int identifier_check(Dyn_string *dynamic_string, Token *token){   
+    if (strcmp(dynamic_string->string, "do")) token->value.keyword=KEYWORD_DO;
+    else if (strcmp(dynamic_string->string, "else")) token->value.keyword=KEYWORD_ELSE;
+    else if (strcmp(dynamic_string->string, "end")) token->value.keyword=KEYWORD_END;
+    else if (strcmp(dynamic_string->string, "function")) token->value.keyword=KEYWORD_FUNCTION;
+    else if (strcmp(dynamic_string->string, "global")) token->value.keyword=KEYWORD_GLOBAL;
+    else if (strcmp(dynamic_string->string, "if")) token->value.keyword=KEYWORD_IF;
+    else if (strcmp(dynamic_string->string, "integer")) token->value.keyword=KEYWORD_INTEGER;
+    else if (strcmp(dynamic_string->string, "local")) token->value.keyword=KEYWORD_LOCAL;
+    else if (strcmp(dynamic_string->string, "nil")) token->value.keyword=KEYWORD_NIL;
+    else if (strcmp(dynamic_string->string, "number")) token->value.keyword=KEYWORD_NUMBER;
+    else if (strcmp(dynamic_string->string, "require")) token->value.keyword=KEYWORD_REQUIRE;
+    else if (strcmp(dynamic_string->string, "return")) token->value.keyword=KEYWORD_RETURN;
+    else if (strcmp(dynamic_string->string, "string")) token->value.keyword=KEYWORD_STRING;
+    else if (strcmp(dynamic_string->string, "then")) token->value.keyword=KEYWORD_THEN;
+    else if (strcmp(dynamic_string->string, "while")) token->value.keyword=KEYWORD_WHILE;
+    else{
+        token->type = ID;
     }
 
-        if (!dyn_string_copy(dynamic_string, token->value.string))
-	    {
-		    return free_dynamic_string(dynamic_string,ERROR_INTERN);
-	    }
-
-    return free_dynamic_string(dynamic_string,ERROR_OK);
+    if (!dyn_string_copy(dynamic_string, token->value.string)){
+		return free_dynamic_string(dynamic_string,ERROR_INTERN);
+	}
+    if (token->type!=ID) token->type = KEYWORD;
+    return free_dynamic_string(dynamic_string, ERROR_OK);
 }
 
 

@@ -48,9 +48,9 @@ typedef enum
 /**
  * @brief Array of keywords to compare with found word
  */
-const char* keywords_array[] = { "do", "else", "end", "function", "global", "if", "integer","local",
+/* const char* keywords_array[] = { "do", "else", "end", "function", "global", "if", "integer","local",
                                  "nil", "number", "require", "return", "string", "then", "while" };
-
+ */
 
 /**
  * @enum Token_types
