@@ -17,10 +17,12 @@
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
+#include <errno.h>
+#include <ctype.h>
 
 Dyn_string s;
 Dyn_string z;
-Token token;
+Token token ;
 FILE *file;
 
 
@@ -32,7 +34,7 @@ int main(){
 
 
 
-assert(dyn_string_init(&s)==true);
+assert(dyn_string_init(&s)==0);
 
     dyn_string_clear(&s);
 
@@ -59,22 +61,28 @@ assert(dyn_string_compare(&s, "iahoj")==0);
     fprintf(stdout,"-----------------------------------------------\n");
     fprintf(stdout,"------------ Lexical analysis tests -----------\n");
 
-file = fopen("../IFJ21_codes", "r");
-get_token(&token);
-assert(token.line==1);
+
+// The important thing to remember in relative paths is that it is relative to the current working directory when the (f*cking) EXECUTABLE is run.
+file = fopen("IFJ21_codes/first_test.ifj21","r");
+set_source(file);
+
+get_token(&token); 
+assert(token.line==0);
 assert(token.start==0);
-assert(token.end==4);
-assert(token.lenght==5);
-assert(token.type==KEYWORD);
-assert(token.value.keyword==KEYWORD_LOCAL);
+assert(token.end==0);
+assert(token.lenght==1);
+assert(token.type==PLUS);
+
 
 get_token(&token);
-assert(token.line==1);
-assert(token.start==6);
-assert(token.end==6);
-assert(token.lenght==1);
-assert(token.type==ID);
-//assert(strcmp((token.value.string),"x")==0);
+assert(token.line==0);
+assert(token.start==0);
+assert(token.end==0);
+assert(token.lenght==8);                        //don't question the elevated one
+assert(token.type==KEYWORD);
+assert((token.value.keyword=KEYWORD_RETURN));
+
+/*//assert(strcmp((token.value.string),"x")==0);
 
 get_token(&token);
 assert(token.line==1);
@@ -101,7 +109,7 @@ assert(token.type==EOL);
 get_token(&token);
 assert(token.type==STATE_EOF);
 //?assert(token.type==ERROR);
-
+*/
 
 
     fprintf(stdout,"                     PASSED                    \n"); 
