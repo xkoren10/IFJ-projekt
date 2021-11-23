@@ -17,10 +17,12 @@
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
+#include <errno.h>
+#include <ctype.h>
 
 Dyn_string s;
 Dyn_string z;
-Token token;
+Token token ;
 FILE *file;
 unsigned token_cnt = 1; // token counter just because
 
@@ -33,7 +35,7 @@ int main(){
 
 
 
-assert(dyn_string_init(&s)==true);
+assert(dyn_string_init(&s)==0);
 
     dyn_string_clear(&s);
 
@@ -60,37 +62,28 @@ assert(dyn_string_compare(&s, "iahoj")==0);
     fprintf(stdout,"-----------------------------------------------\n");
     fprintf(stdout,"------------ Lexical analysis tests -----------\n");
 
-file = fopen("../IFJ21_codes/test_sc1.ifj21", "r");
-get_token(&token);
-fprintf(stdout, "got token n. %d", token_cnt); token_cnt++;
-assert(token.line==1);
-fprintf(stdout, "line check ok");
+
+// The important thing to remember in relative paths is that it is relative to the current working directory when the (f*cking) EXECUTABLE is run.
+file = fopen("IFJ21_codes/first_test.ifj21","r");
+set_source(file);
+
+get_token(&token); 
+assert(token.line==0);
 assert(token.start==0);
-fprintf(stdout, "start check ok");
-assert(token.end==4);
-fprintf(stdout, "end check ok");
-assert(token.lenght==5);
-fprintf(stdout, "lenght check ok");
-assert(token.type==KEYWORD);
-fprintf(stdout, "type check ok");
-assert(token.value.keyword==KEYWORD_LOCAL);
-fprintf(stdout, "keyword check ok");
-fprintf(stdout, "token n. %d ok", --token_cnt);
+assert(token.end==0);
+assert(token.lenght==1);
+assert(token.type==PLUS);
+
 
 get_token(&token);
-fprintf(stdout, "got token n. %d", token_cnt); token_cnt++;
-assert(token.line==1);
-fprintf(stdout, "line check ok");
-assert(token.start==6);
-fprintf(stdout, "start check ok");
-assert(token.end==6);
-fprintf(stdout, "end check ok");
-assert(token.lenght==1);
-fprintf(stdout, "lenght check ok");
-assert(token.type==ID);
-fprintf(stdout, "type check ok");
-//assert(strcmp((token.value.string),"x")==0);
-fprintf(stdout, "token n. %d ok", --token_cnt);
+assert(token.line==0);
+assert(token.start==0);
+assert(token.end==0);
+assert(token.lenght==8);                        //don't question the elevated one
+assert(token.type==KEYWORD);
+assert((token.value.keyword=KEYWORD_RETURN));
+
+/*//assert(strcmp((token.value.string),"x")==0);
 
 get_token(&token);
 fprintf(stdout, "got token n. %d", token_cnt); token_cnt++;
@@ -129,8 +122,7 @@ fprintf(stdout, "got token n. %d", token_cnt);
 assert(token.type==STATE_EOF);
 fprintf(stdout, "token n. %d ok", token_cnt); token_cnt++;
 //?assert(token.type==ERROR);
-fclose(file);
-
+*/
 
 
     fprintf(stdout,"                     PASSED                    \n"); 

@@ -33,7 +33,7 @@ typedef struct
  * @brief Initialization of memory for dynamic string
  * @return True if success, else false
  */
-bool dyn_string_init(Dyn_string *s);
+int dyn_string_init(Dyn_string *s);
 
 /**
  * @param s Pointer to dynamic string
