@@ -1,7 +1,7 @@
 /**
 * Project - Compiler for IFJ21
 * 
-* @brief Scanner for IFJ21 - Lexical analysis
+* @brief Tests for scanner for IFJ21 - Lexical analysis
 * 
 * @author Matej Koreň <xkoren10
 * @author Matej Hložek <xhloze02>
@@ -151,6 +151,57 @@ assert(token.type==STRING);
 assert(dyn_string_compare(token.value.string, "TESTING"));
 fclose(file);
 
+//hello.ifj21
+file = fopen("IFJ21_codes/hello.ifj21", "r");
+set_source(file);
+
+get_token(&token);
+assert(token.type==KEYWORD); // require "ifj21"
+assert(token.value.keyword==KEYWORD_REQUIRE);
+get_token(&token); // function
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_FUNCTION);
+get_token(&token); // main
+assert(token.type==ID);
+get_token(&token); // ( 
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token); // )
+assert(token.type==RIGHT_PARENTHESIS);
+get_token(&token); // local
+assert(token.type==KEYWORD);
+get_token(&token); // str
+assert(token.type==ID);
+get_token(&token); // :
+assert(token.type==COLON);
+get_token(&token); // string
+assert(token.type==KEYWORD);
+get_token(&token); // =
+assert(token.type==EQUALS);
+get_token(&token); // "Hello World"
+assert(token.type==STRING);
+get_token(&token); // write
+assert(token.type==KEYWORD);
+get_token(&token); // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token); // str
+assert(token.type==ID);
+get_token(&token); // )
+assert(token.type==RIGHT_PARENTHESIS); 
+get_token(&token); // line comment
+assert(token.type==KEYWORD);
+get_token(&token); // write
+assert(token.type==KEYWORD);
+get_token(&token); // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token); // "Hello world"
+assert(token.type==STRING);
+get_token(&token); // )
+assert(token.type==RIGHT_PARENTHESIS);
+get_token(&token); // end
+assert(token.type==KEYWORD);
+
+
+fclose(file);
     fprintf(stdout,"                     PASSED                    \n"); 
     fprintf(stdout,"-----------------------------------------------\n");
 

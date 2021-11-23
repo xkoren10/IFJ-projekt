@@ -1,7 +1,10 @@
 -- Nejake zakladne operacie +-*/ 
 require "ifj21"
 
-local x: integer = 5
+
+global x: integer = 5
+
+function main()     
 local y : integer
 local z: integer=0
 
@@ -9,3 +12,9 @@ y = x+z
 x= x * x+5
 z = x - y + 0--ta sranda koment ci?
 y = x/y *1
+
+
+
+
+
+end
