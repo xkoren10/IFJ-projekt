@@ -24,8 +24,6 @@ Dyn_string s;
 Dyn_string z;
 Token token ;
 FILE *file;
-unsigned token_cnt = 1; // token counter just because
-
 
 int main(){
 
@@ -64,6 +62,8 @@ assert(dyn_string_compare(&s, "iahoj")==0);
 
 
 // The important thing to remember in relative paths is that it is relative to the current working directory when the (f*cking) EXECUTABLE is run.
+
+// file = "+ return"
 file = fopen("IFJ21_codes/first_test.ifj21","r");
 set_source(file);
 
@@ -82,47 +82,54 @@ assert(token.end==0);
 assert(token.lenght==8);                        //don't question the elevated one
 assert(token.type==KEYWORD);
 assert((token.value.keyword=KEYWORD_RETURN));
+fclose(file);
 
-/*//assert(strcmp((token.value.string),"x")==0);
+// file = "local x: number = 0.5"
+file = fopen("IFJ21_codes/second_test.ifj21");
+set_source(file);
 
 get_token(&token);
-fprintf(stdout, "got token n. %d", token_cnt); token_cnt++;
+assert(token.line==1);
+assert(token.start==0);
+assert(token.end==4);
+assert(token.lenght==5);
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_LOCAL);
+
+get_token(&token);
+assert(token.line==1);
+assert(token.start==6);
+assert(token.end==6);
+assert(token.lenght==1);
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "x")==0);
+
+get_token(&token);
 assert(token.line==1);
 assert(token.start==7);
 assert(token.end==7);
 assert(token.lenght==1);
 assert(token.type==COLON);
-fprintf(stdout, "token n. %d ok", --token_cnt);
 
 get_token(&token);
-fprintf(stdout, "got token n. %d", token_cnt); token_cnt++;
 assert(token.line==1);
 assert(token.start==9);
 assert(token.end==14);
 assert(token.lenght==6);
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_NUMBER);
-fprintf(stdout, "token n. %d ok", --token_cnt);
 
 get_token(&token);
-fprintf(stdout, "got token n. %d", token_cnt); 
 assert(token.type==ASSIGN);
-fprintf(stdout, "token n. %d ok", token_cnt); token_cnt++;
 get_token(&token);
-fprintf(stdout, "got token n. %d", token_cnt);
 assert(token.type==NUMBER);
 assert(token.value.decimal_value==0.5);
-fprintf(stdout, "token n. %d ok", token_cnt);token_cnt++;
 get_token(&token);
-fprintf(stdout, "got token n. %d", token_cnt);
 assert(token.type==EOL);
-fprintf(stdout, "token n. %d ok", token_cnt); token_cnt++;
 get_token(&token);
-fprintf(stdout, "got token n. %d", token_cnt);
 assert(token.type==STATE_EOF);
-fprintf(stdout, "token n. %d ok", token_cnt); token_cnt++;
 //?assert(token.type==ERROR);
-*/
+
 
 
     fprintf(stdout,"                     PASSED                    \n"); 
