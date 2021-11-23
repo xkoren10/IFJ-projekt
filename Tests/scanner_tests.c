@@ -74,7 +74,6 @@ assert(token.end==0);
 assert(token.lenght==1);
 assert(token.type==PLUS);
 
-
 get_token(&token);
 assert(token.line==0);
 assert(token.start==0);
@@ -85,7 +84,7 @@ assert((token.value.keyword=KEYWORD_RETURN));
 fclose(file);
 
 // file = "local x: number = 0.5"
-file = fopen("IFJ21_codes/second_test.ifj21");
+file = fopen("IFJ21_codes/second_test.ifj21", "r");
 set_source(file);
 
 get_token(&token);
@@ -128,9 +127,29 @@ get_token(&token);
 assert(token.type==EOL);
 get_token(&token);
 assert(token.type==STATE_EOF);
-//?assert(token.type==ERROR);
 
+fclose(file);
 
+//file = "global z: chyba = "TESTING""
+file = fopen("IFJ21_codes/third_test.ifj21", "r");
+set_source(file);
+
+get_token(&token);
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_GLOBAL);
+get_token(&token);
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "x"));
+get_token(&token);
+assert(token.type==COLON);
+get_token(&token);
+assert(token.type==ERROR);
+get_token(&token);
+assert(token.type==EQUALS);
+get_token(&token);
+assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string, "TESTING"));
+fclose(file);
 
     fprintf(stdout,"                     PASSED                    \n"); 
     fprintf(stdout,"-----------------------------------------------\n");
