@@ -1,11 +1,39 @@
 #ifndef _PARSER_H
 #define _PARSER_H
 
-#include <error.h>
+#include "error_codes.h"
+#include "dyn_string.h"
+#include "stack.h"
+#include "symtable.h"
+#include "scanner.h"
+#include <stdbool.h>
 
-typedef enum{
-    
-}keywords;
+//current token
+Token actToken;
+//next token
+Token nextToken;
+ //TODO
+tStack stack;
+//EOL
+bool scanner_EOL;
+
+string Function_name;
+
+int Param_counter;
+
+int label_counter;
+
+ht_table_t global;
+
+ht_table_t local;
+
+
+
+
+
+
+
+
 
 int parse();
 
