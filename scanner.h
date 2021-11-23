@@ -78,7 +78,9 @@ typedef enum
     KEYWORD,
 
     INT,
+    DECIMAL_NUMBER,
     NUMBER,
+    DECIMAL_POINT,
     INDEX_CHAR,                     //  'E' or 'e'
     EXPONENT,
     EXPONENT_SIGN,                  //  + or -                           

@@ -1,4 +1,4 @@
-CFLAGS=-std=gnu99 -Wall -Wextra -Werror
+CFLAGS=-std=gnu99 -Wall -Wextra 
 CC=gcc
 
 
