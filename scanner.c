@@ -98,7 +98,8 @@ int get_token(Token *token)
 
     token->value.string = source_string;
     token->type = state;
-    token->line = token->start = token->end = token->lenght = 0;
+    token->start = token->end = token->lenght = 0;
+    token->line = 1;
 
     Dyn_string tmpstring;
     Dyn_string *string = &tmpstring;

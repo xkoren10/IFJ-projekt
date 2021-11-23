@@ -22,7 +22,7 @@
 
 Dyn_string s;
 Dyn_string z;
-Token token ;
+Token token;
 FILE *file;
 
 int main(){
@@ -68,17 +68,17 @@ file = fopen("IFJ21_codes/first_test.ifj21","r");
 set_source(file);
 
 get_token(&token); 
-assert(token.line==0);
+assert(token.line==1);
 assert(token.start==0);
 assert(token.end==0);
 assert(token.lenght==1);
 assert(token.type==PLUS);
 
 get_token(&token);
-assert(token.line==0);
+assert(token.line==1);
 assert(token.start==0);
 assert(token.end==0);
-assert(token.lenght==8);                        //don't question the elevated one
+assert(token.lenght==8);                        //I will question the elevated one
 assert(token.type==KEYWORD);
 assert((token.value.keyword=KEYWORD_RETURN));
 fclose(file);
@@ -89,32 +89,32 @@ set_source(file);
 
 get_token(&token);
 assert(token.line==1);
-assert(token.start==0);
+/* assert(token.start==0);
 assert(token.end==4);
-assert(token.lenght==5);
+assert(token.lenght==5); */
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_LOCAL);
 
 get_token(&token);
 assert(token.line==1);
-assert(token.start==6);
+/* assert(token.start==6);
 assert(token.end==6);
-assert(token.lenght==1);
+assert(token.lenght==1); */
 assert(token.type==ID);
 assert(dyn_string_compare(token.value.string, "x")==0);
 
 get_token(&token);
 assert(token.line==1);
-assert(token.start==7);
+/* assert(token.start==7);
 assert(token.end==7);
-assert(token.lenght==1);
+assert(token.lenght==1); */
 assert(token.type==COLON);
 
 get_token(&token);
 assert(token.line==1);
-assert(token.start==9);
+/* assert(token.start==9);
 assert(token.end==14);
-assert(token.lenght==6);
+assert(token.lenght==6); */
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_NUMBER);
 
@@ -156,11 +156,16 @@ file = fopen("IFJ21_codes/hello.ifj21", "r");
 set_source(file);
 
 get_token(&token);
+assert(token.type==LINE_COMMENTARY);
+assert(token.line==1);
+get_token(&token);
 assert(token.type==KEYWORD); // require "ifj21"
 assert(token.value.keyword==KEYWORD_REQUIRE);
+assert(token.line==2);
 get_token(&token); // function
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_FUNCTION);
+assert(token.line==4);
 get_token(&token); // main
 assert(token.type==ID);
 get_token(&token); // ( 
@@ -181,6 +186,7 @@ get_token(&token); // "Hello World"
 assert(token.type==STRING);
 get_token(&token); // write
 assert(token.type==KEYWORD);
+assert(token.line==6);
 get_token(&token); // (
 assert(token.type==LEFT_PARENTHESIS);
 get_token(&token); // str
@@ -199,6 +205,7 @@ get_token(&token); // )
 assert(token.type==RIGHT_PARENTHESIS);
 get_token(&token); // end
 assert(token.type==KEYWORD);
+assert(token.line==9);
 
 
 fclose(file);
