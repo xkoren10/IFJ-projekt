@@ -120,7 +120,7 @@ get_token(&token);
 assert(token.type==ASSIGN);
 get_token(&token);
 assert(token.type==DECIMAL_NUMBER);
-assert(token.value.decimal_value==0.5);
+assert(token.value.decimal_value==0.5e4);
 get_token(&token);
 assert(token.type==STATE_EOF);
 

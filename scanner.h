@@ -83,7 +83,9 @@ typedef enum
     DECIMAL_POINT,
     INDEX_CHAR,                     //  'E' or 'e'
     EXPONENT,
+    EXPONENT_NUMBER,  
     EXPONENT_SIGN,                  //  + or -                           
+
 
     NIL,
 

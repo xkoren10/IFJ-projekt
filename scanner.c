@@ -474,10 +474,45 @@ int get_token(Token *token)
                 return process_float(string, token);
             }
 
-
-
-
         break;
+        //---------------------------------------------------------------//
+        case (INDEX_CHAR):
+                if(isdigit(next_char)) {
+                    if (!dyn_string_add_char(string, next_char)) {
+                        return free_memory(ERROR_INTERN, string);
+                    }
+                    state = EXPONENT_NUMBER;
+                } else if (next_char == '+' || next_char == '-') {
+                    if (!dyn_string_add_char(string, next_char)) {
+                        return free_memory(ERROR_INTERN, string);
+                    }
+                    state = EXPONENT_SIGN;
+                }
+        break;
+        //---------------------------------------------------------------//
+
+        case (EXPONENT_SIGN):
+          if(isdigit(next_char)) {
+                    if (!dyn_string_add_char(string, next_char)) {
+                        return free_memory(ERROR_INTERN, string);
+                    }
+                    state = EXPONENT_NUMBER;
+                } else {
+                    return free_memory(ERROR_LEXICAL_ANALISYS, string);
+                }
+                break;
+        //---------------------------------------------------------------//
+        case (EXPONENT_NUMBER):
+
+            if(isdigit(next_char)) {
+                    if (!dyn_string_add_char(string, next_char)) {
+                        return free_memory(ERROR_INTERN, string);
+                    }
+                    state = EXPONENT_NUMBER;
+                } else {
+                    return process_float(string, token);
+                }
+            break;
         }
     }
 }
