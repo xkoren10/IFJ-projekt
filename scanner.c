@@ -200,6 +200,7 @@ int get_token(Token *token)
             if (isspace(next_char))
             {
                 state = START;
+                token->lenght--;
                 if (next_char != '\n' && next_char != EOF)
                     break;
             }
@@ -317,6 +318,8 @@ int get_token(Token *token)
             }
             else
             {
+                ungetc(next_char, source_file); // maybe?
+                token->lenght--;
                 return identifier_check(string, token);
             }
 
