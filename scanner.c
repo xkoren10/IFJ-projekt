@@ -221,11 +221,10 @@ int get_token(Token *token)
                 }
                 state = NUMBER;
             }
-            else if (next_char == '-')
+/*             else if (next_char == '-')
             {
-                state = LINE_COMMENTARY; //can be -something
-            }
-
+                state = LINE_COMMENTARY; //can be -something                        // ????????????????????????
+            } */
             else if (next_char == '+')
             {
                 token->type = PLUS;
@@ -235,8 +234,13 @@ int get_token(Token *token)
             else if (next_char == '-')
             {
                 token->type = MINUS;
-
-                return free_memory(ERROR_OK, string);
+                next_char = getc(source_file);
+                if (next_char == '-') state = LINE_COMMENTARY;
+                else{
+                    ungetc(next_char, source_file);
+                    return free_memory(ERROR_OK, string);
+                }
+                
             }
             else if (next_char == '*')
             {
