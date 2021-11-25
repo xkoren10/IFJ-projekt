@@ -1,4 +1,5 @@
---  Hello World print
+local
+--Hello World print
 require "ifj21"
 
 function main()

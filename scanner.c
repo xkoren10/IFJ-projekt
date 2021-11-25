@@ -266,7 +266,7 @@ int get_token(Token *token)
             }
             else if (next_char == '\n')
             {
-                token->type = EOL;
+                token->type = EOL;                              // returns as a string in case(STRING):
                 token->line++;
 
                 return free_memory(ERROR_OK, string);
@@ -407,7 +407,7 @@ int get_token(Token *token)
 
                     return free_memory(ERROR_LEXICAL_ANALISYS, string);
                 }
-                state = NUMBER;
+               
             }
             else if (next_char == '.')
             {
@@ -514,7 +514,7 @@ int get_token(Token *token)
                     if (!dyn_string_add_char(string, next_char)) {
                         return free_memory(ERROR_INTERN, string);
                     }
-                    state = EXPONENT_NUMBER;
+                   
                 } else {
                     return process_float(string, token);
                 }
@@ -523,7 +523,7 @@ int get_token(Token *token)
         //---------------------------------------------------------------//
         case (LINE_COMMENTARY):
 
-            if (next_char == '\n' || next_char == EOF) return free_memory(ERROR_OK, string);    // check line counter
+            if (next_char == '\n' || next_char == EOF) state=START;   // check line counter
             break;
 
         case (STRING):

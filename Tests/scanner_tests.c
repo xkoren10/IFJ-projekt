@@ -139,22 +139,27 @@ get_token(&token);
 assert(token.type==STRING);
 //assert(dyn_string_compare(token.value.string, "TESTING")==0);
 fclose(file);
-/*
+
 //hello.ifj21
 file = fopen("IFJ21_codes/hello.ifj21", "r");
 set_source(file);
 
 get_token(&token);
-assert(token.type==LINE_COMMENTARY);
 assert(token.line==1);
+assert(token.lenght==5);
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_LOCAL);
+ // line comment
 get_token(&token);
 assert(token.type==KEYWORD); // require "ifj21"
 assert(token.value.keyword==KEYWORD_REQUIRE);
-assert(token.line==2);
-get_token(&token); // function
+assert(token.line==1);
+get_token(&token); //eol
+assert(token.type==STRING);
+get_token(&token);// function
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_FUNCTION);
-assert(token.line==4);
+assert(token.line==1);
 get_token(&token); // main
 assert(token.type==ID);
 get_token(&token); // ( 
@@ -170,22 +175,21 @@ assert(token.type==COLON);
 get_token(&token); // string
 assert(token.type==KEYWORD);
 get_token(&token); // =
-assert(token.type==EQUALS);
+assert(token.type==ASSIGN);
 get_token(&token); // "Hello World"
 assert(token.type==STRING);
 get_token(&token); // write
-assert(token.type==KEYWORD);
-assert(token.line==6);
+assert(token.type==ID);                         // supposed to be built-in function
+assert(token.line==1);
 get_token(&token); // (
 assert(token.type==LEFT_PARENTHESIS);
 get_token(&token); // str
 assert(token.type==ID);
 get_token(&token); // )
 assert(token.type==RIGHT_PARENTHESIS); 
-get_token(&token); // line comment
-assert(token.type==KEYWORD);
+// line comment
 get_token(&token); // write
-assert(token.type==KEYWORD);
+assert(token.type==ID);
 get_token(&token); // (
 assert(token.type==LEFT_PARENTHESIS);
 get_token(&token); // "Hello world"
@@ -194,10 +198,10 @@ get_token(&token); // )
 assert(token.type==RIGHT_PARENTHESIS);
 get_token(&token); // end
 assert(token.type==KEYWORD);
-assert(token.line==9);
+assert(token.line==1);
 
 
-fclose(file);*/
+fclose(file);
     fprintf(stdout,"\x1B[32m""                     PASSED                    \n""\x1B[0m"); 
     fprintf(stdout,"-----------------------------------------------\n");
 
