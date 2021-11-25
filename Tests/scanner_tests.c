@@ -69,15 +69,11 @@ set_source(file);
 
 get_token(&token); 
 assert(token.line==1);
-
-
 assert(token.lenght==1);
 assert(token.type==PLUS);
 
 get_token(&token);
 assert(token.line==1);
-
-
 assert(token.lenght==6);                        //I will question the elevated one
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_RETURN);
@@ -151,10 +147,10 @@ assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_LOCAL);
  // line comment
 get_token(&token);
-assert(token.type==KEYWORD); // require "ifj21"
+assert(token.type==KEYWORD); // require 
 assert(token.value.keyword==KEYWORD_REQUIRE);
 assert(token.line==1);
-get_token(&token); //eol
+get_token(&token); // "ifj21"
 assert(token.type==STRING);
 get_token(&token);// function
 assert(token.type==KEYWORD);
@@ -199,9 +195,64 @@ assert(token.type==RIGHT_PARENTHESIS);
 get_token(&token); // end
 assert(token.type==KEYWORD);
 assert(token.line==1);
-
-
 fclose(file);
+
+
+// fourth_test.ifj21
+file = fopen("IFJ21_codes/fourth_test.ifj21", "r");
+set_source(file);
+
+get_token(&token); //require
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_REQUIRE);
+get_token(&token);  //"ifj21"
+assert(token.type==STRING);
+get_token(&token);  //local
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_LOCAL);
+get_token(&token);  // z
+assert(token.type==ID);
+get_token(&token);  //:
+assert(token.type==COLON);
+get_token(&token);  //string
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_STRING);
+get_token(&token);  //=
+assert(token.type==ASSIGN);
+get_token(&token);  //"test"
+assert(token.type==STRING);
+// /n
+// block comment
+get_token(&token); //function
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_FUNCTION);
+get_token(&token); //fun
+assert(token.type==ID);
+get_token(&token);  //(
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  //x1
+assert(token.type==ID);
+get_token(&token);  //:
+assert(token.type==COLON);
+get_token(&token);  //string
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_STRING);
+get_token(&token);  //)
+assert(token.type==RIGHT_PARENTHESIS);
+get_token(&token);  //write
+assert(token.type==ID);
+get_token(&token);  //(
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  //x1
+assert(token.type==ID);
+get_token(&token);  //)
+assert(token.type==RIGHT_PARENTHESIS);
+get_token(&token);  //end
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_END);
+fclose(file);                               // end of file ? no token type?
+
+    // why the fuck is token.line always set to 1???
     fprintf(stdout,"\x1B[32m""                     PASSED                    \n""\x1B[0m"); 
     fprintf(stdout,"-----------------------------------------------\n");
 

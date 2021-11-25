@@ -119,7 +119,7 @@ int identifier_check(Dyn_string *dynamic_string, Token *token)
         (*token).value.keyword = KEYWORD_NUMBER;
     }
     else if (strcmp(dynamic_string->string, "require") == 0)
-    {
+    {   
         (*token).type = KEYWORD;
         (*token).value.keyword = KEYWORD_REQUIRE;
     }
@@ -168,7 +168,7 @@ int get_token(Token *token)
     token->line = 1;
 
     Dyn_string tmpstring;
-    Dyn_string *string = &tmpstring;
+    Dyn_string *string = &tmpstring;                // question
 
     char next_char;
 
@@ -181,9 +181,8 @@ int get_token(Token *token)
 
     while (true)
     {
-        token->lenght++;
         next_char = getc(source_file);
-
+        fprintf(stdout, "%c", next_char);
 //------------------------------------------------
         // fprintf(stdout, "\n--Kontrola---\n");
         // putc(next_char, stdout);
@@ -197,18 +196,18 @@ int get_token(Token *token)
 
         case (START):
 
-            if (isspace(next_char))
+            if (isspace(next_char) || next_char == '\n' || next_char == '\t')
             {
                 state = START;
-                token->lenght--;
                 if (next_char != '\n' && next_char != EOF) break;
             }
             else if ((isalpha(next_char) || next_char == '_') && next_char != EOF)
             {
-                if (!dyn_string_add_char(string, (char)tolower(next_char)))
+                /* if (!dyn_string_add_char(string, (char)tolower(next_char)))
                 {
                     return free_memory(ERROR_INTERN, string);
-                }
+                } */
+                ungetc(next_char, source_file);     // lebo sak si zoberie hned pri starte jedno pismeno tak samozrejme ze nebude nic spravne na zaciatku
                 state = ID_or_KEYWORD;
             }
             else if (isdigit(next_char))
@@ -226,13 +225,28 @@ int get_token(Token *token)
             else if (next_char == '+')
             {
                 token->type = PLUS;
-
+                token->lenght++;
                 return free_memory(ERROR_OK, string);
             }
             else if (next_char == '-')
-            {
+            {   // maybe check for EOF a bit more?
+                token->lenght++;
                 next_char = getc(source_file);
-                if (next_char == '-') state = LINE_COMMENTARY;
+                if (next_char == '-') 
+                {
+                    state = LINE_COMMENTARY;
+                    next_char = getc(source_file);
+                    if (next_char == '[' && next_char != EOF)
+                    {
+                        next_char = getc(source_file);
+                        if (next_char == '[' && next_char != EOF)
+                        {
+                            state = BLOCK_COMMENTARY_START;
+                        }
+                        else state = LINE_COMMENTARY;
+                    }
+                    else state = LINE_COMMENTARY;
+                }
                 else{
                     ungetc(next_char, source_file);
                     token->type = MINUS;
@@ -243,17 +257,19 @@ int get_token(Token *token)
             else if (next_char == '*')
             {
                 token->type = MULTIPLY;
-
+                token->lenght++;
                 return free_memory(ERROR_OK, string);
             }
             else if (next_char == '(')
             {
+                token->lenght++;
                 token->type = LEFT_PARENTHESIS;
 
                 return free_memory(ERROR_OK, string);
             }
             else if (next_char == ')')
             {
+                token->lenght++;
                 token->type = RIGHT_PARENTHESIS;
 
                 return free_memory(ERROR_OK, string);
@@ -261,7 +277,7 @@ int get_token(Token *token)
             else if (next_char == ',')
             {
                 token->type = COMMA;
-
+                token->lenght++;
                 return free_memory(ERROR_OK, string);
             }
             else if (next_char == '\n')
@@ -280,21 +296,27 @@ int get_token(Token *token)
             else if (next_char == '/')
             {
                 token->type = DIVIDE;
-
+                token->lenght++;
                 return free_memory(ERROR_OK, string);
             }
             else if (next_char == '=')
             {
+                token->lenght++;
                 state = ASSIGN;
             }
             else if (next_char == '<')
+            {
+                token->lenght++;
                 state = LESS_THAN;
-
+            }
             else if (next_char == '>')
+            {
+                token->lenght++;
                 state = GREATER_THAN;
-
+            }
             else if (next_char == ':')
             {
+                token->lenght++;
                 token->type = COLON;
                 return free_memory(ERROR_OK, string);
             }
@@ -312,6 +334,7 @@ int get_token(Token *token)
         case (ID_or_KEYWORD):
             if (isalnum(next_char) || next_char == '_')
             {
+                token->lenght++;
                 if (!dyn_string_add_char(string, (char)tolower(next_char)))
                 {
                     (*token).type = ID;
@@ -322,7 +345,6 @@ int get_token(Token *token)
             else
             {
                 ungetc(next_char, source_file); // maybe?
-                token->lenght--;
                 return identifier_check(string, token);
             }
 
@@ -523,7 +545,18 @@ int get_token(Token *token)
         //---------------------------------------------------------------//
         case (LINE_COMMENTARY):
 
-            if (next_char == '\n' || next_char == EOF) state=START;   // check line counter
+            if (next_char == '\n' || next_char == EOF) state = START;   // check line counter
+            break;
+
+        case (BLOCK_COMMENTARY_START):
+            if (next_char == ']' || next_char == EOF)       // idk, seems like does nothing when EOF
+            {
+                next_char = getc(source_file);
+                if (next_char == ']' || next_char == EOF)
+                {
+                    state = START;
+                }
+            }
             break;
 
         case (STRING):
