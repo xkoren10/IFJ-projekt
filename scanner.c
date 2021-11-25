@@ -201,8 +201,7 @@ int get_token(Token *token)
             {
                 state = START;
                 token->lenght--;
-                if (next_char != '\n' && next_char != EOF)
-                    break;
+                if (next_char != '\n' && next_char != EOF) break;
             }
             else if ((isalpha(next_char) || next_char == '_') && next_char != EOF)
             {
@@ -212,7 +211,6 @@ int get_token(Token *token)
                 }
                 state = ID_or_KEYWORD;
             }
-
             else if (isdigit(next_char))
             {
                 if (!dyn_string_add_char(string, next_char))
@@ -233,11 +231,11 @@ int get_token(Token *token)
             }
             else if (next_char == '-')
             {
-                token->type = MINUS;
                 next_char = getc(source_file);
                 if (next_char == '-') state = LINE_COMMENTARY;
                 else{
                     ungetc(next_char, source_file);
+                    token->type = MINUS;
                     return free_memory(ERROR_OK, string);
                 }
                 
@@ -285,7 +283,6 @@ int get_token(Token *token)
 
                 return free_memory(ERROR_OK, string);
             }
-
             else if (next_char == '=')
             {
                 state = ASSIGN;
@@ -299,10 +296,12 @@ int get_token(Token *token)
             else if (next_char == ':')
             {
                 token->type = COLON;
-
                 return free_memory(ERROR_OK, string);
             }
-
+            else if (next_char == '"')
+            {
+                state = STRING;
+            }
             else
             {
                 return free_memory(ERROR_INTERN, string);
@@ -520,6 +519,41 @@ int get_token(Token *token)
                     return process_float(string, token);
                 }
             break;
-        }
-    }
-}
+        
+        //---------------------------------------------------------------//
+        case (LINE_COMMENTARY):
+
+            if (next_char == '\n' || next_char == EOF) return free_memory(ERROR_OK, string);    // check line counter
+            break;
+
+        case (STRING):
+
+            if (isalnum(next_char) || isspace(next_char)){
+                if (!dyn_string_add_char(string, next_char)) {
+                    return free_memory(ERROR_INTERN, string);
+                }
+            }
+            else if (next_char == '\\'){
+                if (!dyn_string_add_char(string, next_char)) {
+                    return free_memory(ERROR_INTERN, string);
+                }
+                next_char = getc(source_file);
+                if (next_char == 'n' || next_char == 't' || next_char == '\\' || next_char == '\'' || next_char == '\"')
+                {
+                    if (!dyn_string_add_char(string, next_char)) {
+                        return free_memory(ERROR_INTERN, string);
+                    } 
+                }
+                // else error?
+            }
+            else if (next_char == '"'){
+                token->type = STRING;
+                token->value.string = dynamic_string;
+                return free_memory(ERROR_OK, string);
+            }
+            // else error?
+            break;
+
+        }//switch end
+    }//while end
+}//get_token end
