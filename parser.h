@@ -10,8 +10,10 @@
 
 //current token
 Token actToken;
-//next token
-Token nextToken;
+
+/* //next token ehm bud toto alebo nejaka funkcia
+Token nextToken; */
+
  //TODO
 tStack stack;
 //EOL
@@ -31,9 +33,9 @@ ht_table_t local;
 
 
 
+int Next_token();
 
-
-
+void Is_Eol();
 
 int parse();
 
