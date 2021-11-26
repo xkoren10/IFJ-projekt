@@ -110,6 +110,9 @@ int Deklaracie_or_Definicie(){
 }
 int Deklaracia_Funkcie(){
 
+    //vsade overit eof?
+    //ID, parametre nacitat do symtable a potom kontrolovat ci je/ neni vyskyt
+
     int output;
         output = get_token(&actToken);
         output = Is_EOL();
@@ -162,13 +165,28 @@ int Deklaracia_Funkcie(){
         }
 
         output = Typy();
+        return ERROR_OK;
 
 
     }
+}
     int Typy(){
-        
 
-        
+    }
+
+    int Definicia_Funckie(){
+        int output;
+        output = get_token(&actToken);
+        output = Is_EOL();
+
+        if()
+
+
+
+
+        //
+
+
 
 
     }
