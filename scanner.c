@@ -182,7 +182,7 @@ int get_token(Token *token)
     while (true)
     {
         next_char = getc(source_file);
-        fprintf(stdout, "%c", next_char);
+        //fprintf(stdout, "%c", next_char);
 //------------------------------------------------
         // fprintf(stdout, "\n--Kontrola---\n");
         // putc(next_char, stdout);
@@ -208,7 +208,8 @@ int get_token(Token *token)
                     return free_memory(ERROR_INTERN, string);
                 } */
                 ungetc(next_char, source_file);     // lebo sak si zoberie hned pri starte jedno pismeno tak samozrejme ze nebude nic spravne na zaciatku
-                state = ID_or_KEYWORD;
+                state = ID_or_KEYWORD;              // dalsia vec, preco sa toto nepouziva cisto ako starting rozcestnik, ale robia sa tu veci aj s dyn_stringom?
+                                                    // nebolo by lepsie s tym narabat az v jednotlivych states?
             }
             else if (isdigit(next_char))
             {
@@ -452,6 +453,7 @@ int get_token(Token *token)
             }
 
             else {
+                ungetc(next_char, source_file);
                 return process_integer(string, token);
             }
 

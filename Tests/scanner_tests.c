@@ -252,6 +252,97 @@ assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_END);
 fclose(file);                               // end of file ? no token type?
 
+// ifs and loops
+file = fopen("IFJ21_codes/ifs&loops.ifj21", "r");
+set_source(file);
+
+get_token(&token);  // require
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_REQUIRE);
+get_token(&token);  // "ifj21"
+assert(token.type==STRING);
+get_token(&token);  // function
+assert(token.type==KEYWORD);
+get_token(&token);  // main
+assert(token.type==ID);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+get_token(&token);  // local
+assert(token.type==KEYWORD);
+get_token(&token);  // x
+assert(token.type==ID);
+get_token(&token);  // :
+assert(token.type==COLON);
+get_token(&token);  // integer
+assert(token.type==KEYWORD);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token); // 5
+assert(token.type==INT);
+get_token(&token);  // while 
+assert(token.type==KEYWORD);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // x
+assert(token.type==ID);
+get_token(&token);  // <
+assert(token.type==LESS_THAN);
+get_token(&token);  // 10
+assert(token.type==INT);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+get_token(&token);  // do
+assert(token.type==KEYWORD);
+get_token(&token);  // x
+assert(token.type==ID);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // x
+assert(token.type==ID);
+get_token(&token);  // +
+assert(token.type==PLUS);
+get_token(&token);  // 1
+assert(token.type==INT);
+get_token(&token);  // end
+assert(token.type==KEYWORD);
+get_token(&token);  // if
+assert(token.type==KEYWORD);
+get_token(&token);  // x
+assert(token.type==ID);
+get_token(&token);  // >=
+assert(token.type==GREATER_or_EQUALS);
+get_token(&token);  // 5
+assert(token.type==INT);
+get_token(&token);  // then
+assert(token.type==KEYWORD);
+get_token(&token);  // x
+assert(token.type==ID);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // 50
+assert(token.type==INT);
+get_token(&token);  // else
+assert(token.type==KEYWORD);
+get_token(&token);  // x
+assert(token.type==ID);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // 0
+assert(token.type==INT);
+get_token(&token);  // end
+assert(token.type==KEYWORD);
+get_token(&token);  // end
+assert(token.type==KEYWORD);
+get_token(&token);  // main
+assert(token.type==ID);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+
+fclose(file);
     // why the fuck is token.line always set to 1???
     fprintf(stdout,"\x1B[32m""                     PASSED                    \n""\x1B[0m"); 
     fprintf(stdout,"-----------------------------------------------\n");
