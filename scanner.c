@@ -242,7 +242,7 @@ int get_token(Token *token)
                         next_char = getc(source_file);
                         if (next_char == '[' && next_char != EOF)
                         {
-                            state = BLOCK_COMMENTARY_START;
+                            state = BLOCK_COMMENTARY;
                         }
                         else state = LINE_COMMENTARY;
                     }
@@ -550,7 +550,7 @@ int get_token(Token *token)
             if (next_char == '\n' || next_char == EOF) state = START;   // check line counter
             break;
 
-        case (BLOCK_COMMENTARY_START):
+        case (BLOCK_COMMENTARY):
             if (next_char == ']' || next_char == EOF)       // idk, seems like does nothing when EOF
             {
                 next_char = getc(source_file);
