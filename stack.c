@@ -7,7 +7,7 @@
 * @file stack.c
 *
 **/
-
+#include "scanner.h"
 #include "stack.h"
 #include <stdbool.h>
 #include <stdlib.h>
@@ -17,7 +17,7 @@ void Stack_Init(TStack *stack)
     stack->top = NULL;
 }
 
-int Stack_Push(TStack *stack /*TODO data*/)
+int Stack_Push(TStack *stack, Token *token)
 {
     TStack_element *new = (TStack_element *)malloc(sizeof(TStack_element));
     if (new == NULL)
@@ -26,7 +26,7 @@ int Stack_Push(TStack *stack /*TODO data*/)
     }
     else
     {
-        //TODO data
+        new->data = token;
         new->next = stack->top;
         stack->top = new;
     }
@@ -44,9 +44,9 @@ void Stack_Pop(TStack *stack)
     }
 }
 
-void Stack_Top(TStack *stack /*TODO data*/)
+void Stack_Top(TStack *stack, Token *token)
 {
-    //TODO
+    token = stack->top->data;
 }
 
 bool Stack_IsEmpty(TStack *stack)

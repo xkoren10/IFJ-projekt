@@ -16,7 +16,7 @@
  */
 typedef struct s_elem
 {
-    //TODO data
+    Token *data;
     struct s_elem *next;
 } TStack_element;
 
@@ -41,7 +41,7 @@ void Stack_Init(TStack *stack);
  * @param stack Structure
  * @return 0 if malloc failed, 1 if success
  */
-int Stack_Push(TStack *stack /*TODO data*/);
+int Stack_Push(TStack *stack, Token *token);
 
 
 /**
@@ -54,7 +54,7 @@ void Stack_Pop(TStack *stack);
  * @brief Returns data from the top of the stack
  * @param stack Structure
  */
-void Stack_Top(TStack *stack /*TODO data*/);
+void Stack_Top(TStack *stack, Token *token);
 
 /**
  * @brief Checks if stack is empty
