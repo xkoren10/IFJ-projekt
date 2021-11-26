@@ -23,6 +23,7 @@ int Is_Eol(){
 
 int parse(){
 
+    Stack_Init(&syntaxStack);
     int output;
     output = get_token(&actToken);
     output = Is_EOL();
@@ -108,11 +109,69 @@ int Deklaracie_or_Definicie(){
     //rekurzivne     
 }
 int Deklaracia_Funkcie(){
-    //if neni global == return error nejaky 
 
-    //else ak dalsi neni return error
-    actToken.type=COLON
-    //else 
+    int output;
+        output = get_token(&actToken);
+        output = Is_EOL();
+
+
+
+
+
+    //TODO
+    if(/* !string  */){
+        return ERROR_SYNTAX_ANALYSIS;
+    }
+    else{
+        output = get_token(&actToken);
+        output = Is_EOL();
+        
+         if (actToken.type!=COLON)
+        {
+            return ERROR_SYNTAX_ANALYSIS;
+        }
+        
+        output = get_token(&actToken);
+        output = Is_EOL();
+        
+        
+        if(actToken.value.keyword!=KEYWORD_FUNCTION){
+            return ERROR_SYNTAX_ANALYSIS;
+        }
+        
+        output = get_token(&actToken);
+        output = Is_EOL();
+
+        if(actToken.type!=LEFT_PARENTHESIS){
+            return ERROR_SYNTAX_ANALYSIS;
+        }
+        output = Typy();
+
+        output = get_token(&actToken);
+        output = Is_EOL();
+
+        if(actToken.type!=RIGHT_PARENTHESIS){
+            return ERROR_SYNTAX_ANALYSIS;
+        }
+
+        output = get_token(&actToken);
+        output = Is_EOL();
+
+        if(actToken.type!=COLON){
+            return ERROR_SYNTAX_ANALYSIS;
+        }
+
+        output = Typy();
+
+
+    }
+    int Typy(){
+        
+
+        
+
+
+    }
     
 
 
