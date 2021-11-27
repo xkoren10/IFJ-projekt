@@ -93,8 +93,7 @@ typedef enum
     ESCAPE,
 
     LINE_COMMENTARY,                //  --
-    BLOCK_COMMENTARY_START,         //  --[[
-    BLOCK_COMMENTARY_END,           //  ]]
+    BLOCK_COMMENTARY,         //  --[[ ]]
 
     HASH,                           //  #
     DOUBLEDOT,                      // ..
