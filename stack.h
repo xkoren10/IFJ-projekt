@@ -7,8 +7,9 @@
 * @file stack.h
 *
 **/
-
+#include "scanner.h"
 #include <stdbool.h>
+#include <stdlib.h>
 
 /**
  * @struct TStack_element
@@ -16,7 +17,9 @@
  */
 typedef struct s_elem
 {
-    Token *data;
+    Token token;
+    bool handle;
+    bool terminal;
     struct s_elem *next;
 } TStack_element;
 
@@ -41,7 +44,7 @@ void Stack_Init(TStack *stack);
  * @param stack Structure
  * @return 0 if malloc failed, 1 if success
  */
-int Stack_Push(TStack *stack, Token *token);
+int Stack_Push(TStack *stack, Token token, bool handle,bool terminal);
 
 
 /**
@@ -54,7 +57,7 @@ void Stack_Pop(TStack *stack);
  * @brief Returns data from the top of the stack
  * @param stack Structure
  */
-void Stack_Top(TStack *stack, Token *token);
+void Stack_Top(TStack *stack, TStack_element *el);
 
 /**
  * @brief Checks if stack is empty
