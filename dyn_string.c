@@ -83,7 +83,7 @@ bool dyn_string_add_const_str(Dyn_string *s, const char *const_string)
 bool dyn_string_copy(Dyn_string *src, Dyn_string *dest)
 {
     unsigned int new_length = src->length;
-    if (new_length >= dest->size)
+    if (new_length >= (unsigned) dest->size)
     {
         if ((dest->string = (char *)realloc(dest->string, new_length + 1))==NULL)        // Successful reallocation
         {
@@ -98,7 +98,7 @@ bool dyn_string_copy(Dyn_string *src, Dyn_string *dest)
     return true;
 }
 
-int dyn_string_compare(Dyn_string *s, const char *const_string)
+int dyn_string_compare(Dyn_string s, const char *const_string)
 {
-    return strcmp(s->string, const_string);
+    return strcmp(s.string, const_string);
 }

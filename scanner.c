@@ -11,9 +11,10 @@
 
 #include "scanner.h"
 
-Dyn_string *dynamic_string; // Dynamic string that will be written into
+
+
+
 FILE *source_file;
-Dyn_string *source_string;
 bool decimal;
 
 /*
@@ -26,10 +27,7 @@ void set_source(FILE *f)
     source_file = f;
 }
 
-void set_string(Dyn_string *string)
-{
-    source_string = string;
-}
+
 
 int free_memory(int exit_code, Dyn_string *string)
 {
@@ -37,14 +35,15 @@ int free_memory(int exit_code, Dyn_string *string)
     return exit_code;
 }
 
- int process_integer(Dyn_string *dynamic_string, Token *token){
+int process_integer(Dyn_string *dynamic_string, Token *token)
+{
     char *ptr;
     int integer = (int)strtol(dynamic_string->string, &ptr, 10);
 
     if (*ptr)
-	{
-		return free_memory(ERROR_INTERN, dynamic_string);
-	}
+    {
+        return free_memory(ERROR_INTERN, dynamic_string);
+    }
 
     (*token).value.integer_value = integer;
     (*token).type = INT;
@@ -52,14 +51,15 @@ int free_memory(int exit_code, Dyn_string *string)
     return ERROR_OK;
 }
 
- int process_float(Dyn_string  *dynamic_string, Token *token){
+int process_float(Dyn_string *dynamic_string, Token *token)
+{
     char *ptr;
     double double_number = strtod(dynamic_string->string, &ptr);
 
     if (*ptr)
-	{
-		return free_memory(ERROR_INTERN, dynamic_string);
-	}
+    {
+        return free_memory(ERROR_INTERN, dynamic_string);
+    }
 
     (*token).value.decimal_value = double_number;
     (*token).type = DECIMAL_NUMBER;
@@ -147,6 +147,10 @@ int identifier_check(Dyn_string *dynamic_string, Token *token)
     else
     {
         (*token).type = ID;
+        if (dyn_string_copy(dynamic_string,&token->value.string))
+        {
+            return free_memory(ERROR_INTERN, dynamic_string);
+        }
     }
     return ERROR_OK;
 }
@@ -162,9 +166,8 @@ int get_token(Token *token)
 
     int state = START;
 
-    token->value.string = source_string;
+    //token->value.string = source_string;
     token->type = state;
-    token->start = token->end = token->lenght = 0;
     token->line = 1;
 
     Dyn_string tmpstring;
@@ -177,18 +180,16 @@ int get_token(Token *token)
         return ERROR_INTERN;
     }
 
-    token->value.string = dynamic_string;
-
     while (true)
     {
-        token->lenght++;
+        
         next_char = getc(source_file);
 
-//------------------------------------------------
+        //------------------------------------------------
         // fprintf(stdout, "\n--Kontrola---\n");
         // putc(next_char, stdout);
         // fprintf(stdout, "\n"); // výpis obsahu tokenu
-//--------------------------------------------------
+        //--------------------------------------------------
 
         switch (state)
 
@@ -200,8 +201,9 @@ int get_token(Token *token)
             if (isspace(next_char))
             {
                 state = START;
-                token->lenght--;
-                if (next_char != '\n' && next_char != EOF) break;
+                
+                if (next_char != '\n' && next_char != EOF)
+                    break;
             }
             else if ((isalpha(next_char) || next_char == '_') && next_char != EOF)
             {
@@ -219,7 +221,7 @@ int get_token(Token *token)
                 }
                 state = NUMBER;
             }
-/*             else if (next_char == '-')
+            /*             else if (next_char == '-')
             {
                 state = LINE_COMMENTARY; //can be -something                        // ????????????????????????
             } */
@@ -232,13 +234,14 @@ int get_token(Token *token)
             else if (next_char == '-')
             {
                 next_char = getc(source_file);
-                if (next_char == '-') state = LINE_COMMENTARY;
-                else{
+                if (next_char == '-')
+                    state = LINE_COMMENTARY;
+                else
+                {
                     ungetc(next_char, source_file);
                     token->type = MINUS;
                     return free_memory(ERROR_OK, string);
                 }
-                
             }
             else if (next_char == '*')
             {
@@ -266,7 +269,7 @@ int get_token(Token *token)
             }
             else if (next_char == '\n')
             {
-                token->type = EOL;                              // returns as a string in case(STRING):
+                token->type = EOL; // returns as a string in case(STRING):
                 token->line++;
 
                 return free_memory(ERROR_OK, string);
@@ -322,7 +325,7 @@ int get_token(Token *token)
             else
             {
                 ungetc(next_char, source_file); // maybe?
-                token->lenght--;
+                
                 return identifier_check(string, token);
             }
 
@@ -398,8 +401,8 @@ int get_token(Token *token)
 
             //---------------------------------------------------------------//
 
-        case (NUMBER): 
-            
+        case (NUMBER):
+
             if (isdigit(next_char))
             {
                 if (!dyn_string_add_char(string, next_char))
@@ -407,56 +410,57 @@ int get_token(Token *token)
 
                     return free_memory(ERROR_LEXICAL_ANALISYS, string);
                 }
-               
             }
             else if (next_char == '.')
             {
-                
+
                 if (!dyn_string_add_char(string, next_char))
                 {
-                	return free_memory(ERROR_LEXICAL_ANALISYS, string);
+                    return free_memory(ERROR_LEXICAL_ANALISYS, string);
                 }
                 state = DECIMAL_POINT;
             }
             else if (tolower(next_char) == 'e')
             {
-               
+
                 if (!dyn_string_add_char(string, next_char))
                 {
 
                     return free_memory(ERROR_LEXICAL_ANALISYS, string);
                 }
-                 state = INDEX_CHAR;
+                state = INDEX_CHAR;
             }
 
-            else {
+            else
+            {
                 return process_integer(string, token);
             }
 
             break;
-        
-        //---------------------------------------------------------------//
+
+            //---------------------------------------------------------------//
 
         case (DECIMAL_POINT):
-         if (isdigit(next_char))
+            if (isdigit(next_char))
             {
                 if (!dyn_string_add_char(string, next_char))
                 {
-                    
+
                     return free_memory(ERROR_LEXICAL_ANALISYS, string);
                 }
-               
+
                 state = DECIMAL_NUMBER;
             }
-        else {
-            return free_memory(ERROR_LEXICAL_ANALISYS, string);
+            else
+            {
+                return free_memory(ERROR_LEXICAL_ANALISYS, string);
             }
 
             break;
-        //---------------------------------------------------------------//
+            //---------------------------------------------------------------//
 
-        case(DECIMAL_NUMBER):
-        if (isdigit(next_char))
+        case (DECIMAL_NUMBER):
+            if (isdigit(next_char))
             {
                 if (!dyn_string_add_char(string, next_char))
                 {
@@ -464,96 +468,121 @@ int get_token(Token *token)
                     return free_memory(ERROR_LEXICAL_ANALISYS, string);
                 }
             }
-            
+
             else if (tolower(next_char) == 'e')
             {
-               
+
                 if (!dyn_string_add_char(string, next_char))
                 {
 
                     return free_memory(ERROR_LEXICAL_ANALISYS, string);
                 }
-                 state = INDEX_CHAR;
+                state = INDEX_CHAR;
             }
 
-            else {
+            else
+            {
                 return process_float(string, token);
             }
 
-        break;
+            break;
         //---------------------------------------------------------------//
         case (INDEX_CHAR):
-                if(isdigit(next_char)) {
-                    if (!dyn_string_add_char(string, next_char)) {
-                        return free_memory(ERROR_INTERN, string);
-                    }
-                    state = EXPONENT_NUMBER;
-                } else if (next_char == '+' || next_char == '-') {
-                    if (!dyn_string_add_char(string, next_char)) {
-                        return free_memory(ERROR_INTERN, string);
-                    }
-                    state = EXPONENT_SIGN;
+            if (isdigit(next_char))
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
+                    return free_memory(ERROR_INTERN, string);
                 }
-        break;
-        //---------------------------------------------------------------//
+                state = EXPONENT_NUMBER;
+            }
+            else if (next_char == '+' || next_char == '-')
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
+                    return free_memory(ERROR_INTERN, string);
+                }
+                state = EXPONENT_SIGN;
+            }
+            break;
+            //---------------------------------------------------------------//
 
         case (EXPONENT_SIGN):
-          if(isdigit(next_char)) {
-                    if (!dyn_string_add_char(string, next_char)) {
-                        return free_memory(ERROR_INTERN, string);
-                    }
-                    state = EXPONENT_NUMBER;
-                } else {
-                    return free_memory(ERROR_LEXICAL_ANALISYS, string);
+            if (isdigit(next_char))
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
+                    return free_memory(ERROR_INTERN, string);
                 }
-                break;
+                state = EXPONENT_NUMBER;
+            }
+            else
+            {
+                return free_memory(ERROR_LEXICAL_ANALISYS, string);
+            }
+            break;
         //---------------------------------------------------------------//
         case (EXPONENT_NUMBER):
 
-            if(isdigit(next_char)) {
-                    if (!dyn_string_add_char(string, next_char)) {
-                        return free_memory(ERROR_INTERN, string);
-                    }
-                   
-                } else {
-                    return process_float(string, token);
+            if (isdigit(next_char))
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
+                    return free_memory(ERROR_INTERN, string);
                 }
+            }
+            else
+            {
+                return process_float(string, token);
+            }
             break;
-        
+
         //---------------------------------------------------------------//
         case (LINE_COMMENTARY):
 
-            if (next_char == '\n' || next_char == EOF) state=START;   // check line counter
+            if (next_char == '\n' || next_char == EOF)
+                state = START; // check line counter
             break;
 
         case (STRING):
 
-            if (isalnum(next_char) || isspace(next_char)){
-                if (!dyn_string_add_char(string, next_char)) {
+            if (isalnum(next_char) || isspace(next_char))
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
                     return free_memory(ERROR_INTERN, string);
                 }
             }
-            else if (next_char == '\\'){
-                if (!dyn_string_add_char(string, next_char)) {
+            else if (next_char == '\\')
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
                     return free_memory(ERROR_INTERN, string);
                 }
                 next_char = getc(source_file);
                 if (next_char == 'n' || next_char == 't' || next_char == '\\' || next_char == '\'' || next_char == '\"')
                 {
-                    if (!dyn_string_add_char(string, next_char)) {
+                    if (!dyn_string_add_char(string, next_char))
+                    {
                         return free_memory(ERROR_INTERN, string);
-                    } 
+                    }
                 }
                 // else error?
             }
-            else if (next_char == '"'){
+            else if (next_char == '"')
+            {
                 token->type = STRING;
-                token->value.string = dynamic_string;
-                return free_memory(ERROR_OK, string);
+
+                if (dyn_string_copy(string,&token->value.string)==false)                
+                {
+              return free_memory(ERROR_INTERN, string);
+                   
+                }
+                 return free_memory(ERROR_OK, string);
             }
             // else error?
             break;
 
-        }//switch end
-    }//while end
-}//get_token end
+        } //switch end
+    }     //while end
+} //get_token end

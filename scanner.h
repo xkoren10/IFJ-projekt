@@ -114,9 +114,9 @@ typedef enum
  * @union Token_value
  * @brief Definition of token values - word (id), keyword, integer or float
  */
-typedef union
+typedef struct
 {
-	Dyn_string *string;
+	Dyn_string string;
 	Keyword keyword; 
 	int integer_value;
     double decimal_value; 
@@ -133,7 +133,7 @@ typedef union
 typedef struct {
     Token_value value;
     Token_type type;
-    int line, lenght, start, end;
+    int line;
 } Token;
 
 
@@ -152,12 +152,6 @@ int get_token(Token *token);
  */
 void set_source(FILE *f) ;
 
-/**
- * @brief Function to set the dynamic string
- * @param Dyn_string string
- * @return void
- */
-void set_string(Dyn_string *string);
 
 /**
  * @brief Function to free allocated memory

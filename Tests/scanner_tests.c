@@ -52,7 +52,7 @@ assert(s.length==5);
 assert(dyn_string_copy(&s, &z)==true);
 assert(s.length==z.length);
 
-assert(dyn_string_compare(&s, "iahoj")==0);
+assert(dyn_string_compare(z, "iahoj")==0);
 
 
 
@@ -71,14 +71,13 @@ get_token(&token);
 assert(token.line==1);
 
 
-assert(token.lenght==1);
 assert(token.type==PLUS);
 
 get_token(&token);
 assert(token.line==1);
 
 
-assert(token.lenght==6);                        //I will question the elevated one
+                       //I will question the elevated one
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_RETURN);
 fclose(file);
@@ -89,24 +88,21 @@ set_source(file);
 
 get_token(&token);
 assert(token.line==1);
-assert(token.lenght==5);
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_LOCAL);
 
 get_token(&token);
 assert(token.line==1);
-assert(token.lenght==1);
 assert(token.type==ID);
-//assert(dyn_string_compare(token.value.string, "x")==0);
+assert(dyn_string_compare(token.value.string,"x")==0);           //the fuk
 
 get_token(&token);
 assert(token.line==1);
-assert(token.lenght==1); 
+
 assert(token.type==COLON);
 
 get_token(&token);
 assert(token.line==1);
-assert(token.lenght==6);
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_NUMBER);
 
@@ -146,7 +142,6 @@ set_source(file);
 
 get_token(&token);
 assert(token.line==1);
-assert(token.lenght==5);
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_LOCAL);
  // line comment
