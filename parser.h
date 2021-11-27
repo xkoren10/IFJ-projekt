@@ -15,6 +15,8 @@ Token actToken;
 Token nextToken; */
 
  //TODO
+ TStack syntaxStack;
+ 
 tStack stack;
 //EOL
 bool scanner_EOL;
