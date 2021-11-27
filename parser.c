@@ -59,7 +59,7 @@ int Program(){
         if(actToken.type == STATE_EOF)
                 return ERROR_SYNTAX_ANALYSIS;
 
-        if(!actToken.)// todo string este neprocesujem - matej koren 2021
+        if(!actToken.type != ID)// todo string este neprocesujem - matej koren 2021
             return ERROR_SYNTAX_ANALYSIS;        
     }
 
@@ -126,6 +126,8 @@ int Deklaracia_Funkcie(){
         return ERROR_SYNTAX_ANALYSIS;
     }
     else{
+        //TODO načítanie stringu
+
         output = get_token(&actToken);
         output = Is_EOL();
         
@@ -165,6 +167,7 @@ int Deklaracia_Funkcie(){
         }
 
         output = Typy();
+
         return ERROR_OK;
 
 
@@ -179,12 +182,11 @@ int Deklaracia_Funkcie(){
         output = get_token(&actToken);
         output = Is_EOL();
 
-        if()
+        output = Hlavicka_Funkcie()
+      
+        output = Telo_Funkcie();
 
 
-
-
-        //
 
 
 
