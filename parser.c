@@ -60,13 +60,12 @@ int Program(){
                 return ERROR_SYNTAX_ANALYSIS;
 
         if(!actToken.type != ID)// todo string este neprocesujem - matej koren 2021
-            return ERROR_SYNTAX_ANALYSIS;        
+            return ERROR_SYNTAX_ANALYSIS; 
+
+        //Vypis stringu "require ifj21"       
     }
 
     return Deklaracie_or_Definicie();
-
-
-
 
 }
 
@@ -82,6 +81,7 @@ int Deklaracie_or_Definicie(){
         }
         if(actToken.type == STATE_EOF)
             return 0;
+        
         else if(actToken.value.keyword == KEYWORD_GLOBAL){
             output = Deklaracie_Funckie();
 
@@ -117,16 +117,13 @@ int Deklaracia_Funkcie(){
         output = get_token(&actToken);
         output = Is_EOL();
 
-
-
-
-
     //TODO
-    if(/* !string  */){
+    if(actToken.type != ID ){
         return ERROR_SYNTAX_ANALYSIS;
     }
     else{
         //TODO načítanie stringu
+        // nacitanie stringu do symtable
 
         output = get_token(&actToken);
         output = Is_EOL();
@@ -150,7 +147,10 @@ int Deklaracia_Funkcie(){
         if(actToken.type!=LEFT_PARENTHESIS){
             return ERROR_SYNTAX_ANALYSIS;
         }
-        output = Typy();
+        output = get_token(&actToken);
+        output = Is_EOL();
+        if(actToken.type !=RIGHT_PARENTHESIS)
+            output = Typy();
 
         output = get_token(&actToken);
         output = Is_EOL();
@@ -174,29 +174,119 @@ int Deklaracia_Funkcie(){
     }
 }
     int Typy(){
+        //TODO AK NENI PRVY
+        int output;
+        output = Typ();
+        
+        output = get_token(&actToken);
+        output = Is_EOL();
 
+        if(actToken.type == COMMA)
+        {    if(output != ERROR_OK)
+                return output;
+            Typy ();}
+        else
+            return ERROR_OK;
+
+    }
+    int Typ(){
+        int output;
+        output = get_token(&actToken);
+        output = Is_EOL();
+        if(actToken.type!= KEYWORD)
+
+        switch (actToken.type)
+        {
+        case KEYWORD_INTEGER:
+        case KEYWORD_STRING:
+        case KEYWORD_NUMBER:
+            return ERROR_OK;       
+        }
+        return ERROR_SYNTAX_ANALYSIS;
     }
 
     int Definicia_Funckie(){
+        //EFOY
         int output;
         output = get_token(&actToken);
         output = Is_EOL();
 
-        output = Hlavicka_Funkcie()
+        output = Hlavicka_Funkcie();
+        if(output != ERROR_OK)
+            return output;
       
         output = Telo_Funkcie();
+        if(output != ERROR_OK)
+            return output;
 
+        return ERROR_OK;
+    }
 
+    int Hlavicka_funkcie(){
+        //eofy
+        int output;
+        output = get_token(&actToken);
+        output = Is_EOL();
 
+        if(actToken.type != KEYWORD_FUNCTION)
+            return ERROR_SYNTAX_ANALYSIS;
 
+        output = get_token(&actToken);
+        output = Is_EOL();
+
+        if(actToken.type != ID)
+            return ERROR_SYNTAX_ANALYSIS;
+
+        output = get_token(&actToken);
+        output = Is_EOL();
+
+        if(actToken.type !=LEFT_PARENTHESIS)
+            return ERROR_SYNTAX_ANALYSIS;
+
+        output = Zoznam_parametrov();
+        if(output!=ERROR_OK)
+            return output;
+
+        output = get_token(&actToken);
+        output = Is_EOL();
+
+        if(actToken.type !=RIGHT_PARENTHESIS)
+            return ERROR_SYNTAX_ANALYSIS;
+
+        output = get_token(&actToken);
+        output = Is_EOL();
+
+        if(actToken.type != COLON)
+            return ERROR_SYNTAX_ANALYSIS;
+
+        output = get_token(&actToken);
+        output = Is_EOL();
+
+        output = Typy();
+        if(output != ERROR_OK)
+            return ERROR_SYNTAX_ANALYSIS;
+
+        return ERROR_OK;
 
 
     }
-    
+int Zoznam_parametrov(){
+
 
 
 
 }
+
+int Parameter(){
+
+
+
+}
+    
+
+
+
+
 
 
 
