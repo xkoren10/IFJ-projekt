@@ -307,6 +307,11 @@ int get_token(Token *token)
 
                 state = ASSIGN;
             }
+            else if (next_char == '~')
+            {
+
+                state = ALMOST_EQUAL;
+            }
             else if (next_char == '<')
             {
 
@@ -409,6 +414,21 @@ int get_token(Token *token)
             return free_memory(ERROR_OK, string);
             break;
 
+            //---------------------------------------------------------------//
+
+        case (ALMOST_EQUAL):
+
+            if (next_char == '=')
+            {
+
+                token->type = ALMOST_EQUAL;
+            }
+            else
+            {
+               return free_memory(ERROR_LEXICAL_ANALISYS, string);                
+            }
+            return free_memory(ERROR_OK, string);
+            break;
             //---------------------------------------------------------------//
         case (DOT):
             if (next_char == '.')

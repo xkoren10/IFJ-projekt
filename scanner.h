@@ -69,6 +69,7 @@ typedef enum
     GREATER_THAN,                   //  >
     GREATER_or_EQUALS,              //  >=
     EQUALS,                         //  ==
+    ALMOST_EQUAL,                   //  ~=
 
     LEFT_PARENTHESIS,               // (
     RIGHT_PARENTHESIS,              // )
