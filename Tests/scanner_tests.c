@@ -68,16 +68,9 @@ file = fopen("IFJ21_codes/first_test.ifj21","r");
 set_source(file);
 
 get_token(&token); 
-assert(token.line==1);
-
-
 assert(token.type==PLUS);
 
 get_token(&token);
-assert(token.line==1);
-
-
-                       //I will question the elevated one
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_RETURN);
 fclose(file);
@@ -87,22 +80,18 @@ file = fopen("IFJ21_codes/second_test.ifj21", "r");
 set_source(file);
 
 get_token(&token);
-assert(token.line==1);
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_LOCAL);
 
 get_token(&token);
-assert(token.line==1);
 assert(token.type==ID);
 assert(dyn_string_compare(token.value.string,"x")==0);           //the fuk
 
 get_token(&token);
-assert(token.line==1);
 
 assert(token.type==COLON);
 
 get_token(&token);
-assert(token.line==1);
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_NUMBER);
 
@@ -141,20 +130,17 @@ file = fopen("IFJ21_codes/hello.ifj21", "r");
 set_source(file);
 
 get_token(&token);
-assert(token.line==1);
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_LOCAL);
  // line comment
 get_token(&token);
 assert(token.type==KEYWORD); // require 
 assert(token.value.keyword==KEYWORD_REQUIRE);
-assert(token.line==1);
 get_token(&token); // "ifj21"
 assert(token.type==STRING);
 get_token(&token);// function
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_FUNCTION);
-assert(token.line==1);
 get_token(&token); // main
 assert(token.type==ID);
 get_token(&token); // ( 
@@ -175,7 +161,6 @@ get_token(&token); // "Hello World"
 assert(token.type==STRING);
 get_token(&token); // write
 assert(token.type==ID);                         // supposed to be built-in function
-assert(token.line==1);
 get_token(&token); // (
 assert(token.type==LEFT_PARENTHESIS);
 get_token(&token); // str
@@ -193,7 +178,6 @@ get_token(&token); // )
 assert(token.type==RIGHT_PARENTHESIS);
 get_token(&token); // end
 assert(token.type==KEYWORD);
-assert(token.line==1);
 fclose(file);
 
 
@@ -334,6 +318,7 @@ get_token(&token);  // end
 assert(token.type==KEYWORD);
 get_token(&token);  // end
 assert(token.type==KEYWORD);
+
 get_token(&token);  // main
 assert(token.type==ID);
 get_token(&token);  // (
@@ -342,7 +327,116 @@ get_token(&token);  // )
 assert(token.type==RIGHT_PARENTHESIS);
 
 fclose(file);
-    // why the fuck is token.line always set to 1???
+
+// strings
+file = fopen("IFJ21_codes/strings.ifj21", "r");
+set_source(file);
+
+get_token(&token);  // require
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_REQUIRE);
+get_token(&token);  // "ifj21"
+assert(token.type==STRING);
+
+get_token(&token);  // function
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_FUNCTION);
+get_token(&token);  // main
+assert(token.type==ID);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+
+get_token(&token);  // local
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_LOCAL);
+get_token(&token);  // s1
+assert(token.type==ID);
+get_token(&token);  // :
+assert(token.type==COLON);
+get_token(&token);  // string
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_STRING);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // "Toto je nejaky text"
+assert(token.type==STRING);
+
+get_token(&token);  // local
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_LOCAL);
+get_token(&token);  // s2
+assert(token.type==ID);
+get_token(&token);  // :
+assert(token.type==COLON);
+get_token(&token);  // string
+assert(token.type==KEYWORD);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // s1
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string,"s1")==0); 
+get_token(&token);  // ..
+assert(token.type==CONCATENATE);
+get_token(&token);  // " ktery jeste trochu obohatime"
+assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string,", ktery jeste trochu obohatime")==0); 
+get_token(&token);  // write
+assert(token.type==ID);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // s1
+assert(token.type==ID);
+get_token(&token);  // ,
+assert(token.type== COMMA);
+get_token(&token);  // "\010"
+assert(token.type==STRING);
+get_token(&token);  // ,
+assert(token.type== COMMA);
+get_token(&token);  // s2
+assert(token.type==ID);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+get_token(&token);  // local
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_LOCAL);
+get_token(&token);  // s1len
+assert(token.type==ID);
+get_token(&token);  // :
+assert(token.type==COLON);
+get_token(&token);  // integer
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_INTEGER);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // #
+assert(token.type==GET_LENGTH);
+get_token(&token);  // s1
+assert(token.type==ID);
+get_token(&token);  // local
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_LOCAL);
+get_token(&token);  // s1len4
+assert(token.type==ID);
+get_token(&token);  // :
+assert(token.type==COLON);
+get_token(&token);  // integer
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_INTEGER);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // s1len
+assert(token.type==ID);
+
+
+
+
+
+
+fclose(file);
+
+
     fprintf(stdout,"\x1B[32m""                     PASSED                    \n""\x1B[0m"); 
     fprintf(stdout,"-----------------------------------------------\n");
 

@@ -62,7 +62,7 @@ typedef enum
     INTEGER_DIVIDE,                 //  //
     PLUS,                           //  +
     MINUS,                          //  -
-    
+    DOLLAR,                         // stack bottom
 
     LESS_THAN,                      //  <
     LESS_or_EQUALS,                 //  <=
@@ -93,15 +93,20 @@ typedef enum
     ESCAPE,
 
     LINE_COMMENTARY,                //  --
-    BLOCK_COMMENTARY,         //  --[[ ]]
+    BLOCK_COMMENTARY,               //  --[[ ]]
 
     HASH,                           //  #
-    DOUBLEDOT,                      // ..
+    DOUBLEDOT,                      // ..   
     COMMA,                          // ,
     COLON,                          // :
-
+    DOT,                            // .
     EOL,
     STATE_EOF,
+
+
+    CONCATENATE,                    // ..
+    GET_LENGTH,                     // #
+
 
     ERROR = -1
 }
@@ -132,7 +137,6 @@ typedef struct
 typedef struct {
     Token_value value;
     Token_type type;
-    int line;
 } Token;
 
 
