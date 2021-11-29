@@ -1,0 +1,10 @@
+require "ifj21"
+local   z   :   
+string
+=
+"test"
+
+--[[nahodny koment 
+a toto] tu este ]] function fun(x1 :string)
+write(x1)
+end

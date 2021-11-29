@@ -1,0 +1,21 @@
+-- Vypocet faktorialu (iterativne)
+require "ifj21"
+function main()     
+    local a : integer
+    local vysl : integer = 0
+    write("Cislo pro vypocet faktorialu:\n")
+    a = readi()
+    if a == nil then
+        write("a je nil\n") return
+    else
+    end
+    if a < 0 then
+        write("Faktorial nejde spocitat\n")
+    else
+        vysl = 1
+        while a > 0 do
+            vysl = vysl * a a = a - 1 -- dva prikazy
+        end
+        write("Vysledok je: ", vysl, "\n")
+    end
+end

@@ -1,0 +1,10 @@
+local
+--Hello World print
+require "ifj21"
+
+function main()
+local str: string = "Hello World"
+write(str)
+-- haha, useless comment write(str) ze nemalo by to vypisat, haha
+write("Hello World")
+end
