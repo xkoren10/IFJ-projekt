@@ -149,9 +149,13 @@ int Deklaracia_Funkcie(){
         }
         output = get_token(&actToken);
         output = Is_EOL();
+
         if(actToken.type !=RIGHT_PARENTHESIS)
             output = Typy();
 
+        if(output!=ERROR_OK)
+            return output;
+        //asi dobre ale niesom si isty
         output = get_token(&actToken);
         output = Is_EOL();
 
@@ -168,7 +172,7 @@ int Deklaracia_Funkcie(){
 
         output = Typy();
 
-        return ERROR_OK;
+        return output;
 
 
     }
@@ -177,13 +181,15 @@ int Deklaracia_Funkcie(){
         //TODO AK NENI PRVY
         int output;
         output = Typ();
-        
+        // ak chyba return
+        if(output != ERROR_OK)
+                return output;
+
         output = get_token(&actToken);
         output = Is_EOL();
 
         if(actToken.type == COMMA)
-        {    if(output != ERROR_OK)
-                return output;
+        {    
             Typy ();}
         else
             return ERROR_OK;
@@ -242,10 +248,18 @@ int Deklaracia_Funkcie(){
 
         if(actToken.type !=LEFT_PARENTHESIS)
             return ERROR_SYNTAX_ANALYSIS;
+        
+        output = get_token(&actToken);
+        output = Is_EOL();
+
+        if(actToken.type != RIGHT_PARENTHESIS)
+            output = Zoznam_parametrov();
 
         output = Zoznam_parametrov();
         if(output!=ERROR_OK)
             return output;
+
+            //tento asi preskoci jeden token 
 
         output = get_token(&actToken);
         output = Is_EOL();
@@ -263,14 +277,29 @@ int Deklaracia_Funkcie(){
         output = Is_EOL();
 
         output = Typy();
-        if(output != ERROR_OK)
-            return ERROR_SYNTAX_ANALYSIS;
+        
 
-        return ERROR_OK;
+        return output;
 
 
     }
 int Zoznam_parametrov(){
+    int output;
+    output = Parameter();
+
+    if(output != ERROR_OK)
+        return output;
+
+    output = get_token(&actToken);
+    output = Is_EOL();
+
+    if(actToken.type == COMMA)
+        {    
+            Parameter ();}
+        else
+            return ERROR_OK;
+
+
 
 
 
@@ -278,10 +307,26 @@ int Zoznam_parametrov(){
 }
 
 int Parameter(){
+      int output;
+        output = get_token(&actToken);
+        output = Is_EOL();
+        if(actToken.type!=ID)
+            return ERROR_SYNTAX_ANALYSIS;
+
+        //asi nacitat string atd
 
 
+        output = get_token(&actToken);
+        output = Is_EOL();
 
+        if(actToken.type!=COMMA)
+            return ERROR_SYNTAX_ANALYSIS;
+
+        output = Typ();
+        return output;
 }
+
+
     
 
 
