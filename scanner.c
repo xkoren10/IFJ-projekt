@@ -10,312 +10,694 @@
 **/
 
 #include "scanner.h"
-#include <ctype.h>
-#include <unistd.h>
 
-char next_char;
-int state = START;
-Token *token;
-
-FILE *source;               // Source file that will be scanned
-Dyn_string *dynamic_string; // Dynamic string that will be written into
+FILE *source_file;
+bool decimal;
 
 /*
 Fixed enough to be without errors. 
 In special cases we need to check for the succeeding character to determine token type 
 Function to choose keywords would be useful
 */
+void set_source(FILE *f)
+{
+    source_file = f;
+}
+
+int free_memory(int exit_code, Dyn_string *string)
+{
+    dyn_string_free(string);
+    return exit_code;
+}
+
+int process_integer(Dyn_string *dynamic_string, Token *token)
+{
+    char *ptr;
+    int integer = (int)strtol(dynamic_string->string, &ptr, 10);
+
+    if (*ptr)
+    {
+        return free_memory(ERROR_INTERN, dynamic_string);
+    }
+
+    (*token).value.integer_value = integer;
+    (*token).type = INT;
+
+    return ERROR_OK;
+}
+
+int process_float(Dyn_string *dynamic_string, Token *token)
+{
+    char *ptr;
+    double double_number = strtod(dynamic_string->string, &ptr);
+
+    if (*ptr)
+    {
+        return free_memory(ERROR_INTERN, dynamic_string);
+    }
+
+    (*token).value.decimal_value = double_number;
+    (*token).type = DECIMAL_NUMBER;
+    return ERROR_OK;
+}
 
 int identifier_check(Dyn_string *dynamic_string, Token *token)
 {
-    for (int i=0; i<=14; i++)
+    if (strcmp(dynamic_string->string, "do") == 0)
     {
-       if(strcmp(dynamic_string,keywords_array[i])==0)
-       {
-           switch(i){
-               case 0:token->value.keyword = KEYWORD_DO;break;
-               case 1:token->value.keyword = KEYWORD_ELSE;break;
-               case 2:token->value.keyword = KEYWORD_END;break;
-               case 3:token->value.keyword = KEYWORD_FUNCTION;break;
-               case 4:token->value.keyword = KEYWORD_GLOBAL;break;
-               case 5:token->value.keyword = KEYWORD_IF;break;
-               case 6:token->value.keyword = KEYWORD_INTEGER;break;
-               case 7:token->value.keyword = KEYWORD_LOCAL;break;
-               case 8:token->value.keyword = KEYWORD_NIL;break;
-               case 9:token->value.keyword = KEYWORD_NUMBER;break;
-               case 10:token->value.keyword = KEYWORD_REQUIRE;break;
-               case 11:token->value.keyword = KEYWORD_RETURN;break;
-               case 12:token->value.keyword = KEYWORD_STRING;break;
-               case 13:token->value.keyword = KEYWORD_THEN;break;
-               case 14:token->value.keyword = KEYWORD_WHILE;break;
-                default: break;
-           }
-           token->type = KEYWORD;
-           return free_dynamic_string(dynamic_string, ERROR_OK);
-        }
-        else token->type = ID;
-
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_DO;
+    }
+    else if (strcmp(dynamic_string->string, "else") == 0)
+    {
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_ELSE;
+    }
+    else if (strcmp(dynamic_string->string, "end") == 0)
+    {
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_END;
+    }
+    else if (strcmp(dynamic_string->string, "function") == 0)
+    {
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_FUNCTION;
+    }
+    else if (strcmp(dynamic_string->string, "global") == 0)
+    {
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_GLOBAL;
+    }
+    else if (strcmp(dynamic_string->string, "if") == 0)
+    {
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_IF;
+    }
+    else if (strcmp(dynamic_string->string, "integer") == 0)
+    {
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_INTEGER;
+    }
+    else if (strcmp(dynamic_string->string, "local") == 0)
+    {
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_LOCAL;
+    }
+    else if (strcmp(dynamic_string->string, "nil") == 0)
+    {
+        token->type = KEYWORD;
+        (*token).value.keyword = KEYWORD_NIL;
+    }
+    else if (strcmp(dynamic_string->string, "number") == 0)
+    {
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_NUMBER;
+    }
+    else if (strcmp(dynamic_string->string, "require") == 0)
+    {
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_REQUIRE;
+    }
+    else if (strcmp(dynamic_string->string, "return") == 0)
+    {
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_RETURN;
+    }
+    else if (strcmp(dynamic_string->string, "string") == 0)
+    {
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_STRING;
+    }
+    else if (strcmp(dynamic_string->string, "then") == 0)
+    {
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_THEN;
+    }
+    else if (strcmp(dynamic_string->string, "while") == 0)
+    {
+        (*token).type = KEYWORD;
+        (*token).value.keyword = KEYWORD_WHILE;
     }
 
-        if (!dynamic_string_copy(dynamic_string, token->value.string))
-	    {
-		    return free_resources(dynamic_string,ERROR_INTERN);
-	    }
-
-    return free_dynamic_string(dynamic_string,ERROR_OK);
-}
-
-
-int free_dynamic_string(Dyn_string *dynamic_string, int Exit_code)
-{
-
-    dyn_string_free(dynamic_string);
-    return Exit_code;
+    else
+    {
+        (*token).type = ID;
+        if (dyn_string_copy(dynamic_string, &token->value.string))
+        {
+            return free_memory(ERROR_INTERN, dynamic_string);
+        }
+    }
+    return ERROR_OK;
 }
 
 int get_token(Token *token)
+
 {
 
-    if ((!dyn_string_init(dynamic_string)) || (source == NULL))
+    if (source_file == NULL)
     {
         return ERROR_INTERN;
     }
 
-    while (1)
+    int state = START;
+    int esc_cnt = 0;
+    int esc_val = 0;
+
+    token->type = state;
+
+    Dyn_string tmpstring;
+    Dyn_string *string = &tmpstring; // question
+
+    char next_char;
+
+    if (dyn_string_init(string) != 0)
+    {
+        return ERROR_INTERN;
+    }
+
+    while (true)
     {
 
-        next_char = getc(source);
-        token->value.string = dynamic_string;
+        next_char = getc(source_file);
 
+        /* if (next_char == '\n')
+            {
+                token->type = EOL;
+                return free_memory(ERROR_OK, string);                       //dunno how
+            }*/
+
+        //------------------------------------------------
+        //fprintf(stdout, "\n--Kontrola---\n");
+        //putc(next_char, stdout);
+        //fprintf(stdout, "\n"); // výpis obsahu tokenu
+        //--------------------------------------------------
 
         switch (state)
+
         {
-//---------------------------------------------------------------//
+            //---------------------------------------------------------------//
 
-        case START:
+        case (START):
 
-            if (isspace(next_char))
+            if (isspace(next_char) || next_char == '\n' || next_char == '\t')
             {
                 state = START;
+
                 if (next_char != '\n' && next_char != EOF)
                     break;
             }
-            else if (isalpha(next_char) || next_char == '_')
+            else if ((isalpha(next_char) || next_char == '_') && next_char != EOF)
             {
-                if (!dyn_string_add_char(dynamic_string, (char)tolower(next_char)))
-                {
-                    return free_dynamic_string(dynamic_string, ERROR_INTERN);
-                }
-                state = ID_or_KEYWORD;
-            }
 
+                ungetc(next_char, source_file); // lebo sak si zoberie hned pri starte jedno pismeno tak samozrejme ze nebude nic spravne na zaciatku
+                state = ID_or_KEYWORD;          // dalsia vec, preco sa toto nepouziva cisto ako starting rozcestnik, ale robia sa tu veci aj s dyn_stringom?
+                                                // nebolo by lepsie s tym narabat az v jednotlivych states?
+            }
             else if (isdigit(next_char))
             {
-                if (!dyn_string_add_char(dynamic_string, next_char))
+                if (!dyn_string_add_char(string, next_char))
                 {
-                    return free_dynamic_string(dynamic_string, ERROR_INTERN);
+                    return free_memory(ERROR_INTERN, string);
                 }
                 state = NUMBER;
-            }
-            else if (next_char == '-')
-            {
-                state = LINE_COMMENTARY; //can be -something
             }
 
             else if (next_char == '+')
             {
                 token->type = PLUS;
-                return free_dynamic_string(dynamic_string, EXIT_SUCCESS);
+
+                return free_memory(ERROR_OK, string);
+            }
+
+             else if (next_char == '#')
+            {
+                token->type = GET_LENGTH;
+
+                return free_memory(ERROR_OK, string);
             }
             else if (next_char == '-')
-            {
-                token->type = MINUS;
-                return free_dynamic_string(dynamic_string, EXIT_SUCCESS);
+            { // maybe check for EOF a bit more?
+
+                next_char = getc(source_file);
+                if (next_char == '-')
+                {
+                    state = LINE_COMMENTARY;
+                    next_char = getc(source_file);
+                    if (next_char == '[' && next_char != EOF)
+                    {
+                        next_char = getc(source_file);
+                        if (next_char == '[' && next_char != EOF)
+                        {
+                            state = BLOCK_COMMENTARY;
+                        }
+                        else
+                            state = LINE_COMMENTARY;
+                    }
+                    else
+                        state = LINE_COMMENTARY;
+                }
+                else
+                {
+                    ungetc(next_char, source_file);
+                    token->type = MINUS;
+                    return free_memory(ERROR_OK, string);
+                }
             }
             else if (next_char == '*')
             {
                 token->type = MULTIPLY;
-                return free_dynamic_string(dynamic_string, EXIT_SUCCESS);
+
+                return free_memory(ERROR_OK, string);
             }
             else if (next_char == '(')
             {
+
                 token->type = LEFT_PARENTHESIS;
-                return free_dynamic_string(dynamic_string, EXIT_SUCCESS);
+
+                return free_memory(ERROR_OK, string);
             }
             else if (next_char == ')')
             {
+
                 token->type = RIGHT_PARENTHESIS;
-                return free_dynamic_string(dynamic_string, EXIT_SUCCESS);
+
+                return free_memory(ERROR_OK, string);
             }
             else if (next_char == ',')
             {
                 token->type = COMMA;
-                return free_dynamic_string(dynamic_string, EXIT_SUCCESS);
+
+                return free_memory(ERROR_OK, string);
             }
-            else if (next_char == '\n')
-            {
-                token->type = EOL;
-                return free_dynamic_string(dynamic_string, EXIT_SUCCESS);
-            }
+
             else if (next_char == EOF)
             {
                 token->type = STATE_EOF;
-                return free_dynamic_string(dynamic_string, EXIT_SUCCESS);
+
+                return free_memory(ERROR_OK, string);
             }
             else if (next_char == '/')
             {
                 token->type = DIVIDE;
-                return free_dynamic_string(dynamic_string, EXIT_SUCCESS);
-            }
 
+                return free_memory(ERROR_OK, string);
+            }
             else if (next_char == '=')
             {
+
                 state = ASSIGN;
             }
             else if (next_char == '<')
+            {
+
                 state = LESS_THAN;
-
+            }
             else if (next_char == '>')
+            {
+
                 state = GREATER_THAN;
+            }
+            else if (next_char == '.')
+            {
 
+                 state = DOT;
+            }
             else if (next_char == ':')
-                state = COLON;
+            {
 
-             else
-			{
-				return free_dynamic_string(dynamic_string,ERROR_LEXICAL_ANALISYS);
-			}
+                token->type = COLON;
+                return free_memory(ERROR_OK, string);
+            }
+            else if (next_char == '"')
+            {
+                state = STRING;
+            }
+            else
+            {
+                return free_memory(ERROR_INTERN, string);
+            }
+            break;
+            //---------------------------------------------------------------//
 
-			break; 
-//---------------------------------------------------------------//
+        case (ID_or_KEYWORD):
+            if (isalnum(next_char) || next_char == '_')
+            {
 
-case (ID_or_KEYWORD):
-				if (isalnum(next_char) || next_char == '_')
-				{
-					if (!dyn_string_add_char(dynamic_string, (char) tolower(next_char)))
-					{
-						return free_resources(dynamic_string,ERROR_INTERN);
-					}
-				}
-				else
-				{
-					ungetc(next_char, source);
-					return identifier_check(dynamic_string, token);
-				}
+                if (!dyn_string_add_char(string, (char)tolower(next_char)))
+                {
+                    (*token).type = ID;
+                    return free_memory(ERROR_INTERN, string);
+                }
+                state = ID_or_KEYWORD;
+            }
+            else
+            {
+                ungetc(next_char, source_file); // maybe?
+                return identifier_check(string, token);
+            }
 
-				break;
+            break;
 
-//---------------------------------------------------------------//   
+            //---------------------------------------------------------------//
 
-        case(LESS_THAN):
-
-            if (next_char == '=')
-				{
-				
-					token->type = LESS_or_EQUALS;
-				}
-				else
-				{
-					ungetc(next_char, source);
-					token->type = LESS_THAN;
-				}
-
-				return free_dynamic_string(dynamic_string,ERROR_OK);
-
-
-//---------------------------------------------------------------//
-
-
-        case(GREATER_THAN):
+        case (LESS_THAN):
 
             if (next_char == '=')
-				{
-				
-					token->type = GREATER_or_EQUALS;
-				}
-				else
-				{
-					ungetc(next_char, source);
-					token->type = GREATER_THAN;
-				}
+            {
 
-				return free_dynamic_string(dynamic_string,ERROR_OK);
+                token->type = LESS_or_EQUALS;
+            }
+            else
+            {
+                ungetc(next_char, stdin);
+                token->type = LESS_THAN;
+            }
+            return free_memory(ERROR_OK, string);
+            break;
 
-//---------------------------------------------------------------//
+            //---------------------------------------------------------------//
 
-
-        case(ASSIGN):
+        case (GREATER_THAN):
 
             if (next_char == '=')
-				{
-				
-					token->type = EQUALS;
-				}
-				else
-				{
-					ungetc(next_char, source);
-					token->type = ASSIGN;
-				}
+            {
 
-				return free_dynamic_string(dynamic_string,ERROR_OK);
+                token->type = GREATER_or_EQUALS;
+            }
+            else
+            {
+                ungetc(next_char, stdin);
+                token->type = GREATER_THAN;
+            }
+            return free_memory(ERROR_OK, string);
+            break;
 
-//---------------------------------------------------------------//
+            //---------------------------------------------------------------//
 
+        case (ASSIGN):
 
-        case(DIVIDE):
+            if (next_char == '=')
+            {
+
+                token->type = EQUALS;
+            }
+            else
+            {
+                ungetc(next_char, stdin);
+                token->type = ASSIGN;
+            }
+            return free_memory(ERROR_OK, string);
+            break;
+
+            //---------------------------------------------------------------//
+        case (DOT):
+            if (next_char == '.')
+            {
+
+                token->type = CONCATENATE;
+            }
+            else
+            {
+                ungetc(next_char, stdin);
+                return free_memory(ERROR_INTERN, string);
+            }
+            return free_memory(ERROR_OK, string);
+            break;
+
+            //---------------------------------------------------------------//
+
+        case (DIVIDE):
 
             if (next_char == '/')
-				{
-				
-					token->type = INTEGER_DIVIDE;
-				}
-				else
-				{
-					ungetc(next_char, source);
-					token->type = DIVIDE;
-				}
+            {
 
-				return free_dynamic_string(dynamic_string,ERROR_OK);
+                token->type = INTEGER_DIVIDE;
+            }
+            else
+            {
+                ungetc(next_char, stdin);
+                token->type = DIVIDE;
+            }
+            return free_memory(ERROR_OK, string);
+            break;
 
-//---------------------------------------------------------------//
+            //---------------------------------------------------------------//
 
+        case (NUMBER):
 
-        case (NUMBER):                                                                      
-        //if number is int -> strtoi, if decimal -> check after point for another number and back to decimal state, in both check for E
-				if (isdigit(next_char))
-				{
-					if (!dynamic_string_add_char(dynamic_string, next_char))
-					{
-						return free_resources(dynamic_string,ERROR_INTERN);
-					}
-				}
-				else if (next_char == '.')
-				{
-					/*state = DECIMAL_POINT;
-					if (!dynamic_string_add_char(dynamic_string, next_char))
-					{
-						return free_resources(dynamic_string,ERROR_INTERN);
-					}*/
-				}
-				else if (tolower(next_char) == 'e')
-				{
-					state = INDEX_CHAR;
-					if (!dynamic_string_add_char(dynamic_string, next_char))
-					{
-						return free_resources(dynamic_string,ERROR_INTERN);
-					}
-				}
-				else
-				{
-					ungetc(next_char, source);
-				//	return process_integer(dynamic_string, token);
-				}
+            if (isdigit(next_char))
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
 
-				break;
+                    return free_memory(ERROR_LEXICAL_ANALISYS, string);
+                }
+            }
+            else if (next_char == '.')
+            {
 
-    }
-//---------------------------------------------------------------//
+                if (!dyn_string_add_char(string, next_char))
+                {
+                    return free_memory(ERROR_LEXICAL_ANALISYS, string);
+                }
+                state = DECIMAL_POINT;
+            }
+            else if (tolower(next_char) == 'e')
+            {
 
-    }
-    return 0;
-}
+                if (!dyn_string_add_char(string, next_char))
+                {
+
+                    return free_memory(ERROR_LEXICAL_ANALISYS, string);
+                }
+                state = INDEX_CHAR;
+            }
+
+            else
+            {
+                ungetc(next_char, source_file);
+                return process_integer(string, token);
+            }
+
+            break;
+
+            //---------------------------------------------------------------//
+
+        case (DECIMAL_POINT):
+            if (isdigit(next_char))
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
+
+                    return free_memory(ERROR_LEXICAL_ANALISYS, string);
+                }
+
+                state = DECIMAL_NUMBER;
+            }
+            else
+            {
+                return free_memory(ERROR_LEXICAL_ANALISYS, string);
+            }
+
+            break;
+            //---------------------------------------------------------------//
+
+        case (DECIMAL_NUMBER):
+            if (isdigit(next_char))
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
+
+                    return free_memory(ERROR_LEXICAL_ANALISYS, string);
+                }
+            }
+
+            else if (tolower(next_char) == 'e')
+            {
+
+                if (!dyn_string_add_char(string, next_char))
+                {
+
+                    return free_memory(ERROR_LEXICAL_ANALISYS, string);
+                }
+                state = INDEX_CHAR;
+            }
+
+            else
+            {
+                return process_float(string, token);
+            }
+
+            break;
+        //---------------------------------------------------------------//
+        case (INDEX_CHAR):
+            if (isdigit(next_char))
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
+                    return free_memory(ERROR_INTERN, string);
+                }
+                state = EXPONENT_NUMBER;
+            }
+            else if (next_char == '+' || next_char == '-')
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
+                    return free_memory(ERROR_INTERN, string);
+                }
+                state = EXPONENT_SIGN;
+            }
+            break;
+            //---------------------------------------------------------------//
+
+        case (EXPONENT_SIGN):
+            if (isdigit(next_char))
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
+                    return free_memory(ERROR_INTERN, string);
+                }
+                state = EXPONENT_NUMBER;
+            }
+            else
+            {
+                return free_memory(ERROR_LEXICAL_ANALISYS, string);
+            }
+            break;
+        //---------------------------------------------------------------//
+        case (EXPONENT_NUMBER):
+
+            if (isdigit(next_char))
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
+                    return free_memory(ERROR_INTERN, string);
+                }
+            }
+            else
+            {
+                return process_float(string, token);
+            }
+            break;
+
+        //---------------------------------------------------------------//
+        case (LINE_COMMENTARY):
+
+            if (next_char == '\n' || next_char == EOF)
+                state = START; // check line counter
+            break;
+
+        case (BLOCK_COMMENTARY):
+            if (next_char == ']' || next_char == EOF) // idk, seems like does nothing when EOF
+            {
+                next_char = getc(source_file);
+                if (next_char == ']' || next_char == EOF)
+                {
+                    state = START;
+                }
+            }
+            break;
+        //---------------------------------------------------------------//
+        case (STRING):
+
+            if ((next_char >= 32)&&(next_char != '\\')&&(next_char != '"'))
+            {
+                if (!dyn_string_add_char(string, next_char))
+                {
+                    return free_memory(ERROR_INTERN, string);
+                }
+            }
+            else if (next_char == '\\')
+            {
+                state = ESCAPE;
+            }
+            else if (next_char == '"')
+            {
+                token->type = STRING;
+
+                if (dyn_string_copy(string, &token->value.string) == false)
+                {
+                    return free_memory(ERROR_INTERN, string);
+                }
+                return free_memory(ERROR_OK, string);
+            }
+            if (next_char < 32)
+            {
+                return free_memory(ERROR_LEXICAL_ANALISYS, string);
+            }
+            break;
+            //---------------------------------------------------------------//
+
+        case ESCAPE:
+            if (next_char == '\\')
+            {
+                dyn_string_add_char(&token->value.string, next_char);
+                dyn_string_add_char(&token->value.string, '0');
+                dyn_string_add_char(&token->value.string, '9');
+                dyn_string_add_char(&token->value.string, '2');
+                state = STRING;
+            }
+            else if (next_char == 'n')
+            {
+                dyn_string_add_char(&token->value.string, '\\');
+                dyn_string_add_char(&token->value.string, '0');
+                dyn_string_add_char(&token->value.string, '1');
+                dyn_string_add_char(&token->value.string, '0');
+                state = STRING;
+            }
+            else if (next_char == 't')
+            {
+                dyn_string_add_char(&token->value.string, '\\');
+                dyn_string_add_char(&token->value.string, '0');
+                dyn_string_add_char(&token->value.string, '0');
+                dyn_string_add_char(&token->value.string, '9');
+                state = STRING;
+            }
+            else if (next_char == '"')
+            {
+                dyn_string_add_char(&token->value.string, '"');
+                state = STRING;
+            }
+            else if (isdigit(next_char))
+            {
+                switch (esc_cnt)
+
+                {
+                case 0:
+                    esc_val += (next_char - 48) * 100;
+                    esc_cnt++;
+                    break;
+
+                case 1:
+                    esc_val += (next_char - 48) * 10;
+                    esc_cnt++;
+
+                    break;
+
+                case 2:
+                    esc_val += (next_char - 48);
+                    if ((0 < esc_val) || (esc_val < 255))
+                    {
+                        dyn_string_add_char(&token->value.string, '\\');
+                        dyn_string_add_char(&token->value.string, (esc_val / 100 + 48));
+                        esc_val -= (esc_val / 100) * 100;
+                        dyn_string_add_char(&token->value.string, (esc_val / 10 + 48));
+                        esc_val -= (esc_val / 10) * 10;
+                        dyn_string_add_char(&token->value.string, esc_val + 48);
+
+                        state = STRING;
+                    }
+                    break;
+
+                default:
+                    return free_memory(ERROR_LEXICAL_ANALISYS, string);
+                }
+            }
+
+            else
+                return free_memory(ERROR_LEXICAL_ANALISYS, string);
+            break;
+
+        } //switch end
+    }     //while end
+} //get_token end

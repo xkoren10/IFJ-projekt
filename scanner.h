@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include "dyn_string.h"
 #include <error.h>
+#include <ctype.h>
 
 
 /**
@@ -46,13 +47,6 @@ typedef enum
 
 
 /**
- * @brief Array of keywords to compare with found word
- */
-const char* keywords_array[] = { "do", "else", "end", "function", "global", "if", "integer","local",
-                                 "nil", "number", "require", "return", "string", "then", "while" };
-
-
-/**
  * @enum Token_types
  * @brief Token types, also used as states of finite automata
  */
@@ -68,7 +62,7 @@ typedef enum
     INTEGER_DIVIDE,                 //  //
     PLUS,                           //  +
     MINUS,                          //  -
-    
+    DOLLAR,                         // stack bottom
 
     LESS_THAN,                      //  <
     LESS_or_EQUALS,                 //  <=
@@ -84,10 +78,14 @@ typedef enum
     KEYWORD,
 
     INT,
+    DECIMAL_NUMBER,
     NUMBER,
+    DECIMAL_POINT,
     INDEX_CHAR,                     //  'E' or 'e'
     EXPONENT,
+    EXPONENT_NUMBER,  
     EXPONENT_SIGN,                  //  + or -                           
+
 
     NIL,
 
@@ -95,16 +93,20 @@ typedef enum
     ESCAPE,
 
     LINE_COMMENTARY,                //  --
-    BLOCK_COMMENTARY_START,         //  --[[
-    BLOCK_COMMENTARY_END,           //  ]]
+    BLOCK_COMMENTARY,               //  --[[ ]]
 
     HASH,                           //  #
-    DOUBLEDOT,                      // ..
+    DOUBLEDOT,                      // ..   
     COMMA,                          // ,
     COLON,                          // :
-
+    DOT,                            // .
     EOL,
     STATE_EOF,
+
+
+    CONCATENATE,                    // ..
+    GET_LENGTH,                     // #
+
 
     ERROR = -1
 }
@@ -116,9 +118,9 @@ typedef enum
  * @union Token_value
  * @brief Definition of token values - word (id), keyword, integer or float
  */
-typedef union
+typedef struct
 {
-	Dyn_string *string;
+	Dyn_string string;
 	Keyword keyword; 
 	int integer_value;
     double decimal_value; 
@@ -135,27 +137,39 @@ typedef union
 typedef struct {
     Token_value value;
     Token_type type;
-    int line, lenght, start, end;
 } Token;
-
-
 
 
 
 /**
  * @brief Main function to get tokens
- * @param token Structure
- * @return Function 'free_token'
+ * @param token token
+ * @return function 'free_memory'
  */
 int get_token(Token *token);
 
+/**
+ * @brief Function to set source for reading
+ * @param FILE f
+ * @return void
+ */
+void set_source(FILE *f) ;
+
 
 /**
- * @brief Function to free allocated string space and return error codes
- * @param string Dynamic string
- * @param Exit_code Integer value of error defined in error.h
- * @return Error 0 if success, else Error 1
+ * @brief Function to free allocated memory
+ * @param int exit_code
+ * @param Dyn_String string
+ * @return exit_code
  */
-int free_dynamic_string(Dyn_string *string, int Exit_code);
+int free_memory(int exit_code, Dyn_string *string);
+
+/**
+ * @brief Function to set token type to ID or KEYWORD
+ * @param Dyn_string dynamic_sstring
+ * @param Token token
+ * @return Errors
+ */
+int identifier_check(Dyn_string * dynamic_string, Token *token);
 
 #endif /* SCANNER_H*/
