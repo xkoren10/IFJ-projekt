@@ -11,6 +11,7 @@
 #include "scanner.h"
 #include "stack.h"
 #include "error_codes.h"
+#include "symtable.h"
 
 /**
  * @brief Initialization and start of the expresion analysis
@@ -38,3 +39,9 @@ int eol();
  * @return Error code
  */
 int find_index(int *i1,int *i2);
+
+/**
+ * @brief Turns terminals into expression
+ * @return Error code
+ */
+int reduce()

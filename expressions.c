@@ -40,7 +40,7 @@ int eol()
 int expression_analysis(Token *token)
 {
     Stack_Init(&expression_stack);
-    dollar.type = DOLLAR; //TODO
+    dollar.type = DOLLAR; //TODO pushut to na zasobnik
     act_token = *token;
     int output = ERROR_OK;
 
@@ -69,6 +69,12 @@ int analysis()
 {
     int output = ERROR_OK;
     int i1, i2;
+    //TODO ak dostanem hash zmenim ho na operand
+    if (act_token.type == HASH)
+    {
+        hash()
+    }
+
     output = find_index(&i1, &i2);
     if (output != ERROR_OK)
     {
@@ -83,12 +89,15 @@ int analysis()
 
     case '<':
 
-        expression_stack.top->handle = true;
-        handle = false;
+        handle = true;
         terminal = true;
         Stack_Push(&expression_stack, act_token, handle, terminal);
 
         output = get_token(&act_token);
+        if (output != ERROR_OK)
+        {
+            return ERROR_LEXICAL_ANALISYS;
+        }
         output = eol();
 
         if (output != ERROR_OK)
@@ -105,7 +114,27 @@ int analysis()
         break;
 
     case '>':
-        //TODO
+        if (expression_stack.top->handle == true)
+        {
+            expression_stack.top->token.type == NUMBER;
+            expression_stack.top->terminal = false;
+            expression_stack.top->handle = false;
+        }
+        else
+        {
+            TStack_element el1, el2;
+            Stack_Top(&expression_stack, &el1);
+            Stack_Pop(&expression_stack);
+            Stack_Top(&expression_stack, &el2);
+            Stack_Pop(&expression_stack);
+
+            if(Stack_IsEmpty(&expression_stack) || expression_stack.top->token.type == DOLLAR){
+                return ERROR_SYNTAX_ANALYSIS;
+            }
+            //TODO
+
+        }
+
         break;
 
     case '=':
@@ -114,6 +143,10 @@ int analysis()
         Stack_Push(&expression_stack, act_token, handle, terminal);
 
         output = get_token(&act_token);
+        if (output != ERROR_OK)
+        {
+            return ERROR_LEXICAL_ANALISYS;
+        }
         output = eol();
 
         if (output != ERROR_OK)
@@ -130,17 +163,31 @@ int analysis()
         break;
 
     case 'e':
-        //TODO
+    //TODO ak tu mam dva dollare tak nech vrati error code ok
+        return ERROR_SYNTAX_ANALYSIS;
         break;
     }
-
+    //TODO pozriet ci nekonci vyraz ak ano nacitat tam dollar
     output = analysis();
 
     return output;
 }
 
+int reduce()
+{
+}
+
 int find_index(int *i1, int *i2)
 {
+    TStack_element tmp = *(expression_stack.top);
+    bool popped = false;
+
+    if (!tmp.terminal)
+    {
+        Stack_Pop(&expression_stack);
+        popped = true;
+    }
+
     if ((expression_stack.top->token.type == PLUS) || (expression_stack.top->token.type == MINUS))
     {
         *i1 = 0;
@@ -157,7 +204,7 @@ int find_index(int *i1, int *i2)
     {
         *i1 = 3;
     }
-    else if ((expression_stack.top->token.type == ID) || (expression_stack.top->token.type == NUMBER) || (expression_stack.top->token.type == HASH))
+    else if ((expression_stack.top->token.type == ID) || (expression_stack.top->token.type == NUMBER))
     {
         *i1 = 4;
     }
@@ -178,6 +225,11 @@ int find_index(int *i1, int *i2)
         return ERROR_SYNTAX_ANALYSIS;
     }
 
+    if (popped)
+    {
+        Stack_Push(&expression_stack, tmp.token, tmp.handle, tmp.terminal);
+    }
+
     if ((act_token.type == PLUS) || (act_token.type == MINUS))
     {
         *i2 = 0;
@@ -194,7 +246,7 @@ int find_index(int *i1, int *i2)
     {
         *i2 = 3;
     }
-    else if ((act_token.type == ID) || (act_token.type == NUMBER) || (act_token.type == HASH))
+    else if ((act_token.type == ID) || (act_token.type == NUMBER))
     {
         *i2 = 4;
     }
@@ -216,4 +268,32 @@ int find_index(int *i1, int *i2)
     }
 
     return ERROR_OK;
+}
+
+int hash()
+{
+    int output = ERROR_OK;
+    output = get_token(&act_token);
+    if (output != ERROR_OK)
+    {
+        return ERROR_LEXICAL_ANALISYS;
+    }
+
+    output = eol();
+
+    if (output != ERROR_OK)
+    {
+        return ERROR_LEXICAL_ANALISYS;
+    }
+    else
+    {
+        if (act_token.type == STATE_EOF || act_token.type != STRING)
+        {
+            return ERROR_SYNTAX_ANALYSIS;
+        }
+    }
+    bool handle = false;
+    bool terminal = true;
+    act_token.type = NUMBER;
+    act_token.value.integer_value = act_token.lenght;
 }
