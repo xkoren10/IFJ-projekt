@@ -37,7 +37,7 @@ ht_table_t local;
 
 int Next_token();
 
-void Is_Eol();
+int Is_Eol();
 
 int parse();
 

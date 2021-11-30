@@ -313,7 +313,7 @@ int Parameter(){
         if(actToken.type!=ID)
             return ERROR_SYNTAX_ANALYSIS;
 
-        //asi nacitat string atd
+        //asi nacitat string atd actToken.value.string
 
 
         output = get_token(&actToken);
