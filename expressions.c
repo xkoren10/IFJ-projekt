@@ -40,7 +40,10 @@ int eol()
 int expression_analysis(Token *token)
 {
     Stack_Init(&expression_stack);
-    dollar.type = DOLLAR; //TODO pushut to na zasobnik
+    dollar.type = DOLLAR;
+    bool handle = false;
+    bool terminal = false;
+    Stack_Push(&expression_stack, dollar, handle, terminal);
     act_token = *token;
     int output = ERROR_OK;
 
@@ -69,7 +72,6 @@ int analysis()
 {
     int output = ERROR_OK;
     int i1, i2;
-    //TODO ak dostanem hash zmenim ho na operand
     if (act_token.type == HASH)
     {
         hash();
@@ -81,17 +83,12 @@ int analysis()
         return output;
     }
 
-    bool handle;
-    bool terminal;
-
     switch (table[i1][i2])
     {
 
     case '<':
 
-        handle = true;
-        terminal = true;
-        Stack_Push(&expression_stack, act_token, handle, terminal);
+        Stack_Push(&expression_stack, act_token, true, true);
 
         output = get_token(&act_token);
         if (output != ERROR_OK)
@@ -116,31 +113,30 @@ int analysis()
     case '>':
         if (expression_stack.top->handle == true)
         {
-            expression_stack.top->token.type == NUMBER;
             expression_stack.top->terminal = false;
             expression_stack.top->handle = false;
         }
         else
         {
-            TStack_element el1, el2;
+            TStack_element el1, el2, el3;
             Stack_Top(&expression_stack, &el1);
             Stack_Pop(&expression_stack);
             Stack_Top(&expression_stack, &el2);
             Stack_Pop(&expression_stack);
+            Stack_Top(&expression_stack, &el3);
+            Stack_Pop(&expression_stack);
 
-            if(Stack_IsEmpty(&expression_stack) || expression_stack.top->token.type == DOLLAR){
+            if (Stack_IsEmpty(&expression_stack))
+            {
                 return ERROR_SYNTAX_ANALYSIS;
             }
-            //TODO
-
+            output = reduce(el1, el2, el3);
         }
 
         break;
 
     case '=':
-        handle = false;
-        terminal = true;
-        Stack_Push(&expression_stack, act_token, handle, terminal);
+        Stack_Push(&expression_stack, act_token, false, true);
 
         output = get_token(&act_token);
         if (output != ERROR_OK)
@@ -163,18 +159,45 @@ int analysis()
         break;
 
     case 'e':
-    //TODO ak tu mam dva dollare tak nech vrati error code ok
+        if ((i1 == 7) && (i2 == 7))
+        {
+            return ERROR_OK;
+        }
         return ERROR_SYNTAX_ANALYSIS;
         break;
     }
     //TODO pozriet ci nekonci vyraz ak ano nacitat tam dollar
+    if (output != ERROR_OK)
+    {
+        return output;
+    }
     output = analysis();
 
     return output;
 }
 
-int reduce()
+int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
 {
+    Token new;
+    if (!el2.terminal)
+    {
+        Stack_Push(&expression_stack, el2.token, false, false);
+    }
+    else
+    {
+        switch (el2.token.type)
+        {
+        case PLUS:
+            new.type = NUMBER;
+            //TODO new.value =
+            Stack_Push(&expression_stack, new, false, false);
+            break;
+        case MINUS:
+            new.type = NUMBER;
+            //TODO new.value =
+            Stack_Push(&expression_stack, new, false, false);
+        }
+    }
 }
 
 int find_index(int *i1, int *i2)
@@ -216,7 +239,7 @@ int find_index(int *i1, int *i2)
     {
         *i1 = 6;
     }
-    else if (expression_stack.top->token.type == DOLLAR /*TODO*/)
+    else if (expression_stack.top->token.type == DOLLAR)
     {
         *i1 = 7;
     }
@@ -258,7 +281,7 @@ int find_index(int *i1, int *i2)
     {
         *i2 = 6;
     }
-    else if (act_token.type == DOLLAR /*TODO*/)
+    else if (act_token.type == DOLLAR)
     {
         *i2 = 7;
     }
@@ -292,7 +315,9 @@ int hash()
             return ERROR_SYNTAX_ANALYSIS;
         }
     }
-    bool handle = false;
-    bool terminal = true;
-    act_token.type = NUMBER;
+    Token new;
+    int str_len = strlen(act_token.value.string.string);
+    new.type = NUMBER;
+    new.value.integer_value = str_len;
+    act_token = new;
 }
