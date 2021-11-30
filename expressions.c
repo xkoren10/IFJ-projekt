@@ -10,7 +10,7 @@
 
 #include "expressions.h"
 
-const char table[7][7] = {
+const char table[8][8] = {
     //               +-  *///  ..   rel   i    (    )    $
     /*  + -      */ {'>', '<', '>', '>', '<', '<', '>', '>'},
     /*  * / //   */ {'>', '>', '>', '>', '<', '<', '>', '>'},
@@ -196,8 +196,11 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
             new.type = NUMBER;
             //TODO new.value =
             Stack_Push(&expression_stack, new, false, false);
+        default:
+            break;
         }
     }
+    return ERROR_OK; //TODO
 }
 
 int find_index(int *i1, int *i2)
@@ -320,4 +323,6 @@ int hash()
     new.type = NUMBER;
     new.value.integer_value = str_len;
     act_token = new;
+
+    return output;
 }
