@@ -72,7 +72,7 @@ int analysis()
     //TODO ak dostanem hash zmenim ho na operand
     if (act_token.type == HASH)
     {
-        hash()
+        hash();
     }
 
     output = find_index(&i1, &i2);
@@ -295,5 +295,4 @@ int hash()
     bool handle = false;
     bool terminal = true;
     act_token.type = NUMBER;
-    act_token.value.integer_value = act_token.lenght;
 }
