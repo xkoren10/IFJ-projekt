@@ -2,9 +2,10 @@
 require "ifj21"
 
 
-global x: integer = 5
 
-function main()     
+
+function main()   
+local x: integer = 5  
 local y : integer
 local z: integer=0
 
