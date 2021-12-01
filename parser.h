@@ -14,13 +14,20 @@ Token actToken;
 /* //next token ehm bud toto alebo nejaka funkcia
 Token nextToken; */
 
-ht_table_t global;
+ht_table_t *global;
 
-ht_table_t local;
+ht_table_t *local;
+
+ht_item_t *current_item;
+
+func_val_t *current_LL;
 
 
-char* ID_name;
+char* func_name;
+char* var_name;
 
+//ALEBO AJ TOKEN
+Token_type current;
 
 int Next_token();
 
