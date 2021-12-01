@@ -1,3 +1,23 @@
+/**
+ * @file parser.c
+ * @author xpyczl00
+ * @brief 
+ * @version 0.1
+ * @date 2021-12-01
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
+/* POZNAMKY
+VSADE OVERENIA EOFOV
+BUDE TREBA SKONROLOVAT SYMTABLE
+HLOZIMU POSIELAT FUNKCIE S PARAMETRAMI
+MAREKOVI BUDEM MUSIET POSIELAT LOKALNU TABULKU NA KONTROLU PREMENNYCH 
+PREPISAT PARAMETRE V PARSER.H
+*/
+
+
 #include "parser.h"
 
 //fukncia na dalsi token
@@ -23,7 +43,11 @@ int Is_Eol(){
 
 int parse(){
 
-    Stack_Init(&syntaxStack);
+//inicializacia SYMTABLES
+
+    ht_init(global);
+    ht_init(local);
+
     int output;
     output = get_token(&actToken);
     output = Is_EOL();
@@ -62,7 +86,8 @@ int Program(){
         if(!actToken.type != ID)// todo string este neprocesujem - matej koren 2021
             return ERROR_SYNTAX_ANALYSIS; 
 
-        //Vypis stringu "require ifj21"       
+        
+        //header ()   
     }
 
     return Deklaracie_or_Definicie();
@@ -124,6 +149,15 @@ int Deklaracia_Funkcie(){
     else{
         //TODO načítanie stringu
         // nacitanie stringu do symtable
+        //poslat hlozimu parametre,
+
+
+        //VYTVORIM SI STRUKTURU DO KTOREJ DAM ID ALEBO LEN TMP PREMENNA NECH USETRIM VOLANIE
+        ID_name = actToken.value.string.string;
+
+        //ja by som to ale robil inak
+        /* ht_insert(global,actToken.value.string); */
+        
 
         output = get_token(&actToken);
         output = Is_EOL();
@@ -140,7 +174,14 @@ int Deklaracia_Funkcie(){
         if(actToken.value.keyword!=KEYWORD_FUNCTION){
             return ERROR_SYNTAX_ANALYSIS;
         }
-        
+        //NENI PREMENNA, VALUE == NULL
+        /* ht_insert(global,ID_name,value == NULL,); */
+
+
+
+
+
+
         output = get_token(&actToken);
         output = Is_EOL();
 
@@ -150,8 +191,22 @@ int Deklaracia_Funkcie(){
         output = get_token(&actToken);
         output = Is_EOL();
 
-        if(actToken.type !=RIGHT_PARENTHESIS)
-            output = Typy();
+        if(actToken.type !=RIGHT_PARENTHESIS){
+        
+            func_val_t *Types= malloc(sizeof(struct func_val));
+            Types->next=NULL;
+            output = Typy(&Types); //poslem do typov meno a zapisu sa vstupne typy
+            //TU ZACINA SRANDA, MUSIM SI VYTVORIT PREDTYM LL KTORY POSLEM DO TYPOV
+
+
+            ht_item_t *current;
+            ht_insert(global,ID_name);
+            current = ht_search(global,ID_name);
+            current->inval = Types;
+            /* current->string_val =NULL;
+            current->var_value = NULL; */
+
+        }
 
         if(output!=ERROR_OK)
             return output;
@@ -169,20 +224,33 @@ int Deklaracia_Funkcie(){
         if(actToken.type!=COLON){
             return ERROR_SYNTAX_ANALYSIS;
         }
+        //ll
+        //novy ll
+        func_val_t *outTypes= malloc(sizeof(struct func_val));
+            outTypes->next=NULL;
+        output = Typy(&outTypes); //vystupne typy
 
-        output = Typy();
+        Hloziho_func(ID_name,);
 
         return output;
 
 
     }
 }
-    int Typy(){
-        //TODO AK NENI PRVY
+    int Typy(func_val_t *Types){ //vrati mi pointer na head linked listu
+        //PRVY TYP MUSIM NASTAVIT NA HEAD, AK HEAD SA NEROVNA NULL
+        
+
+        
+
+
+
+
         int output;
-        output = Typ();
-        // ak chyba return
+        output = Typ(&Types);
+
         if(output != ERROR_OK)
+
                 return output;
 
         output = get_token(&actToken);
@@ -190,22 +258,64 @@ int Deklaracia_Funkcie(){
 
         if(actToken.type == COMMA)
         {    
-            Typy ();}
+            Typy (&Types);}
         else
             return ERROR_OK;
 
     }
-    int Typ(){
+    int COMPARE_typ(char* ID_name){
         int output;
         output = get_token(&actToken);
         output = Is_EOL();
-        if(actToken.type!= KEYWORD)
+         switch (actToken.type)
+        {
+        case KEYWORD_INTEGER:
+        case KEYWORD_STRING:
+        case KEYWORD_NUMBER:
+            
+            //proste bude prechadzad 
+
+            }
+
+
+
+
+    }
+
+    int Typ(func_val_t *Types){
+        int output;
+        output = get_token(&actToken);
+        output = Is_EOL();
+        /* if(actToken.type!= KEYWORD)  //TOTO CO KUR*A */
 
         switch (actToken.type)
         {
         case KEYWORD_INTEGER:
         case KEYWORD_STRING:
         case KEYWORD_NUMBER:
+            func_val_t *p,*tmp;
+            tmp = malloc(sizeof(struct func_val));
+            tmp->typp=actToken.type;
+            /* tmp->var_string = NULL;
+            tmp->var_val = NULL; */
+            if (Types == NULL)
+            {
+                Types = tmp;
+            }
+            else{
+                p = Types;
+                while(p->next!=NULL){
+                    p = p->next;
+
+
+
+                }
+                p->next = tmp;
+
+            }
+            
+
+        //NASTAVIM FUNC_VAL.PAR_TYPE = ACTTOKEN.TYPE
             return ERROR_OK;       
         }
         return ERROR_SYNTAX_ANALYSIS;
@@ -242,6 +352,16 @@ int Deklaracia_Funkcie(){
 
         if(actToken.type != ID)
             return ERROR_SYNTAX_ANALYSIS;
+        
+        
+        //overenie ci je v tabulke
+        ID_name = actToken.value.string.string;
+        if (ht_search(global,ID_name)!=0)
+            return ERROR_SEMANTIC;
+        
+
+        
+
 
         output = get_token(&actToken);
         output = Is_EOL();
@@ -252,8 +372,12 @@ int Deklaracia_Funkcie(){
         output = get_token(&actToken);
         output = Is_EOL();
 
-        if(actToken.type != RIGHT_PARENTHESIS)
-            output = Zoznam_parametrov();
+        if(actToken.type != RIGHT_PARENTHESIS){
+            output = Zoznam_parametrov(ID_name);
+
+
+        }
+            
 
         output = Zoznam_parametrov();
         if(output!=ERROR_OK)
@@ -283,9 +407,9 @@ int Deklaracia_Funkcie(){
 
 
     }
-int Zoznam_parametrov(){
+int Zoznam_parametrov(char *ID_name){
     int output;
-    output = Parameter();
+    output = Parameter(ID_name);
 
     if(output != ERROR_OK)
         return output;
@@ -295,7 +419,7 @@ int Zoznam_parametrov(){
 
     if(actToken.type == COMMA)
         {    
-            Parameter ();}
+            Zoznam_parametrov ();}
         else
             return ERROR_OK;
 
@@ -310,19 +434,27 @@ int Parameter(){
       int output;
         output = get_token(&actToken);
         output = Is_EOL();
+
+        //pridat meno do lokalnej  
         if(actToken.type!=ID)
             return ERROR_SYNTAX_ANALYSIS;
 
+        char* ID_name = actToken.value.string.string;
         //asi nacitat string atd actToken.value.string
 
 
         output = get_token(&actToken);
         output = Is_EOL();
 
-        if(actToken.type!=COMMA)
+        if(actToken.type!=COLON)
             return ERROR_SYNTAX_ANALYSIS;
 
-        output = Typ();
+        //No, takže takto : do funkcie sa pošle nazov premennej ktory sa pripiše
+        //a taktiež okrem ineho sa pošle aj typ ktory ziskame z linked listu ktorym 
+        //budem musiet postupne prechadzat ale ten typ budem musiet poslat este skor, a overi sa ci je typ spravny 
+        //a taktiez ci je typ uz spomenuty predtym
+        
+        output = COMPARE_Typ(ID_name);
         return output;
 }
 

@@ -13,7 +13,7 @@
 #define _symtable_
 
 #include <stdbool.h>
-
+#include "scanner.h"
 /**
  * @brief Table Size definition
  * 
@@ -27,10 +27,23 @@ extern int HT_SIZE;
  * 
  */
 
+typedef struct func_val{
+float var_val;
+char* var_string;
+Token_type typp;
+func_val_t *next;
+}func_val_t;
+
+
+
+
 typedef struct ht_item {
-  char *key;            // kľúč prvku
-  float value;          // hodnota prvku
-  struct ht_item *next; // ukazateľ na ďalšie synonymum
+  char *key;            // kľúč prvku, meno premennej alebo funkcie
+  float var_value;
+  char *string_val;          //hodnota premennej string
+  struct func_val *inval; //vstupne parametre obe budu heady
+  struct func_val *outval;   //vystupne parametre
+  struct ht_item *next; // ukazateľ na ďalšie synonymum nanic mi to je ale sak neham
 } ht_item_t;
 
 /**
@@ -70,7 +83,7 @@ ht_item_t *ht_search(ht_table_t *table, char *key);
  * @param key 
  * @param data 
  */
-void ht_insert(ht_table_t *table, char *key, float data);
+void ht_insert(ht_table_t *table, char *key);
 
 /**
  * @brief Getting a pointer of the item with given key, if not found returns NULL

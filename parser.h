@@ -14,25 +14,12 @@ Token actToken;
 /* //next token ehm bud toto alebo nejaka funkcia
 Token nextToken; */
 
- //TODO
- TStack syntaxStack;
- 
-tStack stack;
-//EOL
-bool scanner_EOL;
-
-string Function_name;
-
-int Param_counter;
-
-int label_counter;
-
 ht_table_t global;
 
 ht_table_t local;
 
 
-
+char* ID_name;
 
 
 int Next_token();

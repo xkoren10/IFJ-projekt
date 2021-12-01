@@ -45,6 +45,15 @@ void ht_init(ht_table_t *table)
     (*table)[i] = NULL;
   }
 }
+
+void item_null(ht_item_t *item){
+  item->inval=NULL;
+  item->next=NULL;
+  item->outval=NULL;
+  item->string_val=NULL;
+  item->var_value = NULL;
+  
+}
 /**
  * @brief Searching for an item from the table, if not found returns NULL
  * 
@@ -73,13 +82,14 @@ ht_item_t *ht_search(ht_table_t *table, char *key)
  * @param key 
  * @param value 
  */
-void ht_insert(ht_table_t *table, char *key, float value)
+void ht_insert(ht_table_t *table, char *key, float var_val, func_val_t *inval, func_val_t *outval)
 {
 
   ht_item_t *insert = ht_search(table, key);
   if (insert)
   {
-    insert->value = value;
+    insert->var_val = value;
+    //sem dopisem len prepisem a napisem 
     return;
   }
   else
