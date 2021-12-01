@@ -82,30 +82,23 @@ ht_item_t *ht_search(ht_table_t *table, char *key)
  * @param key 
  * @param value 
  */
-void ht_insert(ht_table_t *table, char *key, float var_val, func_val_t *inval, func_val_t *outval)
+ht_item_t *ht_insert(ht_table_t *table, char *key)
 {
 
   ht_item_t *insert = ht_search(table, key);
-  if (insert)
-  {
-    insert->var_val = value;
-    //sem dopisem len prepisem a napisem 
-    return;
-  }
-  else
-  {
-    insert = (ht_item_t *)malloc(sizeof(ht_item_t));
+
+  insert = (ht_item_t *)malloc(sizeof(ht_item_t));
     if (!insert)
       return;
     insert->key = key;
-    insert->value = value;
     insert->next = NULL;
     int hash_index = get_hash(key);
 
-    insert->next = (*table)[hash_index];
+    insert->next = (*table)[hash_index];    //teoreticky netreba ani toto, vlastne vobec
     (*table)[hash_index] = insert;
+    return insert;
   }
-}
+
 
 /**
  * @brief Getting a pointer of the item with given key, if not found returns NULL
@@ -114,6 +107,8 @@ void ht_insert(ht_table_t *table, char *key, float var_val, func_val_t *inval, f
  * @param key 
  * @return float* 
  */
+
+//CELKOM ZBYTOCNE
 float *ht_get(ht_table_t *table, char *key)
 {
   ht_item_t *get = ht_search(table, key);
@@ -127,6 +122,8 @@ float *ht_get(ht_table_t *table, char *key)
  * @param table 
  * @param key 
  */
+
+//ESTE NEVIEM
 void ht_delete(ht_table_t *table, char *key)
 {
   int hash_index = get_hash(key);
@@ -159,6 +156,8 @@ void ht_delete(ht_table_t *table, char *key)
  * 
  * @param table 
  */
+
+//NEVIEM
 void ht_delete_all(ht_table_t *table)
 {
   ht_item_t *tmp, *delete;
