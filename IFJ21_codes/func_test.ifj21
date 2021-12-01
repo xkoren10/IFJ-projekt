@@ -1,0 +1,19 @@
+
+
+require "ifj21"
+
+global foo: function(string): string
+
+function bar(): integer
+    foo("retard")
+    return 1
+
+function foo(var: string): string
+    return var
+
+function main()
+    bar()
+end
+
+main()
+
