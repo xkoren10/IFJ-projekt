@@ -44,4 +44,10 @@ int find_index(int *i1,int *i2);
  * @brief Turns terminals into expression
  * @return Error code
  */
-int reduce()
+int reduce(TStack_element el1,TStack_element el2, TStack_element el3);
+
+/**
+ * @brief Turns tokens with hash and string into a number
+ * @return Error code
+ */
+int hash();
