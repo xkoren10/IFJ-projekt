@@ -170,7 +170,7 @@ int get_token(Token *token)
 
     char next_char;
 
-    if (dyn_string_init(string) != 0)
+dyn_string_init(string);
     {
         return ERROR_INTERN;
     }
