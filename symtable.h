@@ -27,12 +27,12 @@ extern int HT_SIZE;
  * 
  */
 
-typedef struct func_val{
+typedef struct func_val {
 float var_val;
 char* var_string;
 char* var_name;
 Token_type typp;
-func_val_t *next;
+struct func_val *next;
 }func_val_t;
 
 
@@ -43,8 +43,8 @@ typedef struct ht_item {
   float var_value;
   char *string_val;       //hodnota premennej string
   Token_type var_type;          
-  struct func_val *inval; //vstupne parametre obe budu heady
-  struct func_val *outval;   //vystupne parametre
+  func_val_t *inval; //vstupne parametre obe budu heady
+  func_val_t *outval;   //vystupne parametre
   struct ht_item *next; // ukazateľ na ďalšie synonymum nanic mi to je ale sak neham
 } ht_item_t;
 

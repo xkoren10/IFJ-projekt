@@ -24,8 +24,8 @@
 typedef struct
 {
     char *string;
-    unsigned int length;
-    unsigned int size;
+     int length;
+     int size;
 } Dyn_string;
 
 /**
@@ -33,7 +33,7 @@ typedef struct
  * @brief Initialization of memory for dynamic string
  * @return True if success, else false
  */
-bool dyn_string_init(Dyn_string *s);
+int dyn_string_init(Dyn_string *s);
 
 /**
  * @param s Pointer to dynamic string
@@ -79,6 +79,6 @@ bool dyn_string_copy(Dyn_string *src, Dyn_string *dest);
  * @brief  Compares dynamic string with constant string
  * @return Returns 1, 0, or -1 (greater than, equal to, or less than s2)
  */
-int dyn_string_compare(Dyn_string *s, const char *const_string);
+int dyn_string_compare(Dyn_string s, const char *const_string);
 
 #endif  /* DYN_STRING_H*/

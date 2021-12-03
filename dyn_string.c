@@ -14,16 +14,18 @@
 
 #define DYN_STRING_LENGTH 8 /// 1 byte
 
-bool dyn_string_init(Dyn_string *s)
+int dyn_string_init(Dyn_string *s)
 {
-    if ((s->string = (char *)malloc(DYN_STRING_LENGTH)) != NULL)                         // Successful allocation
+    if ((s->string = (char *)malloc(DYN_STRING_LENGTH*sizeof(char))) != NULL)                         // Successful allocation
     {
-        dyn_string_clear(s);                                                         // Setting parameters
-        s->size = sizeof(s);
-        return true;
+        s->length=0;
+        s->string[0]= '\0';                                                     // Setting parameters
+        s->size = DYN_STRING_LENGTH;
+
+        return ERROR_OK;
     }
 
-    return false;
+    return ERROR_INTERN;
 }
 
 void dyn_string_free(Dyn_string *s)
@@ -50,7 +52,8 @@ bool dyn_string_add_char(Dyn_string *s, char c)
         s->size = new_size;
     }
 
-    s->string[s->length++] = c;
+    s->string[s->length] = c;
+    s->length++;
     s->string[s->length] = '\0';                                                        // Adding character and terminator
 
     return true;
@@ -80,7 +83,7 @@ bool dyn_string_add_const_str(Dyn_string *s, const char *const_string)
 bool dyn_string_copy(Dyn_string *src, Dyn_string *dest)
 {
     unsigned int new_length = src->length;
-    if (new_length >= dest->size)
+    if (new_length >= (unsigned) dest->size)
     {
         if ((dest->string = (char *)realloc(dest->string, new_length + 1))==NULL)        // Successful reallocation
         {
@@ -95,7 +98,7 @@ bool dyn_string_copy(Dyn_string *src, Dyn_string *dest)
     return true;
 }
 
-int dyn_string_compare(Dyn_string *s, const char *const_string)
+int dyn_string_compare(Dyn_string s, const char *const_string)
 {
-    return strcmp(s->string, const_string);
+    return strcmp(s.string, const_string);
 }

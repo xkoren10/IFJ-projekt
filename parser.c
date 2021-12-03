@@ -23,7 +23,9 @@ AK NIE 0
 VSADE OVERIT CI TOKEN JE OK
 */
 
+
 #include "parser.h"
+
 
 //fukncia na dalsi token
 int Next_token()
@@ -36,7 +38,7 @@ int Next_token()
 }
 
 //funkcia na skipnutie EOLu
-int Is_Eol()
+/* int Is_Eol()
 {
     int output = ERROR_OK;
     if (actToken.type == EOL)
@@ -45,45 +47,46 @@ int Is_Eol()
         Is_EOL();
     }
     return output;
-}
+} */
 
 int parse()
 {
-
-    //inicializacia SYMTABLES
-
-    ht_init(global);
-    ht_init(local);
-
     int output;
     output = get_token(&actToken);
+    //inicializacia SYMTABLES
+    ht_table_t tmp_global;
+    global = &tmp_global;
+    ht_init(global);
+
+    ht_table_t tmp_local;
+    local = &tmp_local;
+    ht_init(local);
+
+
+
+    
     
 
     if (output != ERROR_OK)
         return ERROR_LEXICAL_ANALISYS;
-
+    
     if (actToken.type == STATE_EOF)
         return ERROR_SYNTAX_ANALYSIS;
-        
     return Program();
 
 }
 int Program()
 {
     int output;
-
     if (actToken.value.keyword != KEYWORD_REQUIRE)
         return ERROR_SYNTAX_ANALYSIS;
         
-        output = get_token(&actToken);
+    output = get_token(&actToken);
         
-        if (output != ERROR_OK)     //čo vracia token
+    if (output != ERROR_OK)     //čo vracia token
             return ERROR_LEXICAL_ANALISYS;
-        
-        if (actToken.type == STATE_EOF)
-            return ERROR_SYNTAX_ANALYSIS;
 
-        if (!actToken.type != ID) 
+    if (actToken.type != STRING) 
             return ERROR_SYNTAX_ANALYSIS;
 
         //header () zavola hlozimu
@@ -106,28 +109,45 @@ int Deklaracie_or_Definicie()
 
     else if (actToken.value.keyword == KEYWORD_GLOBAL)
     {
-        output = Deklaracie_Funckie();
+        
+        output = Deklaracie_Funkcie();
+        fprintf(stdout,"%d no ukaz sa",actToken.value.keyword);
+
+        if (actToken.value.keyword == KEYWORD_FUNCTION)
+        {
+        output = Definicia_Funkcie();
+        return output;
+        }
+
+        //tu sa vrati ok
     }
     else if (actToken.value.keyword == KEYWORD_FUNCTION)
     {
         output = Definicia_Funkcie();
+        return output;
     }
     else
     {
         return ERROR_SYNTAX_ANALYSIS;
     }
 
+   
+
+
+
 
     if (output != ERROR_OK)
         return output;
         
     Deklaracie_or_Definicie();
+    //rekurzivne volanie
 
     //TOTO BY MALO BYT FAJN
 
-
+    return 69;
 }
-int Deklaracia_Funkcie()
+
+int Deklaracie_Funkcie()
 {
 
     //vsade overit eof?
@@ -143,6 +163,7 @@ int Deklaracia_Funkcie()
         return ERROR_SYNTAX_ANALYSIS;
     
     
+    
 
     //TODO
     if (actToken.type != ID)
@@ -151,9 +172,9 @@ int Deklaracia_Funkcie()
     }
     else
     {
-
+        
         //ULOZIM SI PREMENNU A POTOM JU PRIDAM DO HT
-        ID_name = actToken.value.string.string;
+        func_name = actToken.value.string.string;
 
         output = get_token(&actToken);
 
@@ -168,7 +189,7 @@ int Deklaracia_Funkcie()
         {
             return ERROR_SYNTAX_ANALYSIS;
         }
-
+        
         output = get_token(&actToken);
 
         if (output != ERROR_OK)
@@ -180,6 +201,7 @@ int Deklaracia_Funkcie()
         if (actToken.value.keyword != KEYWORD_FUNCTION)
             return ERROR_SYNTAX_ANALYSIS;
 
+        
 
         output = get_token(&actToken);
         
@@ -192,8 +214,8 @@ int Deklaracia_Funkcie()
 
         if (actToken.type != LEFT_PARENTHESIS)
             return ERROR_SYNTAX_ANALYSIS;
-
-
+        
+    
         output = get_token(&actToken);
 
 
@@ -207,35 +229,40 @@ int Deklaracia_Funkcie()
 
         if (actToken.type != RIGHT_PARENTHESIS)
         {
+            
             //Dočasny LL predam do typy
             func_val_t *Types = malloc(sizeof(struct func_val));
-            Types->next = NULL;
+            
            
-            output = Typy(&Types); 
+            output = Typy(Types); 
+            fprintf(stdout,"%d",Types->typp);
+            fprintf(stdout,"%d",Types->next->typp);
+            fprintf(stdout,"%d",Types->next->next->typp);
+            
+            /* fprintf(stdout,"%d TYP",Types->typp); */
+            /* fprintf(stdout,"%d typ",Types->typp); */
+            /* return ERROR_OK; */
+            
             
             //vrati mi LL na ktorom su typy v poradi
             
             //Novy element dam mu ID a priradil LL, staci aby insert vracial nemusim ani definovat
-            ht_item_t *current = ht_insert(global, ID_name);
-            current->inval = Types;
+            ht_item_t *current = ht_insert(global, func_name);
+            current->inval = Types->next; //next 
 
         }
 
         if (output != ERROR_OK)
             return output;
-        
-        output = get_token(&actToken);
-
-        if (output != ERROR_OK)
-            return ERROR_LEXICAL_ANALISYS;
 
         if (actToken.type == STATE_EOF)
             return ERROR_SYNTAX_ANALYSIS;
-
-
+        
         if (actToken.type != RIGHT_PARENTHESIS)
             return ERROR_SYNTAX_ANALYSIS;
 
+        //FUNKCIA MOZE BYT BEZ vystupu
+        
 
         output = get_token(&actToken);
 
@@ -251,38 +278,39 @@ int Deklaracia_Funkcie()
 
         //Dočasny LL predam do typy //MOZNO BY SOM MAL DAT FREE
         func_val_t *outTypes = malloc(sizeof(struct func_val));
+        
         outTypes->next = NULL;
         
-        //vystupne typy
-        output = Typy(&outTypes);
-
-        ht_item_t *current2 = ht_insert(global, ID_name);
-        current2->outval = outTypes;
+        //vystupne typy ,ako viem ze je prazdny??
+        output = get_token(&actToken);
+        output = Typy(outTypes);
+        
+     
+        ht_item_t *current2 = ht_insert(global, func_name);
+        current2->outval = outTypes->next;
 
 
         //predam mu UDAJE NA FUKNCIU
         /* Hloziho_func(ID_name, ); */
-
         return output;
     }
 }
-int Definicia_Funckie()
+int Definicia_Funkcie()
 {
     //EFOY
     int output;
-    output = get_token(&actToken);
+    /* output = get_token(&actToken); */
 
-    if (output != ERROR_OK)
-        return ERROR_LEXICAL_ANALISYS;
+    /* if (output != ERROR_OK)
+        return ERROR_LEXICAL_ANALISYS; */
 
     if (actToken.type == STATE_EOF)
-        return ERROR_SYNTAX_ANALYSIS;
-
-
+        return ERROR_SYNTAX_ANALYSIS;  
+    
     output = Hlavicka_Funkcie();
     if (output != ERROR_OK)
         return output;
-
+    
     output = Telo_Funkcie();
     if (output != ERROR_OK)
         return output;
@@ -290,12 +318,13 @@ int Definicia_Funckie()
     return ERROR_OK;
 }
 
-int Hlavicka_funkcie()
+int Hlavicka_Funkcie()
 {
     //eofy
+    fprintf(stdout,"%d",actToken.type);
+    return ERROR_OK;
     int output;
-    output = get_token(&actToken);
-
+    
     if (output != ERROR_OK)
         return ERROR_LEXICAL_ANALISYS;
 
@@ -303,10 +332,14 @@ int Hlavicka_funkcie()
         return ERROR_SYNTAX_ANALYSIS;
     
 
-    if (actToken.type != KEYWORD_FUNCTION)
+    if (actToken.value.keyword != KEYWORD_FUNCTION)
         return ERROR_SYNTAX_ANALYSIS;
 
+    //preco je to lava zatvorka 
+    
     output = get_token(&actToken);
+
+    return ERROR_OK;
 
     if (output != ERROR_OK)
         return ERROR_LEXICAL_ANALISYS;
@@ -317,12 +350,30 @@ int Hlavicka_funkcie()
     if (actToken.type != ID)
         return ERROR_SYNTAX_ANALYSIS;
 
+    fprintf(stdout,"%d",actToken.type);
+
+    
+
+    fprintf(stdout,"%s",actToken.value.string.string);
     //DOCASNA PREMENNA A HLADANIE CI JE V TABULKE
     func_name = actToken.value.string.string;
-    if (ht_search(global, func_name) != 0)
-        return ERROR_SEMANTIC;
 
+    ht_item_t* over;
+    over = ht_search(global,func_name);
+
+    fprintf(stdout,"%s",func_name); //THIS IS THE PROBLEM
+    return ERROR_OK;
+
+    
+    /* if (over->key == NULL) // existuje ale overit ci tam je
+        return ERROR_SEMANTIC; */
+    
+    return ERROR_OK;
+
+
+ fprintf(stdout,"%d",actToken.type);
     output = get_token(&actToken);
+
 
     if (output != ERROR_OK)
         return ERROR_LEXICAL_ANALISYS;
@@ -330,27 +381,42 @@ int Hlavicka_funkcie()
     if (actToken.type == STATE_EOF)
         return ERROR_SYNTAX_ANALYSIS;    
 
+   
+
     if (actToken.type != LEFT_PARENTHESIS)
         return ERROR_SYNTAX_ANALYSIS;
-
+  
     output = get_token(&actToken);
 
     if (actToken.type == STATE_EOF)
         return ERROR_SYNTAX_ANALYSIS;    
 
-    if (actToken.type != LEFT_PARENTHESIS)
-        return ERROR_SYNTAX_ANALYSIS;    
-    
 
     if (actToken.type != RIGHT_PARENTHESIS)
     {
+        
         //POSIELAM MENO FUNKCIE NECH SI VIEM OVERIT TYPY
         //nacitam si prvy typ do tokenu
         current_item = ht_search(global,func_name);
+
+        /* fprintf(stdout,"%d",current_item->inval->typp); */
+        return ERROR_OK;
         //ci tam je nieco ale to teoreticky overi OVERtyp;
-        current_LL = current_item->inval;
+        if (current_item->inval==NULL)
+        {
+            fprintf(stdout,"skusim");
+            return ERROR_OK;
+
+            fprintf(stdout,"mam daco");
+            current_LL = current_item->inval;
+            
+        }
+        
+        
+        return ERROR_OK;
         output = Zoznam_parametrov();
     }
+    
 
     if (output != ERROR_OK)
         return output;
@@ -392,16 +458,23 @@ int COMPARE_Typy()
 
     if (actToken.type == COMMA)
     {
+        //get token
+        output = get_token(&actToken);
         COMPARE_Typy();
+        return output;
     }
     else
         return ERROR_OK;
+    return 69;
 }
-int COMPARE_typ()
+int COMPARE_Typ()
 {
     int output;
-    output = get_token(&actToken);
-    //overit asi
+    
+
+    /* if (output != ERROR_OK)
+        return output;
+    //overit asi */
 
     if (current_LL->typp == actToken.type)
     {
@@ -422,43 +495,53 @@ int Typy(func_val_t *Types)
 { 
     //VIEM ZE NEBUDE PRAZDNE
     int output;
-    output = Typ(&Types);
-
+    output = Typ(Types);
+    
     if (output != ERROR_OK)
-        return output;
+       return ERROR_SYNTAX_ANALYSIS;
+
 
     output = get_token(&actToken);
+    
 
 
     if (actToken.type == COMMA)
     {
-        Typy(&Types);
+        
+        output = get_token(&actToken);
+        /* fprintf(stdout,"act %d act",actToken.type); */
+        output=Typy(Types);
+        return output;
     }
     else
         return ERROR_OK;
+    return 69;
 }
 
 
 
 int Typ(func_val_t *Types)
 {
-    int output;
-    output = get_token(&actToken);
-
-    if (output != ERROR_OK)
-        return ERROR_LEXICAL_ANALISYS;
-
+    /* fprintf(stdout,"teraz = %d",actToken.value.keyword); */
+    
+    /* output = get_token(&actToken); */
+    
+    /* fprintf(stdout,"potom = %d",actToken.type); */
+    /* if (output != ERROR_OK)
+        return ERROR_LEXICAL_ANALISYS; */
+    
     //EOF NETREBA OSETROVAT
-
-    switch (actToken.type)
+    func_val_t *p, *tmp;
+    switch (actToken.value.keyword)
     {
     case KEYWORD_INTEGER:
     case KEYWORD_STRING:
     case KEYWORD_NUMBER:
         
-        func_val_t *p, *tmp;
+        
         tmp = malloc(sizeof(struct func_val));
-        tmp->typp = actToken.type;
+        tmp->typp = actToken.value.keyword;
+        fprintf(stdout," L%dL",tmp->typp);
 
         if (Types == NULL)
         {
@@ -476,6 +559,9 @@ int Typ(func_val_t *Types)
 
         //NASTAVIM FUNC_VAL.PAR_TYPE = ACTTOKEN.TYPE
         return ERROR_OK;
+    default: 
+        break;
+        
     }
     return ERROR_SYNTAX_ANALYSIS;
 }
@@ -499,6 +585,7 @@ int Zoznam_parametrov()
     }
     else
         return ERROR_OK;
+    return 69;
 }
 
 int Parameter()
@@ -534,4 +621,8 @@ int Parameter()
 
     output = COMPARE_Typ();
     return output;
+}
+int Telo_Funkcie(){
+    return 0;
+
 }

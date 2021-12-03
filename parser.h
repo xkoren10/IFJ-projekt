@@ -3,9 +3,10 @@
 
 #include "error_codes.h"
 #include "dyn_string.h"
-#include "stack.h"
+/* #include "stack.h" */
 #include "symtable.h"
 #include "scanner.h"
+/* #include "expressions.h" */
 #include <stdbool.h>
 
 //current token
@@ -20,7 +21,7 @@ ht_table_t *local;
 
 ht_item_t *current_item;
 
-func_val_t *current_LL;
+struct func_val *current_LL;
 
 
 char* func_name;
@@ -39,7 +40,7 @@ int Program();
 
 int Deklaracie_or_Definicie();
 
-int Deklaracie_Funckie();
+int Deklaracie_Funkcie();
 
 int Definicia_Funkcie();
 
@@ -62,5 +63,13 @@ int Vyraz();
 int Viac_ID();
 
 int Prikaz();
+
+int Typy(struct func_val *f);
+
+int Typ(struct func_val *f);
+
+int COMPARE_Typy();
+
+int COMPARE_Typ();
 
 #endif
