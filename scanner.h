@@ -101,7 +101,6 @@ typedef enum
     COMMA,                          // ,
     COLON,                          // :
     DOT,                            // .
-    EOL,
     STATE_EOF,
 
 
