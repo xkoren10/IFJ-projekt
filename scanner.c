@@ -142,7 +142,7 @@ int identifier_check(Dyn_string *dynamic_string, Token *token)
     else
     {
         (*token).type = ID;
-        if (dyn_string_copy(dynamic_string, &token->value.string))
+        if (!dyn_string_copy(dynamic_string, &token->value.string))
         {
             return free_memory(ERROR_INTERN, dynamic_string);
         }
@@ -170,7 +170,9 @@ int get_token(Token *token)
 
     char next_char;
 
-    if (dyn_string_init(string) != 0)
+
+
+   if (dyn_string_init(string) != 0)
     {
         return ERROR_INTERN;
     }
@@ -307,6 +309,11 @@ int get_token(Token *token)
 
                 state = ASSIGN;
             }
+            else if (next_char == '~')
+            {
+
+                state = ALMOST_EQUAL;
+            }
             else if (next_char == '<')
             {
 
@@ -369,7 +376,7 @@ int get_token(Token *token)
             }
             else
             {
-                ungetc(next_char, stdin);
+                ungetc(next_char, source_file);
                 token->type = LESS_THAN;
             }
             return free_memory(ERROR_OK, string);
@@ -386,7 +393,7 @@ int get_token(Token *token)
             }
             else
             {
-                ungetc(next_char, stdin);
+                ungetc(next_char, source_file);
                 token->type = GREATER_THAN;
             }
             return free_memory(ERROR_OK, string);
@@ -403,12 +410,27 @@ int get_token(Token *token)
             }
             else
             {
-                ungetc(next_char, stdin);
+                ungetc(next_char, source_file);
                 token->type = ASSIGN;
             }
             return free_memory(ERROR_OK, string);
             break;
 
+            //---------------------------------------------------------------//
+
+        case (ALMOST_EQUAL):
+
+            if (next_char == '=')
+            {
+
+                token->type = ALMOST_EQUAL;
+            }
+            else
+            {
+               return free_memory(ERROR_LEXICAL_ANALISYS, string);                
+            }
+            return free_memory(ERROR_OK, string);
+            break;
             //---------------------------------------------------------------//
         case (DOT):
             if (next_char == '.')
@@ -418,7 +440,7 @@ int get_token(Token *token)
             }
             else
             {
-                ungetc(next_char, stdin);
+                ungetc(next_char, source_file);
                 return free_memory(ERROR_INTERN, string);
             }
             return free_memory(ERROR_OK, string);
@@ -435,7 +457,7 @@ int get_token(Token *token)
             }
             else
             {
-                ungetc(next_char, stdin);
+                ungetc(next_char, source_file);
                 token->type = DIVIDE;
             }
             return free_memory(ERROR_OK, string);
