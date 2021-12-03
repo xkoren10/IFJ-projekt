@@ -332,10 +332,10 @@ fclose(file);
 file = fopen("IFJ21_codes/strings.ifj21", "r");
 set_source(file);
 
-get_token(&token);  // require
+assert(get_token(&token)==0);  // require
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_REQUIRE);
-get_token(&token);  // "ifj21"
+assert(get_token(&token)==0);    // "ifj21"
 assert(token.type==STRING);
 
 get_token(&token);  // function
@@ -351,7 +351,7 @@ assert(token.type==RIGHT_PARENTHESIS);
 get_token(&token);  // local
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_LOCAL);
-get_token(&token);  // s1
+assert(get_token(&token)==0);  // s1
 assert(token.type==ID);
 get_token(&token);  // :
 assert(token.type==COLON);

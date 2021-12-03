@@ -142,7 +142,7 @@ int identifier_check(Dyn_string *dynamic_string, Token *token)
     else
     {
         (*token).type = ID;
-        if (dyn_string_copy(dynamic_string, &token->value.string))
+        if (!dyn_string_copy(dynamic_string, &token->value.string))
         {
             return free_memory(ERROR_INTERN, dynamic_string);
         }
@@ -170,7 +170,9 @@ int get_token(Token *token)
 
     char next_char;
 
-dyn_string_init(string);
+
+
+   if (dyn_string_init(string) != 0)
     {
         return ERROR_INTERN;
     }
