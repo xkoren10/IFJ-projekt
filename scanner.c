@@ -376,7 +376,7 @@ int get_token(Token *token)
             }
             else
             {
-                ungetc(next_char, stdin);
+                ungetc(next_char, source_file);
                 token->type = LESS_THAN;
             }
             return free_memory(ERROR_OK, string);
@@ -393,7 +393,7 @@ int get_token(Token *token)
             }
             else
             {
-                ungetc(next_char, stdin);
+                ungetc(next_char, source_file);
                 token->type = GREATER_THAN;
             }
             return free_memory(ERROR_OK, string);
@@ -410,7 +410,7 @@ int get_token(Token *token)
             }
             else
             {
-                ungetc(next_char, stdin);
+                ungetc(next_char, source_file);
                 token->type = ASSIGN;
             }
             return free_memory(ERROR_OK, string);
@@ -440,7 +440,7 @@ int get_token(Token *token)
             }
             else
             {
-                ungetc(next_char, stdin);
+                ungetc(next_char, source_file);
                 return free_memory(ERROR_INTERN, string);
             }
             return free_memory(ERROR_OK, string);
@@ -457,7 +457,7 @@ int get_token(Token *token)
             }
             else
             {
-                ungetc(next_char, stdin);
+                ungetc(next_char, source_file);
                 token->type = DIVIDE;
             }
             return free_memory(ERROR_OK, string);

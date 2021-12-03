@@ -119,7 +119,7 @@ typedef enum
  * @union Token_value
  * @brief Definition of token values - word (id), keyword, integer or float
  */
-typedef union
+typedef struct
 {
 	Dyn_string string;
 	Keyword keyword; 

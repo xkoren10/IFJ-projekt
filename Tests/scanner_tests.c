@@ -58,12 +58,13 @@ assert(dyn_string_compare(z, "iahoj")==0);
 
     fprintf(stdout,"\x1B[32m""                     PASSED                    \n""\x1B[0m"); 
     fprintf(stdout,"-----------------------------------------------\n");
-    fprintf(stdout,"------------ Lexical analysis tests -----------\n");
+    fprintf(stdout,"------------ Lexical analysis tests -----------\n\n");
 
 
 // The important thing to remember in relative paths is that it is relative to the current working directory when the (f*cking) EXECUTABLE is run.
 
 // file = "+ return"
+
 file = fopen("IFJ21_codes/first_test.ifj21","r");
 set_source(file);
 
@@ -75,6 +76,11 @@ assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_RETURN);
 fclose(file);
 
+
+        fprintf(stdout,"--> IFJ21_codes/first_test.ifj21 => ");
+        fprintf(stdout,"\x1B[32m"" PASSED \n""\x1B[0m"); 
+
+
 // file = "local x: number = 0.5"
 file = fopen("IFJ21_codes/second_test.ifj21", "r");
 set_source(file);
@@ -83,8 +89,11 @@ get_token(&token);
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_LOCAL);
 
+
 get_token(&token);
 assert(token.type==ID);
+
+
 assert(dyn_string_compare(token.value.string,"x")==0);           //the fuk
 
 get_token(&token);
@@ -104,6 +113,10 @@ get_token(&token);
 assert(token.type==STATE_EOF);
 fclose(file);
 
+
+        fprintf(stdout,"--> IFJ21_codes/second_test.ifj21 => ");
+        fprintf(stdout,"\x1B[32m"" PASSED \n""\x1B[0m"); 
+
 //file = "global z: chyba = "TESTING""
 file = fopen("IFJ21_codes/third_test.ifj21", "r");
 set_source(file);
@@ -113,7 +126,7 @@ assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_GLOBAL);
 get_token(&token);
 assert(token.type==ID);
-//assert(dyn_string_compare(token.value.string, "x"));
+assert(dyn_string_compare(token.value.string, "z")==0);
 get_token(&token);
 assert(token.type==COLON);
 get_token(&token);
@@ -122,8 +135,69 @@ get_token(&token);
 assert(token.type==ASSIGN);
 get_token(&token);
 assert(token.type==STRING);
-//assert(dyn_string_compare(token.value.string, "TESTING")==0);
+assert(dyn_string_compare(token.value.string, "TESTING")==0);
 fclose(file);
+
+
+        fprintf(stdout,"--> IFJ21_codes/third_test.ifj21 => ");
+        fprintf(stdout,"\x1B[32m"" PASSED \n""\x1B[0m"); 
+
+// fourth_test.ifj21
+file = fopen("IFJ21_codes/fourth_test.ifj21", "r");
+set_source(file);
+
+get_token(&token); //require
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_REQUIRE);
+get_token(&token);  //"ifj21"
+assert(token.type==STRING);
+get_token(&token);  //local
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_LOCAL);
+get_token(&token);  // z
+assert(token.type==ID);
+get_token(&token);  //:
+assert(token.type==COLON);
+get_token(&token);  //string
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_STRING);
+get_token(&token);  //=
+assert(token.type==ASSIGN);
+get_token(&token);  //"test"
+assert(token.type==STRING);
+// /n
+// block comment
+get_token(&token); //function
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_FUNCTION);
+get_token(&token); //fun
+assert(token.type==ID);
+get_token(&token);  //(
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  //x1
+assert(token.type==ID);
+get_token(&token);  //:
+assert(token.type==COLON);
+get_token(&token);  //string
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_STRING);
+get_token(&token);  //)
+assert(token.type==RIGHT_PARENTHESIS);
+get_token(&token);  //write
+assert(token.type==ID);
+get_token(&token);  //(
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  //x1
+assert(token.type==ID);
+get_token(&token);  //)
+assert(token.type==RIGHT_PARENTHESIS);
+get_token(&token);  //end
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_END);
+fclose(file);                               // end of file ? no token type?
+
+        fprintf(stdout,"--> IFJ21_codes/fourth_test.ifj21 => ");
+        fprintf(stdout,"\x1B[32m"" PASSED \n""\x1B[0m"); 
 
 //hello.ifj21
 file = fopen("IFJ21_codes/hello.ifj21", "r");
@@ -180,60 +254,9 @@ get_token(&token); // end
 assert(token.type==KEYWORD);
 fclose(file);
 
+        fprintf(stdout,"--> IFJ21_codes/hello.ifj21 => ");
+        fprintf(stdout,"\x1B[32m"" PASSED \n""\x1B[0m"); 
 
-// fourth_test.ifj21
-file = fopen("IFJ21_codes/fourth_test.ifj21", "r");
-set_source(file);
-
-get_token(&token); //require
-assert(token.type==KEYWORD);
-assert(token.value.keyword==KEYWORD_REQUIRE);
-get_token(&token);  //"ifj21"
-assert(token.type==STRING);
-get_token(&token);  //local
-assert(token.type==KEYWORD);
-assert(token.value.keyword==KEYWORD_LOCAL);
-get_token(&token);  // z
-assert(token.type==ID);
-get_token(&token);  //:
-assert(token.type==COLON);
-get_token(&token);  //string
-assert(token.type==KEYWORD);
-assert(token.value.keyword==KEYWORD_STRING);
-get_token(&token);  //=
-assert(token.type==ASSIGN);
-get_token(&token);  //"test"
-assert(token.type==STRING);
-// /n
-// block comment
-get_token(&token); //function
-assert(token.type==KEYWORD);
-assert(token.value.keyword==KEYWORD_FUNCTION);
-get_token(&token); //fun
-assert(token.type==ID);
-get_token(&token);  //(
-assert(token.type==LEFT_PARENTHESIS);
-get_token(&token);  //x1
-assert(token.type==ID);
-get_token(&token);  //:
-assert(token.type==COLON);
-get_token(&token);  //string
-assert(token.type==KEYWORD);
-assert(token.value.keyword==KEYWORD_STRING);
-get_token(&token);  //)
-assert(token.type==RIGHT_PARENTHESIS);
-get_token(&token);  //write
-assert(token.type==ID);
-get_token(&token);  //(
-assert(token.type==LEFT_PARENTHESIS);
-get_token(&token);  //x1
-assert(token.type==ID);
-get_token(&token);  //)
-assert(token.type==RIGHT_PARENTHESIS);
-get_token(&token);  //end
-assert(token.type==KEYWORD);
-assert(token.value.keyword==KEYWORD_END);
-fclose(file);                               // end of file ? no token type?
 
 // ifs and loops
 file = fopen("IFJ21_codes/ifs&loops.ifj21", "r");
@@ -327,6 +350,9 @@ get_token(&token);  // )
 assert(token.type==RIGHT_PARENTHESIS);
 
 fclose(file);
+
+        fprintf(stdout,"--> IFJ21_codes/ifs&loops.ifj21 => ");
+        fprintf(stdout,"\x1B[32m"" PASSED \n""\x1B[0m"); 
 
 // strings
 file = fopen("IFJ21_codes/strings.ifj21", "r");
@@ -429,15 +455,174 @@ assert(token.type==ASSIGN);
 get_token(&token);  // s1len
 assert(token.type==ID);
 
+get_token(&token);  // s1len
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "s1len")==0);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // s1len
+assert(token.type==ID);
+get_token(&token);  // -
+assert(token.type==MINUS);
+get_token(&token);  // 4
+assert(token.type==INT);
+assert(token.value.integer_value==4);
+
+fclose(file);
+
+        fprintf(stdout,"--> IFJ21_codes/strings.ifj21 => ");
+        fprintf(stdout,"\x1B[32m"" PASSED \n""\x1B[0m"); 
 
 
+//ifs&loops
+file = fopen("IFJ21_codes/simple_ops.ifj21", "r");
+set_source(file);
 
+assert(get_token(&token)==0);  // require
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_REQUIRE);
+assert(get_token(&token)==0);    // "ifj21"
+assert(token.type==STRING);
+
+get_token(&token);//global
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_GLOBAL);
+get_token(&token);//x
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "x")==0);
+get_token(&token);//:
+assert(token.type==COLON);
+assert(get_token(&token)==0);  // integer
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_INTEGER);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // 5
+assert(token.type==INT);
+assert(token.value.integer_value==5);
+
+get_token(&token);// function
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_FUNCTION);
+get_token(&token); // main
+assert(token.type==ID);
+get_token(&token); // ( 
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token); // )
+assert(token.type==RIGHT_PARENTHESIS);
+
+get_token(&token);//local
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_LOCAL);
+get_token(&token);//y
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "y")==0);
+get_token(&token);//:
+assert(token.type==COLON);
+assert(get_token(&token)==0);  // integer
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_INTEGER);
+
+get_token(&token);//local
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_LOCAL);
+get_token(&token);//z
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "z")==0);
+get_token(&token);//:
+assert(token.type==COLON);
+assert(get_token(&token)==0);  // integer
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_INTEGER);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // 5
+assert(token.type==INT);
+assert(token.value.integer_value==0);
+
+
+get_token(&token);//y
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "y")==0);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);//x
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "x")==0);
+get_token(&token);  // +
+assert(token.type==PLUS);
+get_token(&token);//z
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "z")==0);
+
+get_token(&token);//x
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "x")==0);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);//x
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "x")==0);
+get_token(&token);  // *
+assert(token.type==MULTIPLY);
+get_token(&token);//x
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "x")==0);
+get_token(&token);  // +
+assert(token.type==PLUS);
+get_token(&token);  // 5
+assert(token.type==INT);
+assert(token.value.integer_value==5);
+
+get_token(&token);//z
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "z")==0);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);//x
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "x")==0);
+get_token(&token);  // -
+assert(token.type==MINUS);
+get_token(&token);//y
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "y")==0);
+get_token(&token);  // +
+assert(token.type==PLUS);
+get_token(&token);  // 0
+assert(token.type==INT);
+assert(token.value.integer_value==0);
+
+get_token(&token);//y
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "y")==0);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);//x
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "x")==0);
+get_token(&token);  // /
+assert(token.type==DIVIDE);
+get_token(&token);//z
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "y")==0);
+get_token(&token);  // *
+assert(token.type==MULTIPLY);
+get_token(&token);  // 1
+assert(token.type==INT);
+assert(token.value.integer_value==1);
+
+get_token(&token);  // 0
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_END);
 
 
 fclose(file);
 
 
-    fprintf(stdout,"\x1B[32m""                     PASSED                    \n""\x1B[0m"); 
+        fprintf(stdout,"--> IFJ21_codes/simple_ops.ifj21 => ");
+        fprintf(stdout,"\x1B[32m"" PASSED \n""\x1B[0m"); 
+
     fprintf(stdout,"-----------------------------------------------\n");
 
    return 0;
