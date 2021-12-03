@@ -31,7 +31,7 @@ typedef enum
 	KEYWORD_ELSE,
 	KEYWORD_END,
 	KEYWORD_FUNCTION,
-    KEYWORD_GLOBAL,
+    	KEYWORD_GLOBAL,
 	KEYWORD_IF,
 	KEYWORD_INTEGER,
 	KEYWORD_LOCAL,
@@ -96,8 +96,7 @@ typedef enum
     LINE_COMMENTARY,                //  --
     BLOCK_COMMENTARY,               //  --[[ ]]
 
-    HASH,                           //  #
-    DOUBLEDOT,                      // ..   
+    HASH,                           //  # 
     COMMA,                          // ,
     COLON,                          // :
     DOT,                            // .
