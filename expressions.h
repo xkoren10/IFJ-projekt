@@ -27,12 +27,6 @@ int expression_analysis(Token *token);
 int analysis();
 
 /**
- * @brief Skips EOL tokens
- * @return Error code
- */
-int eol();
-
-/**
  * @brief Finds index in the precedence table
  * @param i1 pointer to return index of row
  * @param token pointer to return index of column
