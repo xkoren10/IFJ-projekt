@@ -111,11 +111,12 @@ int Deklaracie_or_Definicie()
     {
         
         output = Deklaracie_Funkcie();
-        fprintf(stdout,"%d no ukaz sa",actToken.value.keyword);
-
+        
         if (actToken.value.keyword == KEYWORD_FUNCTION)
         {
         output = Definicia_Funkcie();
+        printf("JEBKO");
+
         return output;
         }
 
@@ -233,11 +234,22 @@ int Deklaracie_Funkcie()
             //Dočasny LL predam do typy
             func_val_t *Types = malloc(sizeof(struct func_val));
             
-           
+            ht_item_t *current = ht_insert(global,func_name);
+            current->inal = Types; //next 
             output = Typy(Types); 
-            fprintf(stdout,"%d",Types->typp);
-            fprintf(stdout,"%d",Types->next->typp);
-            fprintf(stdout,"%d",Types->next->next->typp);
+            fprintf(stdout,"%d co jeee",current->inal->next->typp);
+
+            
+
+
+
+            ht_item_t *current3 = ht_search(global,func_name);
+        fprintf(stdout,"%d co jeee",current3->inal->next->typp);
+            
+
+
+
+
             
             /* fprintf(stdout,"%d TYP",Types->typp); */
             /* fprintf(stdout,"%d typ",Types->typp); */
@@ -247,8 +259,7 @@ int Deklaracie_Funkcie()
             //vrati mi LL na ktorom su typy v poradi
             
             //Novy element dam mu ID a priradil LL, staci aby insert vracial nemusim ani definovat
-            ht_item_t *current = ht_insert(global, func_name);
-            current->inval = Types->next; //next 
+            
 
         }
 
@@ -277,18 +288,26 @@ int Deklaracie_Funkcie()
             return ERROR_SYNTAX_ANALYSIS;
 
         //Dočasny LL predam do typy //MOZNO BY SOM MAL DAT FREE
+        
         func_val_t *outTypes = malloc(sizeof(struct func_val));
-        
-        outTypes->next = NULL;
-        
+        ht_item_t *current2 = ht_search(global, func_name);
+        current2->outval = outTypes;
         //vystupne typy ,ako viem ze je prazdny??
         output = get_token(&actToken);
         output = Typy(outTypes);
-        
-     
-        ht_item_t *current2 = ht_insert(global, func_name);
-        current2->outval = outTypes->next;
 
+
+
+        /* fprintf(stdout,"%d co jeee",current2->outval->next->typp); */
+/* 
+        ht_item_t *current3 = ht_search(global,func_name);
+        if(current3!=NULL)
+            printf("KOKOT");
+        fprintf(stdout,"%d co jeee",current3->outval->next->typp); */ //THE HOLY CODE
+        
+        //////////////////////////////////
+        /* fprintf(stdout,"%s neveririrm",searched->key);
+        fprintf(stdout,"%d neveririrm",searched->inval->typp); */
 
         //predam mu UDAJE NA FUKNCIU
         /* Hloziho_func(ID_name, ); */
@@ -321,13 +340,10 @@ int Definicia_Funkcie()
 int Hlavicka_Funkcie()
 {
     //eofy
-    fprintf(stdout,"%d",actToken.type);
-    return ERROR_OK;
     int output;
-    
     if (output != ERROR_OK)
         return ERROR_LEXICAL_ANALISYS;
-
+ 
     if (actToken.type == STATE_EOF)         //TEORETICKY EOFY NETREBA
         return ERROR_SYNTAX_ANALYSIS;
     
@@ -339,8 +355,6 @@ int Hlavicka_Funkcie()
     
     output = get_token(&actToken);
 
-    return ERROR_OK;
-
     if (output != ERROR_OK)
         return ERROR_LEXICAL_ANALISYS;
 
@@ -350,28 +364,21 @@ int Hlavicka_Funkcie()
     if (actToken.type != ID)
         return ERROR_SYNTAX_ANALYSIS;
 
-    fprintf(stdout,"%d",actToken.type);
-
     
-
+    
     fprintf(stdout,"%s",actToken.value.string.string);
     //DOCASNA PREMENNA A HLADANIE CI JE V TABULKE
     func_name = actToken.value.string.string;
+    
+    ht_item_t *over = ht_search(global,func_name);
 
-    ht_item_t* over;
-    over = ht_search(global,func_name);
-
-    fprintf(stdout,"%s",func_name); //THIS IS THE PROBLEM
-    return ERROR_OK;
 
     
-    /* if (over->key == NULL) // existuje ale overit ci tam je
-        return ERROR_SEMANTIC; */
+    if (over == NULL) // na toto by mohol byt lepsi sposob
+        return ERROR_SEMANTIC;
     
-    return ERROR_OK;
+     
 
-
- fprintf(stdout,"%d",actToken.type);
     output = get_token(&actToken);
 
 
@@ -381,36 +388,46 @@ int Hlavicka_Funkcie()
     if (actToken.type == STATE_EOF)
         return ERROR_SYNTAX_ANALYSIS;    
 
-   
 
     if (actToken.type != LEFT_PARENTHESIS)
         return ERROR_SYNTAX_ANALYSIS;
-  
+    
+    
+
+
     output = get_token(&actToken);
-
     if (actToken.type == STATE_EOF)
-        return ERROR_SYNTAX_ANALYSIS;    
+        return ERROR_SYNTAX_ANALYSIS;  
 
+      
 
     if (actToken.type != RIGHT_PARENTHESIS)
     {
-        
+       
         //POSIELAM MENO FUNKCIE NECH SI VIEM OVERIT TYPY
         //nacitam si prvy typ do tokenu
-        current_item = ht_search(global,func_name);
+
+
+        //fprintf(stdout,"%d TO jeee", over->inal->next->next->typp); //DOESNT MAKE SENSE
+        
+        fprintf(stdout,"%d inval", over->inal->next->typp);
+         fprintf(stdout,"%d outval", over->outval->next->typp);
+        
+    
+        return ERROR_OK;
+
+        
+
+
+
+
+
+
 
         /* fprintf(stdout,"%d",current_item->inval->typp); */
         return ERROR_OK;
         //ci tam je nieco ale to teoreticky overi OVERtyp;
-        if (current_item->inval==NULL)
-        {
-            fprintf(stdout,"skusim");
-            return ERROR_OK;
-
-            fprintf(stdout,"mam daco");
-            current_LL = current_item->inval;
-            
-        }
+      
         
         
         return ERROR_OK;
@@ -476,7 +493,7 @@ int COMPARE_Typ()
         return output;
     //overit asi */
 
-    if (current_LL->typp == actToken.type)
+   /*  if (current_LL->typp == actToken.type)
     {
         current_LL->var_name = var_name;
         ht_item_t* tmp = ht_insert(local,var_name);
@@ -486,7 +503,8 @@ int COMPARE_Typ()
     }
     else{
         return ERROR_SYNTAX_ANALYSIS;
-    }
+    } */
+    return ERROR_OK;
  }
 
 
@@ -541,7 +559,6 @@ int Typ(func_val_t *Types)
         
         tmp = malloc(sizeof(struct func_val));
         tmp->typp = actToken.value.keyword;
-        fprintf(stdout," L%dL",tmp->typp);
 
         if (Types == NULL)
         {

@@ -44,10 +44,11 @@ void ht_init(ht_table_t *table)
   {
     (*table)[i] = NULL;
   }
+  
 }
 
 void item_null(ht_item_t *item){
-  item->inval=NULL;
+  item->inal=NULL;
   item->next=NULL;
   item->outval=NULL;
   item->string_val=NULL;
@@ -92,7 +93,7 @@ ht_item_t *ht_insert(ht_table_t *table, char *key)
     insert->next = NULL;
     int hash_index = get_hash(key);
 
-    insert->next = (*table)[hash_index];    //teoreticky netreba ani toto, vlastne vobec
+    /* insert->next = (*table)[hash_index];    //teoreticky netreba ani toto, vlastne vobec */
     (*table)[hash_index] = insert;
     return insert;
   }
