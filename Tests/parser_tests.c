@@ -12,7 +12,7 @@
 #include "../error_codes.h"
 #include "../dyn_string.h"
 #include "../parser.h"
-//#include "../expressions.h"
+#include "../expressions.h"
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
