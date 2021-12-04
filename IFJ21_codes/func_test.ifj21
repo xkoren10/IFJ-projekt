@@ -1,19 +1,5 @@
-
-
 require "ifj21"
 
-global foo: function(string): string
+global kokot : function( integer , string , string ):integer
 
-function bar(): integer
-    foo("retard")
-    return 1
-
-function foo(var: string): string
-    return var
-
-function main()
-    bar()
-end
-
-main()
-
+function kokot ( x : integer, y:string ,z : number): integer

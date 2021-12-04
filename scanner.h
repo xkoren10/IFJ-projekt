@@ -96,11 +96,9 @@ typedef enum
     BLOCK_COMMENTARY,               //  --[[ ]]
 
     HASH,                           //  #
-    DOUBLEDOT,                      // ..   
     COMMA,                          // ,
     COLON,                          // :
     DOT,                            // .
-    EOL,
     STATE_EOF,
 
 

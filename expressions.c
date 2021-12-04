@@ -26,17 +26,6 @@ TStack expression_stack;
 Token act_token;
 Token dollar;
 
-int eol()
-{
-    int output = ERROR_OK;
-    if (act_token.type == EOL)
-    {
-        output = get_token(&act_token);
-        eol();
-    }
-    return output;
-}
-
 int expression_analysis(Token *token)
 {
     Stack_Init(&expression_stack);
@@ -47,24 +36,12 @@ int expression_analysis(Token *token)
     act_token = *token;
     int output = ERROR_OK;
 
-    if (act_token.type == EOL)
+    if (act_token.type == STATE_EOF)
     {
-        output = eol();
-    }
-
-    if (output != ERROR_OK)
-    {
-        return ERROR_LEXICAL_ANALISYS;
+        return ERROR_SYNTAX_ANALYSIS;
     }
     else
-    {
-        if (act_token.type == STATE_EOF)
-        {
-            return ERROR_SYNTAX_ANALYSIS;
-        }
-        else
-            output = analysis();
-    }
+        output = analysis();
     return output;
 }
 
@@ -83,6 +60,11 @@ int analysis()
         return output;
     }
 
+    if ((i1 == 7) && (expression_stack.top->terminal == false))
+    {
+        return ERROR_OK;
+    }
+
     switch (table[i1][i2])
     {
 
@@ -91,11 +73,6 @@ int analysis()
         Stack_Push(&expression_stack, act_token, true, true);
 
         output = get_token(&act_token);
-        if (output != ERROR_OK)
-        {
-            return ERROR_LEXICAL_ANALISYS;
-        }
-        output = eol();
 
         if (output != ERROR_OK)
         {
@@ -118,12 +95,12 @@ int analysis()
         }
         else
         {
-            TStack_element el1, el2, el3;
-            Stack_Top(&expression_stack, &el1);
+            TStack_element el1, el2, el3;                   //TODO osetrenia
+            Stack_Top(&expression_stack, &el3);
             Stack_Pop(&expression_stack);
             Stack_Top(&expression_stack, &el2);
             Stack_Pop(&expression_stack);
-            Stack_Top(&expression_stack, &el3);
+            Stack_Top(&expression_stack, &el1);
             Stack_Pop(&expression_stack);
 
             if (Stack_IsEmpty(&expression_stack))
@@ -139,11 +116,6 @@ int analysis()
         Stack_Push(&expression_stack, act_token, false, true);
 
         output = get_token(&act_token);
-        if (output != ERROR_OK)
-        {
-            return ERROR_LEXICAL_ANALISYS;
-        }
-        output = eol();
 
         if (output != ERROR_OK)
         {
@@ -166,7 +138,7 @@ int analysis()
         return ERROR_SYNTAX_ANALYSIS;
         break;
     }
-    //TODO pozriet ci nekonci vyraz ak ano nacitat tam dollar
+
     if (output != ERROR_OK)
     {
         return output;
@@ -179,12 +151,15 @@ int analysis()
 int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
 {
     Token new;
+    int output = ERROR_OK;
     if (!el2.terminal)
     {
         Stack_Push(&expression_stack, el2.token, false, false);
     }
     else
     {
+
+        check_id(&el1,&el2,&el3);
         switch (el2.token.type)
         {
         case PLUS:
@@ -192,15 +167,78 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
             //TODO new.value =
             Stack_Push(&expression_stack, new, false, false);
             break;
+
         case MINUS:
             new.type = NUMBER;
             //TODO new.value =
             Stack_Push(&expression_stack, new, false, false);
+            break;
+
+        case MULTIPLY:
+            new.type = NUMBER;
+            //TODO new.value =
+            Stack_Push(&expression_stack, new, false, false);
+            break;
+
+        case DIVIDE:
+            new.type = NUMBER;
+            //TODO new.value =
+            Stack_Push(&expression_stack, new, false, false);
+            break;
+
+        case INTEGER_DIVIDE:
+            new.type = NUMBER;
+            //TODO new.value =
+            Stack_Push(&expression_stack, new, false, false);
+            break;
+
+        case GREATER_THAN:
+            new.type = NUMBER;
+            //TODO new.value =
+            Stack_Push(&expression_stack, new, false, false);
+            break;
+
+        case LESS_THAN:
+            new.type = NUMBER;
+            //TODO new.value =
+            Stack_Push(&expression_stack, new, false, false);
+            break;
+
+        case GREATER_or_EQUALS:
+            new.type = NUMBER;
+            //TODO new.value =
+            Stack_Push(&expression_stack, new, false, false);
+            break;
+
+        case LESS_or_EQUALS:
+            new.type = NUMBER;
+            //TODO new.value =
+            Stack_Push(&expression_stack, new, false, false);
+            break;
+
+        case EQUALS:
+            new.type = NUMBER;
+            //TODO new.value =
+            Stack_Push(&expression_stack, new, false, false);
+            break;
+
+        case EG_ASSIGN:
+            new.type = NUMBER;
+            //TODO new.value =
+            Stack_Push(&expression_stack, new, false, false);
+            break;
+
+        case CONCATENATE:
+            new.type = NUMBER;
+            //TODO new.value =
+            Stack_Push(&expression_stack, new, false, false);
+            break;
+
         default:
             break;
         }
     }
-    return ERROR_OK; //TODO
+    return output;
 }
 
 int find_index(int *i1, int *i2)
@@ -222,7 +260,7 @@ int find_index(int *i1, int *i2)
     {
         *i1 = 1;
     }
-    else if (expression_stack.top->token.type == DOUBLEDOT)
+    else if (expression_stack.top->token.type == CONCATENATE)
     {
         *i1 = 2;
     }
@@ -230,7 +268,7 @@ int find_index(int *i1, int *i2)
     {
         *i1 = 3;
     }
-    else if ((expression_stack.top->token.type == ID) || (expression_stack.top->token.type == NUMBER))
+    else if ((expression_stack.top->token.type == ID) || (expression_stack.top->token.type == NUMBER)) //TODO moze byt asi aj int a tak
     {
         *i1 = 4;
     }
@@ -264,7 +302,7 @@ int find_index(int *i1, int *i2)
     {
         *i2 = 1;
     }
-    else if (act_token.type == DOUBLEDOT)
+    else if (act_token.type == CONCATENATE)
     {
         *i2 = 2;
     }
@@ -272,7 +310,7 @@ int find_index(int *i1, int *i2)
     {
         *i2 = 3;
     }
-    else if ((act_token.type == ID) || (act_token.type == NUMBER))
+    else if ((act_token.type == ID) || (act_token.type == NUMBER)) //TODO moze byt asi aj int a tak
     {
         *i2 = 4;
     }
@@ -290,6 +328,10 @@ int find_index(int *i1, int *i2)
     }
     else
     {
+        if ((*i1 == 7) && (expression_stack.top->terminal == false))
+        {
+            return ERROR_OK;
+        }
         return ERROR_SYNTAX_ANALYSIS;
     }
 
@@ -304,16 +346,9 @@ int hash()
     {
         return ERROR_LEXICAL_ANALISYS;
     }
-
-    output = eol();
-
-    if (output != ERROR_OK)
-    {
-        return ERROR_LEXICAL_ANALISYS;
-    }
     else
     {
-        if (act_token.type == STATE_EOF || act_token.type != STRING)
+        if ((act_token.type == STATE_EOF) || (act_token.type != STRING))
         {
             return ERROR_SYNTAX_ANALYSIS;
         }
@@ -325,4 +360,8 @@ int hash()
     act_token = new;
 
     return output;
+}
+
+int check_id(TStack_element *el1, TStack_element *el2, TStack_element *el3){
+    //TODO
 }

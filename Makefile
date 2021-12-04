@@ -3,16 +3,13 @@ CC=gcc
 
 .PHONY: clean 
 
-make: dyn_string.c scanner.c parser.c expressions.c
-	$(CC) $(CFLAGS) dyn_string.c scanner.c parser.c expressions.c -o compiler
+make: *.c *.h
+	$(CC) $(CFLAGS) *.c *.h -o compiler
 
-test_sc: Tests/scanner_tests.c dyn_string.c scanner.c
-	$(CC) $(CFLAGS) Tests/scanner_tests.c dyn_string.c scanner.c -o scanner_tests
-	./scanner_tests
-	rm -f scanner_tests
 
-test_par: Tests/parser_tests.c dyn_string.c scanner.c
-	$(CC) $(CFLAGS) Tests/parser_tests.c dyn_string.c scanner.c parser.c expressions.c -o parser_tests
+
+test_par: Tests/parser_tests.c dyn_string.c scanner.c symtable.c parser.c parser.h
+	$(CC) $(CFLAGS) Tests/parser_tests.c dyn_string.c scanner.c parser.c symtable.c parser.h  -o parser_tests
 	./parser_tests
 	rm -f parser_tests
 

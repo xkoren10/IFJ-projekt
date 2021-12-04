@@ -28,11 +28,11 @@ int main(){
     fprintf(stdout,"-----------------------------------------------\n");
     fprintf(stdout,"--------------- Expressions tests -------------\n");
 
-file = fopen("IFJ21_codes/Expressions/basic.txt", "r");
+/* file = fopen("IFJ21_codes/Expressions/basic.txt", "r");
 set_source(file);
 get_token(&token);
 res = expression_analysis(&token);
-fclose(file);
+fclose(file); */
 
     fprintf(stdout,"\x1B[32m""                     PASSED                    \n""\x1B[0m");
     fprintf(stdout,"-----------------------------------------------\n");

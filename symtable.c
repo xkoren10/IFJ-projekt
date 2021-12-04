@@ -44,14 +44,15 @@ void ht_init(ht_table_t *table)
   {
     (*table)[i] = NULL;
   }
+  
 }
 
 void item_null(ht_item_t *item){
-  item->inval=NULL;
+  item->inal=NULL;
   item->next=NULL;
   item->outval=NULL;
   item->string_val=NULL;
-  item->var_value = NULL;
+  /* item->var_value = NULL; */
   
 }
 /**
@@ -88,13 +89,11 @@ ht_item_t *ht_insert(ht_table_t *table, char *key)
   ht_item_t *insert = ht_search(table, key);
 
   insert = (ht_item_t *)malloc(sizeof(ht_item_t));
-    if (!insert)
-      return;
     insert->key = key;
     insert->next = NULL;
     int hash_index = get_hash(key);
 
-    insert->next = (*table)[hash_index];    //teoreticky netreba ani toto, vlastne vobec
+    /* insert->next = (*table)[hash_index];    //teoreticky netreba ani toto, vlastne vobec */
     (*table)[hash_index] = insert;
     return insert;
   }
@@ -109,12 +108,12 @@ ht_item_t *ht_insert(ht_table_t *table, char *key)
  */
 
 //CELKOM ZBYTOCNE
-float *ht_get(ht_table_t *table, char *key)
+/* float *ht_get(ht_table_t *table, char *key)
 {
   ht_item_t *get = ht_search(table, key);
 
   return get ? &(get->value) : NULL;
-}
+} */
 
 /**
  * @brief Deleting an item with given key
