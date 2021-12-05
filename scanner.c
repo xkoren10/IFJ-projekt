@@ -63,6 +63,9 @@ int process_float(Dyn_string *dynamic_string, Token *token)
 
 int identifier_check(Dyn_string *dynamic_string, Token *token)
 {
+
+    // Id check
+
     if (strcmp(dynamic_string->string, "do") == 0)
     {
         (*token).type = KEYWORD;
@@ -138,6 +141,43 @@ int identifier_check(Dyn_string *dynamic_string, Token *token)
         (*token).type = KEYWORD;
         (*token).value.keyword = KEYWORD_WHILE;
     }
+
+    // Built-in check
+
+        else if (strcmp(dynamic_string->string, "reads") == 0)
+    {
+        (*token).type = BUILT_IN_READS;
+    }
+            else if (strcmp(dynamic_string->string, "readi") == 0)
+    {
+        (*token).type = BUILT_IN_READI;
+    }
+            else if (strcmp(dynamic_string->string, "readn") == 0)
+    {
+        (*token).type = BUILT_IN_READN;
+    }
+            else if (strcmp(dynamic_string->string, "write") == 0)
+    {
+        (*token).type = BUILT_IN_WRITE;
+    }
+            else if (strcmp(dynamic_string->string, "tointeger") == 0)
+    {
+        (*token).type = BUILT_IN_TOINTEGER;
+    }
+            else if (strcmp(dynamic_string->string, "substr") == 0)
+    {
+        (*token).type = BUILT_IN_SUBSTR;
+    }
+            else if (strcmp(dynamic_string->string, "ord") == 0)
+    {
+        (*token).type = BUILT_IN_ORD;
+    }
+            else if (strcmp(dynamic_string->string, "chr") == 0)
+    {
+        (*token).type = BUILT_IN_CHR;
+    }
+
+    // Else it's ID
 
     else
     {
@@ -312,7 +352,7 @@ int get_token(Token *token)
             else if (next_char == '~')
             {
 
-                /* state = ALMOST_EQUAL; */
+                state = NOT_EQUAL;
             }
             else if (next_char == '<')
             {
@@ -418,19 +458,19 @@ int get_token(Token *token)
 
             //---------------------------------------------------------------//
 
-        /* case (ALMOST_EQUAL):
+        case (NOT_EQUAL):
 
             if (next_char == '=')
             {
 
-                token->type = ALMOST_EQUAL;
+                token->type = NOT_EQUAL;
             }
             else
             {
                return free_memory(ERROR_LEXICAL_ANALISYS, string);                
             }
             return free_memory(ERROR_OK, string);
-            break; */
+            break; 
             //---------------------------------------------------------------//
         case (DOT):
             if (next_char == '.')
@@ -631,6 +671,7 @@ int get_token(Token *token)
             }
             else if (next_char == '\\')
             {
+                 
                 state = ESCAPE;
             }
             else if (next_char == '"')
@@ -653,31 +694,32 @@ int get_token(Token *token)
         case ESCAPE:
             if (next_char == '\\')
             {
-                dyn_string_add_char(&token->value.string, next_char);
-                dyn_string_add_char(&token->value.string, '0');
-                dyn_string_add_char(&token->value.string, '9');
-                dyn_string_add_char(&token->value.string, '2');
+                dyn_string_add_char(string, next_char);
+                dyn_string_add_char(string, '0');
+                dyn_string_add_char(string, '9');
+                dyn_string_add_char(string, '2');
                 state = STRING;
             }
             else if (next_char == 'n')
             {
-                dyn_string_add_char(&token->value.string, '\\');
-                dyn_string_add_char(&token->value.string, '0');
-                dyn_string_add_char(&token->value.string, '1');
-                dyn_string_add_char(&token->value.string, '0');
+                dyn_string_add_char(string, '\\');
+                dyn_string_add_char(string, '0');
+                dyn_string_add_char(string, '1');
+                dyn_string_add_char(string, '0');
                 state = STRING;
             }
             else if (next_char == 't')
             {
-                dyn_string_add_char(&token->value.string, '\\');
-                dyn_string_add_char(&token->value.string, '0');
-                dyn_string_add_char(&token->value.string, '0');
-                dyn_string_add_char(&token->value.string, '9');
+                dyn_string_add_char(string, '\\');
+                dyn_string_add_char(string, '0');
+                dyn_string_add_char(string, '0');
+                dyn_string_add_char(string, '9');
                 state = STRING;
             }
             else if (next_char == '"')
             {
-                dyn_string_add_char(&token->value.string, '"');
+                dyn_string_add_char(string, '\\');
+                dyn_string_add_char(string, '"');
                 state = STRING;
             }
             else if (isdigit(next_char))
@@ -700,12 +742,12 @@ int get_token(Token *token)
                     esc_val += (next_char - 48);
                     if ((0 < esc_val) || (esc_val < 255))
                     {
-                        dyn_string_add_char(&token->value.string, '\\');
-                        dyn_string_add_char(&token->value.string, (esc_val / 100 + 48));
+                        dyn_string_add_char(string, '\\');
+                        dyn_string_add_char(string, (esc_val / 100 + 48));
                         esc_val -= (esc_val / 100) * 100;
-                        dyn_string_add_char(&token->value.string, (esc_val / 10 + 48));
+                        dyn_string_add_char(string, (esc_val / 10 + 48));
                         esc_val -= (esc_val / 10) * 10;
-                        dyn_string_add_char(&token->value.string, esc_val + 48);
+                        dyn_string_add_char(string, esc_val + 48);
 
                         state = STRING;
                     }
