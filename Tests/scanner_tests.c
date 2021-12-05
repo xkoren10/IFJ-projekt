@@ -184,7 +184,7 @@ assert(token.value.keyword==KEYWORD_STRING);
 get_token(&token);  //)
 assert(token.type==RIGHT_PARENTHESIS);
 get_token(&token);  //write
-assert(token.type==ID);
+assert(token.type==BUILT_IN_WRITE);
 get_token(&token);  //(
 assert(token.type==LEFT_PARENTHESIS);
 get_token(&token);  //x1
@@ -234,7 +234,7 @@ assert(token.type==ASSIGN);
 get_token(&token); // "Hello World"
 assert(token.type==STRING);
 get_token(&token); // write
-assert(token.type==ID);                         // supposed to be built-in function
+assert(token.type==BUILT_IN_WRITE);                         // supposed to be built-in function
 get_token(&token); // (
 assert(token.type==LEFT_PARENTHESIS);
 get_token(&token); // str
@@ -243,7 +243,7 @@ get_token(&token); // )
 assert(token.type==RIGHT_PARENTHESIS); 
 // line comment
 get_token(&token); // write
-assert(token.type==ID);
+assert(token.type==BUILT_IN_WRITE);
 get_token(&token); // (
 assert(token.type==LEFT_PARENTHESIS);
 get_token(&token); // "Hello world"
@@ -315,6 +315,7 @@ get_token(&token);  // end
 assert(token.type==KEYWORD);
 get_token(&token);  // if
 assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_IF);
 get_token(&token);  // x
 assert(token.type==ID);
 get_token(&token);  // >=
@@ -409,7 +410,7 @@ get_token(&token);  // " ktery jeste trochu obohatime"
 assert(token.type==STRING);
 assert(dyn_string_compare(token.value.string,", ktery jeste trochu obohatime")==0); 
 get_token(&token);  // write
-assert(token.type==ID);
+assert(token.type==BUILT_IN_WRITE);
 get_token(&token);  // (
 assert(token.type==LEFT_PARENTHESIS);
 get_token(&token);  // s1
@@ -418,6 +419,7 @@ get_token(&token);  // ,
 assert(token.type== COMMA);
 get_token(&token);  // "\010"
 assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string, "\\010")==0);
 get_token(&token);  // ,
 assert(token.type== COMMA);
 get_token(&token);  // s2
@@ -467,6 +469,193 @@ assert(token.type==MINUS);
 get_token(&token);  // 4
 assert(token.type==INT);
 assert(token.value.integer_value==4);
+
+get_token(&token);  // s1
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "s1")==0);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // substr
+assert(token.type==BUILT_IN_SUBSTR);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // s2
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "s2")==0);
+get_token(&token);  // ,
+assert(token.type==COMMA);
+get_token(&token);  // s1len
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "s1len")==0);
+get_token(&token);  // ,
+assert(token.type==COMMA);
+get_token(&token);  // s1len
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "s1len4")==0);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+
+get_token(&token);  // s1len
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "s1len")==0);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // s1len
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "s1len")==0);
+get_token(&token);  // +
+assert(token.type==PLUS);
+get_token(&token);  // 4
+assert(token.type==INT);
+assert(token.value.integer_value==1);
+
+get_token(&token);  // write
+assert(token.type==BUILT_IN_WRITE);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // 4 zaky od
+assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string, "4 znaky od")==0);
+get_token(&token);  // ,
+assert(token.type==COMMA);
+get_token(&token);  // s1len
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "s1len")==0);
+get_token(&token);  // ,
+assert(token.type==COMMA);
+get_token(&token); // . znaku v
+assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string, ". znaku v \\\"")==0);        // pozn.: \\ => '\' ; \" => " ; \\\" => \"
+get_token(&token);  // ,
+assert(token.type==COMMA);
+get_token(&token);  // s2
+assert(token.type==ID);
+get_token(&token);  // ,
+assert(token.type==COMMA);
+get_token(&token);
+assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string, "\\\":")==0); 
+get_token(&token);  // ,
+assert(token.type==COMMA);
+get_token(&token);  // s1
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "s1")==0);
+get_token(&token);  // ,
+assert(token.type==COMMA);
+get_token(&token); // \n
+assert(dyn_string_compare(token.value.string, "\\010")==0);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+
+get_token(&token);  // write
+assert(token.type==BUILT_IN_WRITE);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token); // 
+assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string, "Zadejte serazenou posloupnost vsech malych pismen a-h, ")==0);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS); 
+
+get_token(&token);  // write
+assert(token.type==BUILT_IN_WRITE);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token); // 
+assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string, "pricemz se pismena nesmeji v posloupnosti opakovat: ")==0);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+
+get_token(&token);  // s1
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "s1")==0);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // reads
+assert(token.type==BUILT_IN_READS);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+
+get_token(&token);
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_IF);
+get_token(&token);  // s1
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "s1")==0);
+get_token(&token);  // ~=
+assert(token.type==NOT_EQUAL);
+get_token(&token);
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_NIL);
+get_token(&token);
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_THEN);
+
+get_token(&token);//while
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_WHILE);
+get_token(&token);  // s1
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "s1")==0);
+get_token(&token);  // ~=
+assert(token.type==NOT_EQUAL);
+get_token(&token); // 
+assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string, "abcdefgh")==0);
+get_token(&token);//do
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_DO);
+
+get_token(&token);  // write
+assert(token.type==BUILT_IN_WRITE);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // \n
+assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string, "\\010")==0);
+get_token(&token);  // ,
+assert(token.type==COMMA);
+get_token(&token);// Spatne zadana posloupnost, zkuste znovu:
+assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string, "Spatne zadana posloupnost, zkuste znovu:")==0);        // pozn.: \\ => '\' ; \" => " ; \\\" => \"
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+
+get_token(&token);  // s1
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string, "s1")==0);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // reads
+assert(token.type==BUILT_IN_READS);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+
+get_token(&token);  // end
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_END);
+get_token(&token);  // else
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_ELSE);
+get_token(&token);  // end
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_END);
+get_token(&token);  // end
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_END);
+get_token(&token); // main
+assert(token.type==ID);
+get_token(&token); // ( 
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token); // )
+assert(token.type==RIGHT_PARENTHESIS);
+
+
 
 fclose(file);
 
@@ -612,15 +801,165 @@ get_token(&token);  // 1
 assert(token.type==INT);
 assert(token.value.integer_value==1);
 
-get_token(&token);  // 0
+get_token(&token);  // end
 assert(token.type==KEYWORD);
 assert(token.value.keyword==KEYWORD_END);
+
+
 
 
 fclose(file);
 
 
         fprintf(stdout,"--> IFJ21_codes/simple_ops.ifj21 => ");
+        fprintf(stdout,"\x1B[32m"" PASSED \n""\x1B[0m"); 
+
+
+//factorial
+file = fopen("IFJ21_codes/factorial.ifj21", "r");
+set_source(file);
+
+assert(get_token(&token)==0);  // require
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_REQUIRE);
+assert(get_token(&token)==0);    // "ifj21"
+assert(token.type==STRING);
+
+get_token(&token);  // function
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_FUNCTION);
+get_token(&token);  // main
+assert(token.type==ID);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+
+get_token(&token);  // local
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_LOCAL);
+get_token(&token);  // a
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string,"a")==0);
+get_token(&token);  // :
+assert(token.type==COLON);
+get_token(&token);  // integer
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_INTEGER);
+
+get_token(&token);  // local
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_LOCAL);
+get_token(&token);  // vysl
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string,"vysl")==0);
+get_token(&token);  // :
+assert(token.type==COLON);
+get_token(&token);  // integer
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_INTEGER);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // 0
+assert(token.type==INT);
+assert(token.value.integer_value==0);
+
+get_token(&token);  // write
+assert(token.type==BUILT_IN_WRITE);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // Cislo pro vypocet faktorialu:\n
+assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string, "Cislo pro vypocet faktorialu:\\010")==0);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+
+get_token(&token);  // a
+assert(token.type==ID);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // readi
+assert(token.type==BUILT_IN_READI);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+
+get_token(&token);  // if
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_IF);
+get_token(&token);  // a
+assert(token.type==ID);
+get_token(&token);  // ==
+assert(token.type==EQUALS);
+get_token(&token);  // nil
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_NIL);
+get_token(&token);  // then
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_THEN);
+
+get_token(&token);  // write
+assert(token.type==BUILT_IN_WRITE);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // a je nil\n
+assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string, "a je nil\\010")==0);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+get_token(&token);  // return
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_RETURN);
+
+get_token(&token);  // else
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_ELSE);
+
+get_token(&token);  // end
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_END);
+
+get_token(&token);  // if
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_IF);
+get_token(&token);  // a
+assert(token.type==ID);
+get_token(&token);  // <
+assert(token.type==LESS_THAN);
+get_token(&token);  // 0
+assert(token.type==INT);
+assert(token.value.integer_value==0);
+get_token(&token);  // then
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_THEN);
+
+get_token(&token);  // write
+assert(token.type==BUILT_IN_WRITE);
+get_token(&token);  // (
+assert(token.type==LEFT_PARENTHESIS);
+get_token(&token);  // Faktorial nejde spocitat\n
+assert(token.type==STRING);
+assert(dyn_string_compare(token.value.string, "Faktorial nejde spocitat\\010")==0);
+get_token(&token);  // )
+assert(token.type==RIGHT_PARENTHESIS);
+get_token(&token);  // else
+assert(token.type==KEYWORD);
+assert(token.value.keyword==KEYWORD_ELSE);
+
+get_token(&token);  // vysl
+assert(token.type==ID);
+assert(dyn_string_compare(token.value.string,"vysl")==0);
+get_token(&token);  // =
+assert(token.type==ASSIGN);
+get_token(&token);  // 1
+assert(token.type==INT);
+assert(token.value.integer_value==1);
+
+fclose(file);
+
+
+        fprintf(stdout,"--> IFJ21_codes/factorial.ifj21 => ");
         fprintf(stdout,"\x1B[32m"" PASSED \n""\x1B[0m"); 
 
     fprintf(stdout,"-----------------------------------------------\n");
