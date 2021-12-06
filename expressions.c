@@ -25,14 +25,14 @@ const char table[8][8] = {
 TStack expression_stack;
 Token act_token;
 Token dollar;
+ht_table_t *symtable;
 
-int expression_analysis(Token *token, ht_table_t *symtable)
+int expression_analysis(Token *token, ht_table_t *symtable_ptr)
 {
+    symtable = symtable_ptr;
     Stack_Init(&expression_stack);
     dollar.type = DOLLAR;
-    bool handle = false;
-    bool terminal = false;
-    Stack_Push(&expression_stack, dollar, handle, terminal);
+    Stack_Push(&expression_stack, dollar, false, false);
     act_token = *token;
     int output = ERROR_OK;
 
@@ -41,16 +41,19 @@ int expression_analysis(Token *token, ht_table_t *symtable)
         return ERROR_SYNTAX_ANALYSIS;
     }
     else
+    {
         output = analysis();
         *token = act_token;
+    }
+    Stack_Dispose(&expression_stack);
     return output;
 }
 
 int analysis()
 {
     int output = ERROR_OK;
-    int i1, i2;
-    if (act_token.type == HASH)
+    int i1 = 8, i2 = 8;
+    if (act_token.type == GET_LENGTH)
     {
         hash();
     }
@@ -89,38 +92,36 @@ int analysis()
         break;
 
     case '>':
-        if (expression_stack.top->handle == true)           //E -> id
+        if (expression_stack.top->handle == true) //E -> id
         {
             expression_stack.top->terminal = false;
             expression_stack.top->handle = false;
         }
         else
         {
-            TStack_element el1, el2, el3;                   
-            Stack_Top(&expression_stack, &el3);
+            TStack_element el1, el2, el3;
+            el3 = Stack_Top(&expression_stack);
             Stack_Pop(&expression_stack);
             if (Stack_IsEmpty(&expression_stack))
             {
                 return ERROR_SYNTAX_ANALYSIS;
             }
 
-
-            Stack_Top(&expression_stack, &el2);
+            el2 = Stack_Top(&expression_stack);
             Stack_Pop(&expression_stack);
             if (Stack_IsEmpty(&expression_stack))
             {
                 return ERROR_SYNTAX_ANALYSIS;
             }
 
-
-            Stack_Top(&expression_stack, &el1);
+            el1 = Stack_Top(&expression_stack);
             Stack_Pop(&expression_stack);
 
             if (Stack_IsEmpty(&expression_stack) || el1.token.type == DOLLAR)
             {
                 return ERROR_SYNTAX_ANALYSIS;
             }
-            output = reduce(el1, el2, el3);         //E -> E ? E  alebo E -> (E)
+            output = reduce(el1, el2, el3); //E -> E ? E  alebo E -> (E)
         }
 
         break;
@@ -132,7 +133,7 @@ int analysis()
 
         if (output != ERROR_OK)
         {
-            return ERROR_LEXICAL_ANALISYS;
+            return output;
         }
         else
         {
@@ -163,90 +164,102 @@ int analysis()
 
 int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
 {
-    el1 = el3; //TODO odstranit
     Token new;
+    new.value.integer_value = 1;
+    new.value.decimal_value = 1;
     int output = ERROR_OK;
-    if (!el2.terminal)                                              //E -> (E)
+    Token_type return_type = ERROR;
+    if (!el2.terminal) //E -> (E)
     {
         Stack_Push(&expression_stack, el2.token, false, false);
     }
     else
     {
 
-        switch (el2.token.type)                             //TODO check id a typ, zavolaj code gen
+        switch (el2.token.type) //TODO zavolaj code gen
         {
         case PLUS:
-            new.type = NUMBER;
-            //check_id_and_type(&el1,&el2,&el3)
+            new.type = return_type;
+            output = check_id_and_type(&el1, &el2, &el3, &return_type);
             Stack_Push(&expression_stack, new, false, false);
             break;
 
         case MINUS:
-            new.type = NUMBER;
+            new.type = return_type;
             Stack_Push(&expression_stack, new, false, false);
             break;
 
         case MULTIPLY:
-            new.type = NUMBER;
-            //TODO new.value =
+            new.type = return_type;
+            output = check_id_and_type(&el1, &el2, &el3, &return_type);
             Stack_Push(&expression_stack, new, false, false);
             break;
 
         case DIVIDE:
-            new.type = NUMBER;
-            //TODO new.value =
+            if((el3.token.type == INT) && (el3.token.value.integer_value == 0)){
+                return ERROR_RUNTIME_DIVISON_BY_ZERO;
+            }
+            if((el3.token.type == NUMBER) && (el3.token.value.decimal_value == 0)){
+                return ERROR_RUNTIME_DIVISON_BY_ZERO;
+            }
+            new.type = return_type;
+            output = check_id_and_type(&el1, &el2, &el3, &return_type);
             Stack_Push(&expression_stack, new, false, false);
             break;
 
         case INTEGER_DIVIDE:
-            new.type = NUMBER;
-            //TODO new.value =
+            if((el3.token.type == INT) && (el3.token.value.integer_value == 0)){
+                return ERROR_RUNTIME_DIVISON_BY_ZERO;
+            }
+            new.type = return_type;
+            output = check_id_and_type(&el1, &el2, &el3, &return_type);
             Stack_Push(&expression_stack, new, false, false);
             break;
 
         case GREATER_THAN:
-            new.type = NUMBER;
-            //TODO new.value =
+            new.type = return_type;
+            output = check_id_and_type(&el1, &el2, &el3, &return_type);
             Stack_Push(&expression_stack, new, false, false);
             break;
 
         case LESS_THAN:
-            new.type = NUMBER;
-            //TODO new.value =
+            new.type = return_type;
+            output = check_id_and_type(&el1, &el2, &el3, &return_type);
             Stack_Push(&expression_stack, new, false, false);
             break;
 
         case GREATER_or_EQUALS:
-            new.type = NUMBER;
-            //TODO new.value =
+            new.type = return_type;
+            output = check_id_and_type(&el1, &el2, &el3, &return_type);
             Stack_Push(&expression_stack, new, false, false);
             break;
 
         case LESS_or_EQUALS:
-            new.type = NUMBER;
-            //TODO new.value =
+            new.type = return_type;
+            output = check_id_and_type(&el1, &el2, &el3, &return_type);
             Stack_Push(&expression_stack, new, false, false);
             break;
 
         case EQUALS:
-            new.type = NUMBER;
-            //TODO new.value =
+            new.type = return_type;
+            output = check_id_and_type(&el1, &el2, &el3, &return_type);
             Stack_Push(&expression_stack, new, false, false);
             break;
 
         case EG_ASSIGN:
-            new.type = NUMBER;
-            //TODO new.value =
+            new.type = return_type;
+            output = check_id_and_type(&el1, &el2, &el3, &return_type);
             Stack_Push(&expression_stack, new, false, false);
             break;
 
         case CONCATENATE:
-            new.type = NUMBER;
-            //TODO new.value =
+            new.type = return_type;
+            output = check_id_and_type(&el1, &el2, &el3, &return_type);
             Stack_Push(&expression_stack, new, false, false);
             break;
 
         default:
+            return ERROR_SYNTAX_ANALYSIS;
             break;
         }
     }
@@ -280,7 +293,7 @@ int find_index(int *i1, int *i2)
     {
         *i1 = 3;
     }
-    else if ((expression_stack.top->token.type == ID) || (expression_stack.top->token.type == NUMBER)|| (expression_stack.top->token.type == INT)|| (expression_stack.top->token.type == STRING))
+    else if ((expression_stack.top->token.type == ID) || (expression_stack.top->token.type == NUMBER) || (expression_stack.top->token.type == INT) || (expression_stack.top->token.type == STRING))
     {
         *i1 = 4;
     }
@@ -322,7 +335,7 @@ int find_index(int *i1, int *i2)
     {
         *i2 = 3;
     }
-    else if ((act_token.type == ID) || (act_token.type == NUMBER)|| (act_token.type == STRING))
+    else if ((act_token.type == ID) || (act_token.type == NUMBER) || (act_token.type == STRING))
     {
         *i2 = 4;
     }
@@ -356,7 +369,7 @@ int hash()
     output = get_token(&act_token);
     if (output != ERROR_OK)
     {
-        return ERROR_LEXICAL_ANALISYS;
+        return output;
     }
     else
     {
@@ -367,13 +380,321 @@ int hash()
     }
     Token new;
     int str_len = strlen(act_token.value.string.string);
-    new.type = NUMBER;
+    new.type = INT;
     new.value.integer_value = str_len;
     act_token = new;
 
     return output;
 }
 
-/*int check_id_and_type(TStack_element *el1, TStack_element *el2, TStack_element *el3){
-    //TODO
-}*/
+int check_id_and_type(TStack_element *el1, TStack_element *el2, TStack_element *el3, Token_type *return_type)
+{
+    Token_type type1, type2;
+    ht_item_t *var = NULL;
+    if ((el2->token.type == PLUS) || (el2->token.type == MINUS) || (el2->token.type == MULTIPLY) || (el2->token.type == DIVIDE) || (el2->token.type == INTEGER_DIVIDE)) //+-*///
+    {
+
+        if (el1->token.type == INT)
+        {
+            type1 = INT;
+        }
+        else if (el1->token.type == NUMBER)
+        {
+            type1 = NUMBER;
+        }
+        else if (el1->token.type == ID)
+        {
+            var = ht_search(symtable, el1->token.value.string.string);
+            if (var == NULL)
+            {
+                return ERROR_SEMANTIC;
+            }
+            else
+            {
+                if ((var->var_type != NUMBER) && (var->var_type != INT))
+                {
+                    return ERROR_SEMANTIC_EXPRESSION_TYPE;
+                }
+                type1 = var->var_type;
+            }
+        }
+        else
+        {
+            return ERROR_SEMANTIC_EXPRESSION_TYPE;
+        }
+
+        if (el3->token.type == INT)
+        {
+            type2 = INT;
+        }
+        else if (el3->token.type == NUMBER)
+        {
+            type2 = NUMBER;
+        }
+        else if (el3->token.type == ID)
+        {
+            var = ht_search(symtable, el3->token.value.string.string);
+            if (var == NULL)
+            {
+                return ERROR_SEMANTIC;
+            }
+            else
+            {
+                if ((var->var_type != NUMBER) && (var->var_type != INT))
+                {
+                    return ERROR_SEMANTIC_EXPRESSION_TYPE;
+                }
+                type2 = var->var_type;
+            }
+        }
+        else
+        {
+            return ERROR_SEMANTIC_EXPRESSION_TYPE;
+        }
+
+        if ((type1 == INT) && (type2 == INT))
+        {
+            *return_type = INT;
+            return ERROR_OK;
+        }
+        else
+        {
+            if (el2->token.type == INTEGER_DIVIDE)
+            {
+                return ERROR_SEMANTIC_EXPRESSION_TYPE;
+            }
+            *return_type = NUMBER;
+            return ERROR_OK;
+        }
+    }
+    else if ((el2->token.type == CONCATENATE)) //..
+    {
+        if (el1->token.type == STRING)
+        {
+            type1 = STRING;
+        }
+        else if (el1->token.type == ID)
+        {
+            var = ht_search(symtable, el1->token.value.string.string);
+            if (var == NULL)
+            {
+                return ERROR_SEMANTIC;
+            }
+            else
+            {
+                if (var->var_type != STRING)
+                {
+                    return ERROR_SEMANTIC_EXPRESSION_TYPE;
+                }
+                type1 = var->var_type;
+            }
+        }
+        else
+        {
+            return ERROR_SEMANTIC_EXPRESSION_TYPE;
+        }
+
+        if (el3->token.type == STRING)
+        {
+            type2 = STRING;
+        }
+        else if (el3->token.type == ID)
+        {
+            var = ht_search(symtable, el3->token.value.string.string);
+            if (var == NULL)
+            {
+                return ERROR_SEMANTIC;
+            }
+            else
+            {
+                if (var->var_type != STRING)
+                {
+                    return ERROR_SEMANTIC_EXPRESSION_TYPE;
+                }
+                type2 = var->var_type;
+            }
+        }
+        else
+        {
+            return ERROR_SEMANTIC_EXPRESSION_TYPE;
+        }
+
+        *return_type = STRING;
+        return ERROR_OK;
+    }
+    else if ((el2->token.type == GREATER_THAN) || (el2->token.type == GREATER_or_EQUALS) || (el2->token.type == LESS_THAN) || (el2->token.type == LESS_or_EQUALS)) // <= => < >
+    {
+        if (el1->token.type == INT)
+        {
+            type1 = INT;
+        }
+        else if (el1->token.type == NUMBER)
+        {
+            type1 = NUMBER;
+        }
+        else if (el1->token.type == ID)
+        {
+            var = ht_search(symtable, el1->token.value.string.string);
+            if (var == NULL)
+            {
+                return ERROR_SEMANTIC;
+            }
+            else
+            {
+                if ((var->var_type != NUMBER) && (var->var_type != INT))
+                {
+                    return ERROR_SEMANTIC_EXPRESSION_TYPE;
+                }
+                type1 = var->var_type;
+            }
+        }
+        else if (el1->token.type == STRING)
+        {
+            type1 = STRING;
+        }
+        else
+        {
+            return ERROR_SEMANTIC_EXPRESSION_TYPE;
+        }
+
+        if (el3->token.type == INT)
+        {
+            type2 = INT;
+        }
+        else if (el3->token.type == NUMBER)
+        {
+            type2 = NUMBER;
+        }
+        else if (el3->token.type == ID)
+        {
+            var = ht_search(symtable, el3->token.value.string.string);
+            if (var == NULL)
+            {
+                return ERROR_SEMANTIC;
+            }
+            else
+            {
+                if ((var->var_type != NUMBER) && (var->var_type != INT))
+                {
+                    return ERROR_SEMANTIC_EXPRESSION_TYPE;
+                }
+                type2 = var->var_type;
+            }
+        }
+        else if (el3->token.type == STRING)
+        {
+            type2 = STRING;
+        }
+        else
+        {
+            return ERROR_SEMANTIC_EXPRESSION_TYPE;
+        }
+
+        if (type1 == type2)
+        {
+            *return_type = INT;
+        }
+        else if (((type1 == INT) && (type2 == NUMBER)) || ((type2 == INT) && (type1 == NUMBER)))
+        {
+            *return_type = INT;
+        }
+        else
+        {
+            return ERROR_SEMANTIC_EXPRESSION_TYPE;
+        }
+
+        return ERROR_OK;
+    }
+    else if ((el2->token.type == EQUALS) || (el2->token.type == EG_ASSIGN)) // == ~=
+    {
+        if (el1->token.type == INT)
+        {
+            type1 = INT;
+        }
+        else if (el1->token.type == NUMBER)
+        {
+            type1 = NUMBER;
+        }
+        else if (el1->token.type == ID)
+        {
+            var = ht_search(symtable, el1->token.value.string.string);
+            if (var == NULL)
+            {
+                return ERROR_SEMANTIC;
+            }
+            else
+            {
+                if ((var->var_type != NUMBER) && (var->var_type != INT))
+                {
+                    return ERROR_SEMANTIC_EXPRESSION_TYPE;
+                }
+                type1 = var->var_type;
+            }
+        }
+        else if (el1->token.type == STRING)
+        {
+            type1 = STRING;
+        }
+        else if ((el1->token.type == KEYWORD) && (el1->token.value.keyword == KEYWORD_NIL))
+        {
+            type1 = KEYWORD;
+        }
+        else
+        {
+            return ERROR_SEMANTIC_EXPRESSION_TYPE;
+        }
+
+        if (el3->token.type == INT)
+        {
+            type2 = INT;
+        }
+        else if (el3->token.type == NUMBER)
+        {
+            type2 = NUMBER;
+        }
+        else if (el3->token.type == ID)
+        {
+            var = ht_search(symtable, el3->token.value.string.string);
+            if (var == NULL)
+            {
+                return ERROR_SEMANTIC;
+            }
+            else
+            {
+                if ((var->var_type != NUMBER) && (var->var_type != INT))
+                {
+                    return ERROR_SEMANTIC_EXPRESSION_TYPE;
+                }
+                type2 = var->var_type;
+            }
+        }
+        else if (el3->token.type == STRING)
+        {
+            type2 = STRING;
+        }
+        else if ((el3->token.type == KEYWORD) && (el3->token.value.keyword == KEYWORD_NIL))
+        {
+            type2 = KEYWORD;
+        }
+        else
+        {
+            return ERROR_SEMANTIC_EXPRESSION_TYPE;
+        }
+
+        if (type1 == type2)
+        {
+            *return_type = INT;
+        }
+        else if (((type1 == INT) && (type2 == NUMBER)) || ((type2 == INT) && (type1 == NUMBER)))
+        {
+            *return_type = INT;
+        }
+        else
+        {
+            return ERROR_SEMANTIC_EXPRESSION_TYPE;
+        }
+
+        return ERROR_OK;
+    }
+    return ERROR_OK;
+}

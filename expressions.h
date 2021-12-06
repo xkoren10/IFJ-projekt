@@ -45,3 +45,9 @@ int reduce(TStack_element el1,TStack_element el2, TStack_element el3);
  * @return Error code
  */
 int hash();
+
+/**
+ * @brief Semantic check
+ * @return Error code
+ */
+int check_id_and_type(TStack_element *el1, TStack_element *el2, TStack_element *el3, Token_type *return_type);
