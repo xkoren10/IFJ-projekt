@@ -100,21 +100,21 @@ int analysis()
         else
         {
             TStack_element el1, el2, el3;
-            el3 = Stack_Top(&expression_stack);
+            el3 = *(Stack_Top(&expression_stack));
             Stack_Pop(&expression_stack);
             if (Stack_IsEmpty(&expression_stack))
             {
                 return ERROR_SYNTAX_ANALYSIS;
             }
 
-            el2 = Stack_Top(&expression_stack);
+            el2 = *(Stack_Top(&expression_stack));
             Stack_Pop(&expression_stack);
             if (Stack_IsEmpty(&expression_stack))
             {
                 return ERROR_SYNTAX_ANALYSIS;
             }
 
-            el1 = Stack_Top(&expression_stack);
+            el1 = *(Stack_Top(&expression_stack));
             Stack_Pop(&expression_stack);
 
             if (Stack_IsEmpty(&expression_stack) || el1.token.type == DOLLAR)
