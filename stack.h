@@ -57,7 +57,7 @@ void Stack_Pop(TStack *stack);
  * @brief Returns data from the top of the stack
  * @param stack Structure
  */
-TStack_element Stack_Top(TStack *stack);
+TStack_element *Stack_Top(TStack *stack);
 
 /**
  * @brief Checks if stack is empty

@@ -45,9 +45,9 @@ void Stack_Pop(TStack *stack)
     }
 }
 
-TStack_element Stack_Top(TStack *stack)
+TStack_element *Stack_Top(TStack *stack)
 {
-    return *(stack->top);
+    return stack->top;
 }
 
 bool Stack_IsEmpty(TStack *stack)
