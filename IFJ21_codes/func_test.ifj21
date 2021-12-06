@@ -1,5 +1,9 @@
 require "ifj21"
 
-global kokot : function( integer , string , string ):integer
+global kokot : function( integer , string , string ):string
 
-function kokot ( x : integer, y:string ,z : number): integer
+function kokot ( x : integer, y:string ,z : string): string
+
+global penis : function( integer , string , string ):string
+
+function penis ( x : integer, y:string ,z : string):string
