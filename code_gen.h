@@ -34,7 +34,7 @@ typedef union{
  */
 typedef struct{
     char* id;  // ID of variable
-    char* value_type;   // Type of variable (string, float, integer)
+    char* value_type;   // Type of variable (string, float, integer, id, E)
     Values value;   // Value (string, float or integer) of variable or string="%" for stack_pop
 } Symbol;
 
@@ -73,7 +73,7 @@ void gen_var_setval(Symbol var);
  * @brief Generates start of an user function
  * @param func_name hmmm
  */
-void gen_function_start(char* func_name, char* args,char* arg_types, char* return_types, char* returns); // TODO rework
+void gen_function_start(char* func_name, char** args, char** arg_types, char** returns, char** return_types); // TODO rework
 
 /**
  * @brief Generates end of an user function
@@ -123,4 +123,12 @@ void gen_if_else();
  * @brief Generates end of IF
  */
 void gen_if_end();
+
+/**
+ * @brief Generates instructions for conditions 
+ * @param type Instruction type
+ * @param op_l First operator
+ * @param op_r Second operator
+ */
+void gen_condition(char* type, Symbol op_l, Symbol op_r);
 #endif

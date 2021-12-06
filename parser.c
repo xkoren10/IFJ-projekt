@@ -10,6 +10,7 @@
  */
 
 /* POZNAMKY
+vsade pred keywordy overit ze su keywordy lebo koren nevie ani šunku nakrájať
 OSETRENIE ZIADNEHO VYSTUPU
 VSADE OVERENIA EOFOV
 BUDE TREBA SKONROLOVAT SYMTABLE
@@ -87,12 +88,12 @@ int Deklaracie_or_Definicie()
     }
     
     //IF GLOBAL -> DEKLARACIA_FUNKCIE
-    else if (actToken.value.keyword == KEYWORD_GLOBAL)
+    else if (actToken.value.keyword == KEYWORD_GLOBAL)//KOREN
     {
         output = Deklaracie_Funkcie();
     }
     //IF LOCAL -> DEFINICIA_FUNKCIE
-    else if (actToken.value.keyword == KEYWORD_FUNCTION)
+    else if (actToken.value.keyword == KEYWORD_FUNCTION)//KOREN
     {
         output = Definicia_Funkcie();  
     }
@@ -443,6 +444,28 @@ int Parameter()
 
 int Telo_Funkcie()  //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
 {
+    if(actToken.type = KEYWORD && actToken.value.keyword == KEYWORD_END)
+    {
+        //KONIEC FUNKCIE
+    }  
+    else if(actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_LOCAL)
+    {
+        //DEKLARACIA PREMENNEJ
+
+    }
+    else if (actToken.type == ID)
+    {
+        //VIAC ID = VIAC VYRAZOV
+    }
+    else if (actToken.type ==)
+    {
+        //BUILTIN FUNKCIE, LEN ZAVOLAM HLOZIMU 
+    }
+    else if()
+    {
+
+    }
+    fprintf(stdout,"%d jebbbe ",actToken.type);
 
 
 
