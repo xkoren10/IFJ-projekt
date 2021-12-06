@@ -31,7 +31,7 @@ typedef enum
 	KEYWORD_ELSE,
 	KEYWORD_END,
 	KEYWORD_FUNCTION,
-    	KEYWORD_GLOBAL,
+    KEYWORD_GLOBAL,
 	KEYWORD_IF,
 	KEYWORD_INTEGER,
 	KEYWORD_LOCAL,
@@ -96,9 +96,6 @@ typedef enum
     BUILT_IN_TOINTEGER,
     BUILT_IN_ORD,
     BUILT_IN_CHR,                      
-
-
-    NIL,
 
     STRING,
     ESCAPE,
