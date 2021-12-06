@@ -26,7 +26,7 @@ TStack expression_stack;
 Token act_token;
 Token dollar;
 
-int expression_analysis(Token *token)
+int expression_analysis(Token *token, Token *return_token, ht_table_t *symtable)
 {
     Stack_Init(&expression_stack);
     dollar.type = DOLLAR;
@@ -42,6 +42,7 @@ int expression_analysis(Token *token)
     }
     else
         output = analysis();
+        *return_token = act_token;
     return output;
 }
 
@@ -88,26 +89,38 @@ int analysis()
         break;
 
     case '>':
-        if (expression_stack.top->handle == true)
+        if (expression_stack.top->handle == true)           //E -> id
         {
             expression_stack.top->terminal = false;
             expression_stack.top->handle = false;
         }
         else
         {
-            TStack_element el1, el2, el3;                   //TODO osetrenia
+            TStack_element el1, el2, el3;                   
             Stack_Top(&expression_stack, &el3);
             Stack_Pop(&expression_stack);
-            Stack_Top(&expression_stack, &el2);
-            Stack_Pop(&expression_stack);
-            Stack_Top(&expression_stack, &el1);
-            Stack_Pop(&expression_stack);
-
             if (Stack_IsEmpty(&expression_stack))
             {
                 return ERROR_SYNTAX_ANALYSIS;
             }
-            output = reduce(el1, el2, el3);
+
+
+            Stack_Top(&expression_stack, &el2);
+            Stack_Pop(&expression_stack);
+            if (Stack_IsEmpty(&expression_stack))
+            {
+                return ERROR_SYNTAX_ANALYSIS;
+            }
+
+
+            Stack_Top(&expression_stack, &el1);
+            Stack_Pop(&expression_stack);
+
+            if (Stack_IsEmpty(&expression_stack) || el1.token.type == DOLLAR)
+            {
+                return ERROR_SYNTAX_ANALYSIS;
+            }
+            output = reduce(el1, el2, el3);         //E -> E ? E  alebo E -> (E)
         }
 
         break;
@@ -150,27 +163,26 @@ int analysis()
 
 int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
 {
+    el1 = el3; //TODO odstranit
     Token new;
     int output = ERROR_OK;
-    if (!el2.terminal)
+    if (!el2.terminal)                                              //E -> (E)
     {
         Stack_Push(&expression_stack, el2.token, false, false);
     }
     else
     {
 
-        check_id(&el1,&el2,&el3);
-        switch (el2.token.type)
+        switch (el2.token.type)                             //TODO check id a typ, zavolaj code gen
         {
         case PLUS:
             new.type = NUMBER;
-            //TODO new.value =
+            //check_id_and_type(&el1,&el2,&el3)
             Stack_Push(&expression_stack, new, false, false);
             break;
 
         case MINUS:
             new.type = NUMBER;
-            //TODO new.value =
             Stack_Push(&expression_stack, new, false, false);
             break;
 
@@ -268,7 +280,7 @@ int find_index(int *i1, int *i2)
     {
         *i1 = 3;
     }
-    else if ((expression_stack.top->token.type == ID) || (expression_stack.top->token.type == NUMBER)) //TODO moze byt asi aj int a tak
+    else if ((expression_stack.top->token.type == ID) || (expression_stack.top->token.type == NUMBER)|| (expression_stack.top->token.type == INT)|| (expression_stack.top->token.type == STRING))
     {
         *i1 = 4;
     }
@@ -310,7 +322,7 @@ int find_index(int *i1, int *i2)
     {
         *i2 = 3;
     }
-    else if ((act_token.type == ID) || (act_token.type == NUMBER)) //TODO moze byt asi aj int a tak
+    else if ((act_token.type == ID) || (act_token.type == NUMBER)|| (act_token.type == STRING))
     {
         *i2 = 4;
     }
@@ -362,6 +374,6 @@ int hash()
     return output;
 }
 
-int check_id(TStack_element *el1, TStack_element *el2, TStack_element *el3){
+/*int check_id_and_type(TStack_element *el1, TStack_element *el2, TStack_element *el3){
     //TODO
-}
+}*/
