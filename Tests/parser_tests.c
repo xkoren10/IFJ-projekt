@@ -13,6 +13,7 @@
 #include "../dyn_string.h"
 #include "../parser.h"
 #include "../expressions.h"
+#include "../scanner.h"
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
@@ -28,11 +29,13 @@ int main(){
     fprintf(stdout,"-----------------------------------------------\n");
     fprintf(stdout,"--------------- Expressions tests -------------\n");
 
-/* file = fopen("IFJ21_codes/Expressions/basic.txt", "r");
+file = fopen("IFJ21_codes/Expressions/basic.txt", "r");
 set_source(file);
 get_token(&token);
+assert(token.type == INT);
 res = expression_analysis(&token);
-fclose(file); */
+assert(res==0);
+fclose(file);
 
     fprintf(stdout,"\x1B[32m""                     PASSED                    \n""\x1B[0m");
     fprintf(stdout,"-----------------------------------------------\n");
