@@ -586,7 +586,8 @@ int get_token(Token *token)
             }
 
             else
-            {
+            {   
+                ungetc(next_char,source_file);
                 return process_float(string, token);
             }
 
