@@ -48,7 +48,7 @@ void ht_init(ht_table_t *table)
 }
 
 void item_null(ht_item_t *item){
-  item->inal=NULL;
+  item->inval=NULL;
   item->next=NULL;
   item->outval=NULL;
   item->string_val=NULL;

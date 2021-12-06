@@ -21,7 +21,7 @@ ht_table_t *local;
 
 ht_item_t *current_item;
 
-struct func_val *current_LL;
+func_val_t *current_LL;
 
 
 char* func_name;

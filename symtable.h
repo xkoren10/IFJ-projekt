@@ -31,7 +31,7 @@ typedef struct func_val {
 float var_val;
 char* var_string;
 char* var_name;
-Token_type typp;
+Keyword typp;
 struct func_val *next;
 }func_val_t;
 
@@ -43,7 +43,7 @@ typedef struct ht_item {
   float var_value;
   char *string_val;       //hodnota premennej string
   Token_type var_type;          
-  func_val_t *inal; //vstupne parametre obe budu heady
+  func_val_t *inval; //vstupne parametre obe budu heady
   func_val_t *outval;   //vystupne parametre
   struct ht_item *next; // ukazateľ na ďalšie synonymum nanic mi to je ale sak neham
 } ht_item_t;
