@@ -11,6 +11,8 @@
 
 #ifndef _CODE_GEN_H
 #define _CODE_GEN_H
+
+#include "parser.h"
 /** @brief Iterator for ifs*/
 unsigned if_i;
 /** @brief Iterator for loops*/
@@ -31,9 +33,9 @@ typedef union{
  * @brief Structure used when function takes either variable or constant
  */
 typedef struct{
-    char* var;
-    char* value_type;
-    Values value;
+    char* id;  // ID of variable
+    char* value_type;   // Type of variable (string, float, integer)
+    Values value;   // Value (string, float or integer) of variable or string="%" for stack_pop
 } Symbol;
 
 /**
@@ -47,13 +49,12 @@ void gen_header();
 void gen_main();
 
 /**
- * @brief Generates instruction
+ * @brief Generates instruction with two operators and pushes the result to stack
  * @param type Instruction type
- * @param id_res Variable where the result will be stored
  * @param op_l First operator
- * @param op_r Second operator
+ * @param op_r Second operator (value_type == "NONE" if second operand is not needed)
  */
-void gen_instruction(char* type, char* id_res, Symbol op_l, Symbol op_r);
+void gen_instruction(char* type, Symbol op_l, Symbol op_r);
 
 /**
  * @brief Generates variable declaration
@@ -65,18 +66,24 @@ void gen_var_def(char* id);
  * @brief Generates setting of a variable with given type and value
  * @param var Name, value type and value of variable 
  */
-void gen_var_valset(Symbol var);
+void gen_var_setval(Symbol var);
+// MOVE <where> <what>  / MOVE <Symbol.var> <type@value>
 
 /**
  * @brief Generates start of an user function
  * @param func_name hmmm
  */
-void gen_function_start(char* func_name, char* args,char* arg_types, char* return_types, char* returns);// rework
+void gen_function_start(char* func_name, char* args,char* arg_types, char* return_types, char* returns); // TODO rework
 
 /**
  * @brief Generates end of an user function
  */
 void gen_function_end();
+
+/**
+ * @brief Generates call of an user function
+ */
+void gen_function_call(char* func_name);
 
 /**
  * @brief Generates build-in function read
