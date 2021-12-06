@@ -18,7 +18,7 @@
  * @param token Structure Token
  * @return Error code
  */
-int expression_analysis(Token *token, Token *return_token, ht_table_t *symtable);
+int expression_analysis(Token *token,ht_table_t *symtable);
 
 /**
  * @brief Expresion analysis

@@ -26,7 +26,7 @@ TStack expression_stack;
 Token act_token;
 Token dollar;
 
-int expression_analysis(Token *token, Token *return_token, ht_table_t *symtable)
+int expression_analysis(Token *token, ht_table_t *symtable)
 {
     Stack_Init(&expression_stack);
     dollar.type = DOLLAR;
@@ -42,7 +42,7 @@ int expression_analysis(Token *token, Token *return_token, ht_table_t *symtable)
     }
     else
         output = analysis();
-        *return_token = act_token;
+        *token = act_token;
     return output;
 }
 
