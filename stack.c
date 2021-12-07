@@ -16,7 +16,7 @@ void Stack_Init(TStack *stack)
     stack->top = NULL;
 }
 
-int Stack_Push(TStack *stack, Token token, bool handle, bool terminal)
+int Stack_Push(TStack *stack, Token token, bool handle, bool terminal, bool expression)
 {
     TStack_element *new = (TStack_element *)malloc(sizeof(TStack_element));
     if (new == NULL)
@@ -25,6 +25,7 @@ int Stack_Push(TStack *stack, Token token, bool handle, bool terminal)
     }
     else
     {   
+        new->expression = expression;
         new->terminal = terminal;
         new->token = token;
         new->next = stack->top;
