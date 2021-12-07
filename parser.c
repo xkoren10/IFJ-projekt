@@ -505,17 +505,13 @@ int Telo_Funkcie()  //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
         //expressions volanie prvej var, if ciarka expressions volanie dalsiej , atd atd
         //VIAC ID = VIAC VYRAZOV
     }
-<<<<<<< HEAD
+
     else if (actToken.type == BUILTIN)
-=======
-    /*else if (actToken.type ==)
->>>>>>> f25aa308025440cbdbd99d7cf21410018f1e826e
     {
         //BUILTIN FUNKCIE, LEN ZAVOLAM HLOZIMU      <-- added
     }
     else if(actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_IF)
     {
-<<<<<<< HEAD
         //expressions pre mareka,
         //if
         //telo funkcie
@@ -541,16 +537,12 @@ int Telo_Funkcie()  //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
     if(output!=ERROR_OK)
             return ERROR_SYNTAX_ANALYSIS;
     return Telo_Funkcie(); 
-=======
 
-    }*/
-    fprintf(stdout,"%d jebbbe ",actToken.type);
-
+    }
+    
 
 
 
 
-
->>>>>>> f25aa308025440cbdbd99d7cf21410018f1e826e
 
 }
