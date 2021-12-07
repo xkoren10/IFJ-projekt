@@ -168,7 +168,9 @@ int analysis()
                 return ERROR_SYNTAX_ANALYSIS;
             }
             output = reduce(el1, el2, el3); //E -> E ? E  alebo E -> (E)
-
+            if (output!=ERROR_OK){
+                return output;
+            }
             if ((expression_stack.top->terminal == false) && (expression_stack.top->next->token.type == DOLLAR) && (i2 == 7))
             {
                 return ERROR_OK;
@@ -223,7 +225,7 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
         Stack_Push(&expression_stack, el2.token, false, false, el2.expression);
         if ((el2.terminal == false) && (exp_reduced == true))
         {
-            fprintf(stdout, "%d", exp_reduced);
+            //fprintf(stdout, "%d", exp_reduced);
             return_symbol.value_type = "E";
         }
         else
@@ -794,7 +796,7 @@ void set_op(TStack_element *el, Symbol *op)
         }
         else if (el->token.type == STRING)
         {
-            op->value_type = "integer";
+            op->value_type = "string";
             op->value.string = el->token.value.string.string;
         }
     }
