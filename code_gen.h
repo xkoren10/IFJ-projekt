@@ -35,7 +35,7 @@ typedef union{
 typedef struct{
     char* id;  // ID of variable
     char* value_type;   // Type of variable (string, float, integer, id, E)
-    char* result_type;   // Type of returned expression
+    Token_type result_type;   // Type of returned expression
     Values value;   // Value (string, float or integer) of variable
 } Symbol;
 
