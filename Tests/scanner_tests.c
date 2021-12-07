@@ -1334,6 +1334,20 @@ fclose(file);
         fprintf(stdout,"--> IFJ21_codes/basic.ifj21 => ");
         fprintf(stdout,"\x1B[32m"" PASSED \n""\x1B[0m"); 
 
+//janko
+file = fopen("IFJ21_codes/janko.ifj21", "r");
+set_source(file);
+
+get_token(&token);
+assert(token.type == ID);
+assert(dyn_string_compare(token.value.string, "janko")==0);
+
+ fclose(file);
+
+
+        fprintf(stdout,"--> IFJ21_codes/janko.ifj21 => ");
+        fprintf(stdout,"\x1B[32m"" PASSED \n""\x1B[0m"); 
+
     fprintf(stdout,"-----------------------------------------------\n");
 
    return 0;
