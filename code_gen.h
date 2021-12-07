@@ -35,6 +35,7 @@ typedef union{
 typedef struct{
     char* id;  // ID of variable
     char* value_type;   // Type of variable (string, float, integer, id, E)
+    char* result_type;   // Type of returned expression
     Values value;   // Value (string, float or integer) of variable or string="%" for stack_pop
 } Symbol;
 
@@ -73,7 +74,7 @@ void gen_var_setval(Symbol var);
  * @brief Generates start of an user function
  * @param func_name hmmm
  */
-void gen_function_start(char* func_name, char** args, char** arg_types, char** returns, char** return_types); // TODO rework
+void gen_function_start(char* func_name, func_val_t args, func_val_t returns); // TODO rework
 
 /**
  * @brief Generates end of an user function
@@ -131,4 +132,31 @@ void gen_if_end();
  * @param op_r Second operator
  */
 void gen_condition(char* type, Symbol op_l, Symbol op_r);
+
+/**
+ * @brief Generates instructions for conditions 
+ * @param var Variable to substring
+ * @param index_from Index from varible will be substringed
+ * @param index_to Index where substring will end
+ */
+void gen_substring(Symbol var, int index_from, int index_to);
+
+/**
+ * @brief Generates build-in function for converting char to int
+ * @param var Variable
+ */
+void gen_ordinal(Symbol var);
+
+/**
+ * @brief Generates build-in function for getting one char from string
+ * @param var Variable
+ * @param index Index of char
+ */
+void gen_chr(Symbol var, int index);
+
+/**
+ * @brief Generates build-in function for converting float/ number to integer
+ * @param var Variable
+ */
+void gen_toINT(Symbol var);
 #endif
