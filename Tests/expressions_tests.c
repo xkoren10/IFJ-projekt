@@ -236,7 +236,6 @@ assert(token.value.integer_value == 5);
 res = expression_analysis(&token,symtable_ptr,symptr,t_list_ptr);
 assert(strcmp(sym.value_type,"integer")==0);
 assert(token.type == STATE_EOF);
-fprintf(stdout,"%d type -- %d res -- %s\n", token.type, res, sym.value_type);
 assert(res==0);
 
 fclose(file);

@@ -175,7 +175,7 @@ int analysis()
 }
 
 int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
-{
+{ //fprintf(stdout,"\n%d - operand %d - operator %d - operand\n",el1.token.value.integer_value,el2.token.type,el3.token.value.integer_value); test print
     Token new;
     new.value.integer_value = 1;
     new.value.decimal_value = 1;
@@ -186,7 +186,7 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
         Stack_Push(&expression_stack, el2.token, false, false);
         if ((el2.terminal == false )&& (exp_reduced== true))
         {
-            fprintf(stdout,"%d",exp_reduced);
+           
             return_symbol.value_type = "E";
         }
         else
