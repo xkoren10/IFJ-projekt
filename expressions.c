@@ -801,7 +801,7 @@ void set_op(TStack_element *el, Symbol *op)
         }
         else if (el->token.type == STRING)
         {
-            op->value_type = "integer";
+            op->value_type = "string";
             op->value.string = el->token.value.string.string;
         }
     }

@@ -116,9 +116,8 @@ void gen_loop_end();
 
 /**
  * @brief Generates start of IF
- * @param type Type of condition
  */
-void gen_if_start(char* type);
+void gen_if_start();
 
 /**
  * @brief Generates else branch of IF
