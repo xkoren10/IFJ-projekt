@@ -69,6 +69,7 @@ typedef enum
     GREATER_THAN,                   //  >
     GREATER_or_EQUALS,              //  >=
     EQUALS,                         //  ==
+    NOT_EQUAL,                      //  ~=
 
     LEFT_PARENTHESIS,               // (
     RIGHT_PARENTHESIS,              // )
@@ -84,10 +85,17 @@ typedef enum
     INDEX_CHAR,                     //  'E' or 'e'
     EXPONENT,
     EXPONENT_NUMBER,  
-    EXPONENT_SIGN,                  //  + or -                           
+    EXPONENT_SIGN,                  //  + or -     
 
 
-    NIL,
+    BUILT_IN_READN,
+    BUILT_IN_READI,
+    BUILT_IN_READS,
+    BUILT_IN_WRITE,
+    BUILT_IN_SUBSTR,
+    BUILT_IN_TOINTEGER,
+    BUILT_IN_ORD,
+    BUILT_IN_CHR,                      
 
     STRING,
     ESCAPE,
@@ -95,7 +103,7 @@ typedef enum
     LINE_COMMENTARY,                //  --
     BLOCK_COMMENTARY,               //  --[[ ]]
 
-    HASH,                           //  #
+
     COMMA,                          // ,
     COLON,                          // :
     DOT,                            // .

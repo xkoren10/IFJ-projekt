@@ -45,12 +45,21 @@ void Stack_Pop(TStack *stack)
     }
 }
 
-void Stack_Top(TStack *stack, TStack_element *el)
+TStack_element *Stack_Top(TStack *stack)
 {
-    el = stack->top;
+    return stack->top;
 }
 
 bool Stack_IsEmpty(TStack *stack)
 {
     return (stack->top == NULL);
+}
+
+void Stack_Dispose(TStack *stack){
+    while(stack->top != NULL){
+        TStack_element *del = stack->top;
+        stack->top = stack->top->next;
+        free(del);
+        del = NULL;
+    }
 }

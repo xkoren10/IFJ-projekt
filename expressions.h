@@ -18,7 +18,7 @@
  * @param token Structure Token
  * @return Error code
  */
-int expression_analysis(Token *token);
+int expression_analysis(Token *token,ht_table_t *symtable);
 
 /**
  * @brief Expresion analysis
@@ -45,3 +45,9 @@ int reduce(TStack_element el1,TStack_element el2, TStack_element el3);
  * @return Error code
  */
 int hash();
+
+/**
+ * @brief Semantic check
+ * @return Error code
+ */
+int check_id_and_type(TStack_element *el1, TStack_element *el2, TStack_element *el3, Token_type *return_type);

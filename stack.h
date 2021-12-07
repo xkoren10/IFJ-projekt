@@ -57,7 +57,7 @@ void Stack_Pop(TStack *stack);
  * @brief Returns data from the top of the stack
  * @param stack Structure
  */
-void Stack_Top(TStack *stack, TStack_element *el);
+TStack_element *Stack_Top(TStack *stack);
 
 /**
  * @brief Checks if stack is empty
@@ -65,3 +65,9 @@ void Stack_Top(TStack *stack, TStack_element *el);
  * @return true if stack is empty, false if stack is not empty
  */
 bool Stack_IsEmpty(TStack *stack);
+
+/**
+ * @brief Removes data from the stack
+ * @param stack Structure
+ */
+void Stack_Dispose(TStack *stack);
