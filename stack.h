@@ -21,6 +21,7 @@ typedef struct s_elem
     bool handle;
     bool terminal;
     struct s_elem *next;
+    bool expression;
 } TStack_element;
 
 /**
@@ -44,7 +45,7 @@ void Stack_Init(TStack *stack);
  * @param stack Structure
  * @return 0 if malloc failed, 1 if success
  */
-int Stack_Push(TStack *stack, Token token, bool handle,bool terminal);
+int Stack_Push(TStack *stack, Token token, bool handle, bool terminal, bool expression);
 
 
 /**
