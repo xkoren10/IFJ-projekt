@@ -910,5 +910,5 @@ int Telo_Funkcie_vo_while()
     else if (actToken.type == BUILT_IN_TOINTEGER) //ak nieco ine
     {
     }
-    return 
+    return Telo_Funkcie_vo_while();
 }
