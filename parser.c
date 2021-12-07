@@ -10,7 +10,7 @@
  */
 
 /* POZNAMKY
-vsade pred keywordy overit ze su keywordy lebo koren nevie ani šunku nakrájať
+vsade pred keywordy overit ze su keywordy lebo koren nevie ani šunku nakrájať -- excuse me
 OSETRENIE ZIADNEHO VYSTUPU
 VSADE OVERENIA EOFOV
 BUDE TREBA SKONROLOVAT SYMTABLE
@@ -457,14 +457,14 @@ int Telo_Funkcie()  //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
     {
         //VIAC ID = VIAC VYRAZOV
     }
-    else if (actToken.type ==)
+    /*else if (actToken.type ==)
     {
-        //BUILTIN FUNKCIE, LEN ZAVOLAM HLOZIMU 
+        //BUILTIN FUNKCIE, LEN ZAVOLAM HLOZIMU      <-- added
     }
     else if()
     {
 
-    }
+    }*/
     fprintf(stdout,"%d jebbbe ",actToken.type);
 
 
