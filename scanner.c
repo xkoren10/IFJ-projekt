@@ -179,7 +179,7 @@ int identifier_check(Dyn_string *dynamic_string, Token *token)
 
     // Else it's ID
 
-    else
+   else
     {
         (*token).type = ID;
         if (!dyn_string_copy(dynamic_string, &token->value.string))

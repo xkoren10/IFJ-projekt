@@ -27,6 +27,7 @@ void print_push(Symbol op){
     else if( strcmp(op.value_type, "string")==0 ){
         fprintf(stdout, "string@%s\n", op.value.string);
     }
+    //else if (strcmp(op.value_type, "E")==0) fprintf(stdout, "EEEEEEEE\n");
     else{
         fprintf(stderr, "\n!\nPUSHS ERROR - WRONG INPUT VAR TYPE\n!\n");
         return;

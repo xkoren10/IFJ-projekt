@@ -32,7 +32,7 @@ bool exp_reduced = false;
 bool list_read;
 
 int expression_analysis(Token *token, ht_table_t *symtable_ptr, Symbol *ret_sym, token_list_t *l)
-{
+{ 
     list_read = false;
     list = l;
     if (list != NULL)
@@ -114,7 +114,6 @@ int analysis()
     case '>':
         if (expression_stack.top->handle == true) //E -> id
         {
-
             expression_stack.top->terminal = false;
             expression_stack.top->handle = false;
             if (expression_stack.top->token.type == INT)
@@ -134,6 +133,11 @@ int analysis()
             }
             else if (expression_stack.top->token.type == ID)
             {
+                ht_item_t *var = ht_search(symtable, expression_stack.top->token.value.string.string);
+                if (var == NULL)
+                {
+                    return ERROR_SEMANTIC;
+                }
                 return_symbol.value_type = "id";
                 return_symbol.id = expression_stack.top->token.value.string.string;
             }
@@ -168,6 +172,9 @@ int analysis()
                 return ERROR_SYNTAX_ANALYSIS;
             }
             output = reduce(el1, el2, el3); //E -> E ? E  alebo E -> (E)
+            if(output != ERROR_OK){
+                return output;
+            }
 
             if ((expression_stack.top->terminal == false) && (expression_stack.top->next->token.type == DOLLAR) && (i2 == 7))
             {
@@ -211,7 +218,7 @@ int analysis()
 }
 
 int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
-{
+{ //fprintf(stdout,"\n%d - operand %d - operator %d - operand\n",el1.token.value.integer_value,el2.token.type,el3.token.value.integer_value); test print
     Token new;
     new.value.integer_value = 1;
     new.value.decimal_value = 1;
@@ -223,7 +230,7 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
         Stack_Push(&expression_stack, el2.token, false, false, el2.expression);
         if ((el2.terminal == false) && (exp_reduced == true))
         {
-            fprintf(stdout, "%d", exp_reduced);
+           
             return_symbol.value_type = "E";
         }
         else

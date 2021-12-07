@@ -2,5 +2,4 @@
 "strindger" .. strindger then
 intengener .. intengener then
 "strindger" .. () then
-#"striger" == 3 
-
+#"striger" == 3 then
