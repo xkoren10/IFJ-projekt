@@ -390,7 +390,7 @@ int get_token(Token *token)
             if (isalnum(next_char) || next_char == '_')
             {
 
-                if (!dyn_string_add_char(string, (char)tolower(next_char)))
+                if (!dyn_string_add_char(string, next_char))
                 {
                     (*token).type = ID;
                     return free_memory(ERROR_INTERN, string);

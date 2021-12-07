@@ -537,7 +537,7 @@ int check_id_and_type(TStack_element *el1, TStack_element *el2, TStack_element *
             type2 = STRING;
         }
         else if (el3->token.type == ID)
-        {
+        { 
             var = ht_search(symtable, el3->token.value.string.string);
             if (var == NULL)
             {

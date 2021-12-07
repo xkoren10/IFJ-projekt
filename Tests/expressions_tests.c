@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include "../error_codes.h"
 #include "../dyn_string.h"
-#include "../parser.h"
 #include "../expressions.h"
 #include "../scanner.h"
 #include "../symtable.h"
@@ -24,13 +23,21 @@
 Token token;
 FILE *file;
 int res;
-ht_table_t *symtable_ptr;
-ht_table_t symtable;
+ht_table_t test_symtable;
+ht_table_t *symtable_ptr=&test_symtable;
+ht_item_t * item;
 
 
 int main(){
 
-//ht_init(symtable);   not needed now
+ht_init(symtable_ptr);
+
+ht_insert(symtable_ptr,"Hello");
+
+item = ht_search(symtable_ptr,"Hello");
+item->var_type=STRING;
+
+
 //fprintf(stdout,"%d type -- %d res\n", token.type, res); prípadný test
 
     fprintf(stdout,"\x1B[31m""---------------- Expressions tests ----------------\n""\x1B[0m");
@@ -40,13 +47,13 @@ set_source(file);
 get_token(&token);
 assert(token.type == INT);
 assert(token.value.integer_value == 5);
-res = expression_analysis(&token,&symtable);
+res = expression_analysis(&token,symtable_ptr);
 assert(token.type == KEYWORD);
 assert(token.value.keyword == KEYWORD_THEN);
 assert(res==0);
 
 get_token(&token);
-res = expression_analysis(&token,&symtable);
+res = expression_analysis(&token,symtable_ptr);
 assert(token.type == STATE_EOF);
 assert(res==0);
 
@@ -61,7 +68,7 @@ set_source(file);
 get_token(&token);
 assert(token.type == INT);
 assert(token.value.integer_value == 3);
-res = expression_analysis(&token,&symtable);
+res = expression_analysis(&token,symtable_ptr);
 assert(token.type == STATE_EOF);
 assert(res==0);
 
@@ -76,7 +83,7 @@ set_source(file);
 get_token(&token);
 assert(token.type == INT);
 assert(token.value.integer_value == 5);
-res = expression_analysis(&token,&symtable);
+res = expression_analysis(&token,symtable_ptr);
 assert(token.type == KEYWORD);
 assert(token.value.keyword == KEYWORD_THEN);
 assert(res==0);
@@ -91,7 +98,7 @@ set_source(file);
 get_token(&token);
 assert(token.type == INT);
 assert(token.value.integer_value == 20);
-res = expression_analysis(&token,&symtable);
+res = expression_analysis(&token,symtable_ptr);
 assert(token.type == KEYWORD);
 assert(token.value.keyword == KEYWORD_THEN);
 assert(res==0);
@@ -106,7 +113,7 @@ set_source(file);
 get_token(&token);
 assert(token.type == STRING);
 assert(dyn_string_compare(token.value.string, "test")==0);
-res = expression_analysis(&token,&symtable);
+res = expression_analysis(&token,symtable_ptr);
 assert(token.type == KEYWORD);
 assert(token.value.keyword == KEYWORD_THEN);
 assert(res==0);
@@ -120,7 +127,7 @@ file = fopen("IFJ21_codes/Expressions/strlen.txt", "r");
 set_source(file);
 get_token(&token);
 assert(token.type == GET_LENGTH);
-res = expression_analysis(&token,&symtable);
+res = expression_analysis(&token,symtable_ptr);
 assert(token.type == STATE_EOF);
 assert(res==0);
 
@@ -135,9 +142,9 @@ file = fopen("IFJ21_codes/Expressions/concatenate.txt", "r");
 set_source(file);
 get_token(&token);
 assert(token.type == STRING);
-res = expression_analysis(&token,&symtable);
+res = expression_analysis(&token,symtable_ptr);
 assert(token.type == STATE_EOF);
-assert(res==6);
+assert(res==0);
 
 fclose(file);
 
