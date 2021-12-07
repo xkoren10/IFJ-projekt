@@ -11,12 +11,12 @@
 
 typedef struct token_list{
     Token current;
-    struct token_list_t *next;
+    struct token_list *next;
 }token_list_t;
 
 typedef struct id_list{
     char *id;
-    id_list_t* next;
+   struct id_list *next;
 }id_list_t;
 
 //current token

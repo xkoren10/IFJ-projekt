@@ -26,7 +26,7 @@ int res;
 
 int main(){
 
-    fprintf(stdout,"\x1B[32m""                     PASSED                    \n""\x1B[0m");
+    fprintf(stdout,"\x1B[32m""                     PASSED?                    \n""\x1B[0m");
     fprintf(stdout,"-----------------------------------------------\n");
     fprintf(stdout,"------------- Parser tests ------------\n");
 

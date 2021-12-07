@@ -31,7 +31,7 @@ typedef struct func_val {
 float var_val;
 char* var_string;
 char* var_name;
-Keyword typp;
+Token_type typp;
 struct func_val *next;
 }func_val_t;
 
