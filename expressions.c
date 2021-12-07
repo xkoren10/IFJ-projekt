@@ -28,6 +28,7 @@ Token dollar;
 ht_table_t *symtable;
 token_list_t *list;
 Symbol return_symbol;
+bool exp_reduced = false;
 
 int expression_analysis(Token *token, ht_table_t *symtable_ptr, Symbol *ret_sym, token_list_t *l)
 {
@@ -38,6 +39,7 @@ int expression_analysis(Token *token, ht_table_t *symtable_ptr, Symbol *ret_sym,
     dollar.type = DOLLAR;
     Stack_Push(&expression_stack, dollar, false, true);
     act_token = *token;
+    exp_reduced = false;
     int output = ERROR_OK;
 
     if (act_token.type == STATE_EOF)
@@ -88,6 +90,7 @@ int analysis()
     case '>':
         if (expression_stack.top->handle == true) //E -> id
         {
+            
             expression_stack.top->terminal = false;
             expression_stack.top->handle = false;
             if (expression_stack.top->token.type == INT)
@@ -107,6 +110,10 @@ int analysis()
                 return_symbol.value_type = "id";
             }
             return_symbol.result_type = expression_stack.top->token.type;
+            if ((expression_stack.top->terminal == false) && (expression_stack.top->next->token.type == DOLLAR) && (i2 == 7))
+            {
+                return ERROR_OK;
+            }
         }
         else
         {
@@ -151,13 +158,6 @@ int analysis()
         {
             return output;
         }
-        else
-        {
-            if (act_token.type == STATE_EOF)
-            {
-                return ERROR_SYNTAX_ANALYSIS;
-            }
-        }
         break;
 
     case 'e':
@@ -184,8 +184,9 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
     if (!el2.terminal) //E -> (E)
     {
         Stack_Push(&expression_stack, el2.token, false, false);
-        if (el2.terminal == false)
+        if ((el2.terminal == false )&& (exp_reduced== true))
         {
+            fprintf(stdout,"%d",exp_reduced);
             return_symbol.value_type = "E";
         }
         else
@@ -211,7 +212,6 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
     }
     else
     {
-
         switch (el2.token.type) //TODO zavolaj code gen
         {
         case PLUS:
@@ -353,10 +353,12 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
             return ERROR_SYNTAX_ANALYSIS;
             break;
         }
+        exp_reduced = true;
+        return_symbol.value_type = "E";
+        return_symbol.result_type = return_type;
     }
 
-    return_symbol.value_type = "E";
-    return_symbol.result_type = return_type;
+    
 
     return output;
 }

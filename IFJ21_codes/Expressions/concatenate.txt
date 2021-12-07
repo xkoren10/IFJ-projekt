@@ -1,4 +1,6 @@
 "strindger" .. intengener then
 "strindger" .. strindger then
 intengener .. intengener then
-"strindger" .. ()
+"strindger" .. () then
+#"striger" == 3 
+
