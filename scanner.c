@@ -229,9 +229,9 @@ int get_token(Token *token)
             }*/
 
         //------------------------------------------------
-        //fprintf(stdout, "\n--Kontrola---\n");
-        //putc(next_char, stdout);
-        //fprintf(stdout, "\n"); // výpis obsahu tokenu
+        fprintf(stdout, "\n--Kontrola---\n");
+        putc(next_char, stdout);
+        fprintf(stdout, "\n"); // výpis obsahu tokenu
         //--------------------------------------------------
 
         switch (state)
@@ -678,7 +678,7 @@ int get_token(Token *token)
             {
                 token->type = STRING;
 
-                if (dyn_string_copy(string, &token->value.string) == false)
+                if (!dyn_string_copy(string, &token->value.string))
                 {
                     return free_memory(ERROR_INTERN, string);
                 }
