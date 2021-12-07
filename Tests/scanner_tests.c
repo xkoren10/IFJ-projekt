@@ -677,7 +677,7 @@ assert(token.type==STRING);
 
 get_token(&token);//global
 assert(token.type==KEYWORD);
-assert(token.value.keyword==KEYWORD_GLOBAL);
+assert(token.value.keyword==KEYWORD_LOCAL);
 get_token(&token);//x
 assert(token.type==ID);
 assert(dyn_string_compare(token.value.string, "x")==0);
@@ -793,7 +793,7 @@ get_token(&token);//x
 assert(token.type==ID);
 assert(dyn_string_compare(token.value.string, "x")==0);
 get_token(&token);  // /
-assert(token.type==DIVIDE);
+assert(token.type==INTEGER_DIVIDE);
 get_token(&token);//z
 assert(token.type==ID);
 assert(dyn_string_compare(token.value.string, "y")==0);

@@ -13,6 +13,9 @@
 #include "parser.h"
 #include "parser.h"
 
+unsigned if_i = 0;
+unsigned loop_i = 0;
+
 void print_push(Symbol op){
     fprintf(stdout, "PUSHS");
     if ( strcmp(op.value_type, "integer")==0 ){
@@ -106,24 +109,54 @@ void gen_var_setval(Symbol var){
             fprintf(stderr, "\n!\nSETVAL ERROR - NONSTACK - WRONG TYPE\n!\n");
             return;
         }
-        
-        
     }
 }
 
-/* void gen_function_start(){
+void gen_function_start(char* func_name, func_val_t args, func_val_t returns){
     fprintf(stdout, "LABEL $%s\n", func_name);
     fprintf(stdout, "PUSHFRAME\n");
-    fprintf(stdout, "\n");
-} */
+    func_val_t* iter;
+    iter = returns.next;
+    do{
+        fprintf(stdout, "DEFVAR LF@%s\n", iter->var_name);
+        fprintf(stdout, "MOVEVAR LF@%s nil@nil\n");
+        iter = returns.next;
+    }
+    while(iter!=NULL);
+}
 
 void gen_function_end(){
     fprintf(stdout, "POPSTACK\n");
     fprintf(stdout, "RETURN\n");
 }
 
-void gen_function_call(char* func_name){
+void gen_function_call(char* func_name, func_val_t args, func_val_t returns){
+    func_val_t* iter;
+    iter = args.next;
+    do{
+        fprintf(stdout, "DEFVAR LF@%s\n", iter->var_name);
+        fprintf(stdout, "MOVEVAR LF@%s ", iter->var_name);
+        if ( iter->typp == ID ){
+            fprintf(stdout, "LF@%s\n", iter->var_string);
+        }
+        else if ( iter->typp == INT){
+            fprintf(stdout, "integer@%.0f\n", iter->var_val);   //TODO check to int
+        }
+        else if ( iter->typp == NUMBER ){
+            fprintf(stdout, "float@%a\n", iter->var_val);
+        }
+        else if ( iter->typp == STRING ){
+            fprintf(stdout, "string@%s\n", iter->var_string);
+        }
+        else{
+            fprintf(stderr, "\n!\nGEN FUNC CALL - WRONG TYPE\n!\n");
+            return;
+        }
+        iter = returns.next;
+    }
+    while(iter!=NULL);
     fprintf(stdout, "CALL $%s\n", func_name);
+
 }
 
 // TO CHECK
@@ -168,6 +201,7 @@ void gen_header(){
     fprintf(stdout, "DEFVAR GF@RESULT_R\n");
     fprintf(stdout, "DEFVAR GF@EXP_L\n");
     fprintf(stdout, "DEFVAR GF@EXP_R\n");
+    fprintf(stdout, "DEFVAR GF@VARstring\n");
     fprintf(stdout, "JUMP $$MAIN\n");
 }
 
@@ -218,3 +252,63 @@ void gen_write(Symbol var){
 void gen_read(char* id, char* type){
     fprintf(stdout, "READ LF@%s %s\n", id, type);
 }
+
+void gen_chr(Symbol var, Symbol index){
+    fprintf(stdout, "PUSHS GF@VARstring\n");
+    if ( strcmp(var.value_type, "id")==0 ){
+        fprintf(stdout, "GETCHAR GF@VARstring LF@%s ", var.id);
+        if ( strcmp(index.value_type,"id")==0 ){
+            fprintf(stdout, "LF@%s\n", index.id);
+        }
+        else if ( strcmp(index.value_type, "integer")==0 ){
+            fprintf(stdout, "integer@%d\n", index.value.integer);
+        }
+        else{
+            fprintf(stderr, "\n!\nGEN_CHR - ID - WRONG TYPE\n!\n");
+            return;
+        }
+    }
+    else if ( strcmp(var.value_type, "string")==0 ){
+        fprintf(stdout, "GETCHAR GF@VARstring LF@%s ", var.value.string);
+        if ( strcmp(index.value_type,"id")==0 ){
+            fprintf(stdout, "LF@%s\n", index.id);
+        }
+        else if ( strcmp(index.value_type, "integer")==0 ){
+            fprintf(stdout, "integer@%d\n", index.value.integer);
+        }
+        else{
+            fprintf(stderr, "\n!\nGEN_CHR - STRING - WRONG TYPE\n!\n");
+            return;
+        }
+    }
+    fprintf(stdout, "PUSHS GF@VARstring\n");
+}
+
+void gen_ordinal(Symbol var, Symbol index){
+
+    gen_chr(var, index);
+    fprintf(stdout, "STR2INTS\n");
+}
+
+void gen_toINT(Symbol var){
+    if ( strcmp(var.value_type, "id")==0 ){
+        fprintf(stdout, "PUSHS LF@%s\n", var.id);
+        fprintf(stdout, "FLOAT2INTS\n");
+    }
+    else if ( strcmp(var.value_type,"number")==0 ){
+        fprintf(stdout, "PUSHS %a\n", var.value.number);
+        fprintf(stdout, "FLOAT2INTS\n");
+    }
+    else{
+        fprintf(stderr, "\n!\nTO_INT - WRONG TYPE\n!\n");
+        return;
+    }   
+}
+
+/* DOLE TODO */
+
+void gen_substring(Symbol var, Symbol index_from, Symbol index_to){
+    /* TODO */
+    fprintf(stdout, "\n");
+}
+

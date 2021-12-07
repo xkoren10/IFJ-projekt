@@ -11,7 +11,7 @@
 
 typedef struct token_list{
     Token current;
-    token_list_t *next;
+    struct token_list_t *next;
 }token_list_t;
 
 typedef struct id_list{

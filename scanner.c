@@ -340,9 +340,8 @@ int get_token(Token *token)
             }
             else if (next_char == '/')
             {
-                token->type = DIVIDE;
-
-                return free_memory(ERROR_OK, string);
+                state = DIVIDE;
+                
             }
             else if (next_char == '=')
             {
@@ -390,7 +389,7 @@ int get_token(Token *token)
             if (isalnum(next_char) || next_char == '_')
             {
 
-                if (!dyn_string_add_char(string, (char)tolower(next_char)))
+                if (!dyn_string_add_char(string, next_char))
                 {
                     (*token).type = ID;
                     return free_memory(ERROR_INTERN, string);
@@ -678,11 +677,13 @@ int get_token(Token *token)
             else if (next_char == '"')
             {
                 token->type = STRING;
+                
 
-                if (dyn_string_copy(string, &token->value.string) == false)
+                if (!dyn_string_copy(string, &token->value.string))
                 {
                     return free_memory(ERROR_INTERN, string);
                 }
+                
                 return free_memory(ERROR_OK, string);
             }
             if (next_char < 32)
