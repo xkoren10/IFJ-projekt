@@ -9,7 +9,13 @@
 /* #include "expressions.h" */
 #include <stdbool.h>
 
+typedef struct token_list{
+    Token current;
+    token_list_t *next;
+}token_list_t;
+
 //current token
+
 Token actToken;
 
 /* //next token ehm bud toto alebo nejaka funkcia
@@ -22,6 +28,7 @@ ht_table_t *local;
 ht_item_t *current_item;
 
 func_val_t *current_LL;
+
 
 
 char* func_name;

@@ -23,6 +23,9 @@ VSADE OVERIT CI TOKEN JE OK
 */
 
 #include "parser.h"
+#include "code_gen.h"
+#include "expressions.h"
+
 
 int parse()
 {
@@ -444,34 +447,94 @@ int Parameter()
 
 int Telo_Funkcie()  //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
 {
+    int output;
     if(actToken.type = KEYWORD && actToken.value.keyword == KEYWORD_END)
     {
+       gen_function_end();
+       return ERROR_OK;
         //KONIEC FUNKCIE
     }  
     else if(actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_LOCAL)
     {
-        //DEKLARACIA PREMENNEJ
+
+        /* VNORENA DEKLARACIA, UNDECLARE KED JE VONKU z ifu whileu funkcie */
+        output = get_token(&actToken);
+        if(output!=ERROR_OK)
+            return ERROR_SYNTAX_ANALYSIS;
+        if(actToken.type != ID)
+            return ERROR_SYNTAX_ANALYSIS;
+        var_name = actToken.value.string.string;
+/*         ht_insert(local,var_name);
+        gen_var_def(var_name); */
+        
+        output = get_token(&actToken);
+        if(output!=ERROR_OK)
+            return ERROR_SYNTAX_ANALYSIS;
+        if(actToken.type != COLON)
+            return ERROR_SYNTAX_ANALYSIS;
+        
+        output = get_token(&actToken);
+        if(output!=ERROR_OK)
+            return ERROR_SYNTAX_ANALYSIS;
+        if(actToken.type != KEYWORD)
+            return ERROR_SYNTAX_ANALYSIS;
+        if (actToken.value.keyword != KEYWORD_STRING || actToken.value.keyword != KEYWORD_INTEGER ||  actToken.value.keyword !=KEYWORD_NUMBER )
+        {
+            return ERROR_SYNTAX_ANALYSIS;
+        }
+        ht_insert(local,var_name);
+        gen_var_def(var_name);
+
+        //MUSIM PRIDAT DO LOCAL tabulky
+
+        //ulozit premennu niekam
+        expression_analysis(&actToken);
+        Symbol var;
+        var->id = var_name;
+        //type neviem ale musim nejak zistit
+        
+        gen_var_setval(var);
+        //expression pre marecka
+        
 
     }
     else if (actToken.type == ID)
     {
+        //ID UKLADAM DO LISTU 
+        //POSTUPNE OVERUJEM CI SU V LOKALNEJ
+        //expressions volanie prvej var, if ciarka expressions volanie dalsiej , atd atd
         //VIAC ID = VIAC VYRAZOV
     }
-    else if (actToken.type ==)
+    else if (actToken.type == BUILTIN)
     {
         //BUILTIN FUNKCIE, LEN ZAVOLAM HLOZIMU 
     }
-    else if()
+    else if(actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_IF)
     {
-
+        //expressions pre mareka,
+        //if
+        //telo funkcie
+        
     }
-    fprintf(stdout,"%d jebbbe ",actToken.type);
+    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_WHILE)
+    {
+        //WHILE
+        //linked list 
+        //vzdy ked bude while zavola podmienku marekovi atd
+    }
+    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_RETURN)
+    {
+        //netusim
+        //RETURN
+    }
+    else //ak nieco ine
+    {
+        return ERROR_SYNTAX_ANALYSIS;
+    }
+    
+    //toto je asi zbytocne 
+    if(output!=ERROR_OK)
+            return ERROR_SYNTAX_ANALYSIS;
+    return Telo_Funkcie(); 
 
-
-
-
-
-
-
-    return 0;
 }
