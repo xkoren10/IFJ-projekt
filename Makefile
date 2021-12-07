@@ -11,13 +11,8 @@ test_par: Tests/parser_tests.c dyn_string.c scanner.c symtable.c parser.c parser
 	./parser_tests
 	rm -f parser_tests
 
-<<<<<<< HEAD
-test_exp: Tests/expressions_tests.c dyn_string.c scanner.c symtable.c expressions.c stack.c code_gen.c
-	$(CC) $(CFLAGS) Tests/expressions_tests.c dyn_string.c scanner.c  symtable.c expressions.c stack.c code_gen.c -o expressions_tests
-=======
 test_exp: Tests/expressions_tests.c dyn_string.c scanner.c symtable.c  expressions.c stack.c code_gen.c
 	$(CC) $(CFLAGS) Tests/expressions_tests.c code_gen.c dyn_string.c scanner.c  symtable.c  expressions.c stack.c -o expressions_tests
->>>>>>> 35d25fe1cc60d4413c5e4558ac8ea3a5a5be9726
 	./expressions_tests
 	rm -f expressions_tests
 
