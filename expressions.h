@@ -12,13 +12,14 @@
 #include "stack.h"
 #include "error_codes.h"
 #include "symtable.h"
+#include "code_gen.h"
 
 /**
  * @brief Initialization and start of the expresion analysis
  * @param token Structure Token
  * @return Error code
  */
-int expression_analysis(Token *token,ht_table_t *symtable);
+int expression_analysis(Token *token, ht_table_t *symtable_ptr, Symbol *ret_sym, token_list_t *l);
 
 /**
  * @brief Expresion analysis
