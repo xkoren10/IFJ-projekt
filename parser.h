@@ -14,7 +14,13 @@ typedef struct token_list{
     struct token_list_t *next;
 }token_list_t;
 
+typedef struct id_list{
+    char *id;
+    id_list_t* next;
+}id_list_t;
+
 //current token
+token_list_t Tok;
 
 Token actToken;
 

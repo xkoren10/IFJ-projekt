@@ -144,20 +144,21 @@ void gen_condition(char* type, Symbol op_l, Symbol op_r);
  * @param index_from Index from varible will be substringed
  * @param index_to Index where substring will end
  */
-void gen_substring(Symbol var, int index_from, int index_to);
+void gen_substring(Symbol var, Symbol index_from, Symbol index_to);
 
 /**
  * @brief Generates build-in function for converting char to int
- * @param var Variable
+ * @param var String or variable with string
+ * @param index Variable or integer with index of char
  */
-void gen_ordinal(Symbol var);
+void gen_ordinal(Symbol var, Symbol index);
 
 /**
  * @brief Generates build-in function for getting one char from string
  * @param var Variable
  * @param index Index of char
  */
-void gen_chr(Symbol var, int index);
+void gen_chr(Symbol var, Symbol index);
 
 /**
  * @brief Generates build-in function for converting float/ number to integer

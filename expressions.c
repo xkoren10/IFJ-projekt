@@ -29,15 +29,26 @@ ht_table_t *symtable;
 token_list_t *list;
 Symbol return_symbol;
 bool exp_reduced = false;
+bool list_read;
 
 int expression_analysis(Token *token, ht_table_t *symtable_ptr, Symbol *ret_sym, token_list_t *l)
 {
+    list_read = false;
     list = l;
-    return_symbol = *ret_sym;
+    if (list != NULL)
+    {
+        /*list_read = true;
+        list = list->next;
+        act_token = list->current;*/
+    }
+    if (ret_sym != NULL)
+    {
+        return_symbol = *ret_sym;
+    }
     symtable = symtable_ptr;
     Stack_Init(&expression_stack);
     dollar.type = DOLLAR;
-    Stack_Push(&expression_stack, dollar, false, true);
+    Stack_Push(&expression_stack, dollar, false, true, false);
     act_token = *token;
     exp_reduced = false;
     int output = ERROR_OK;
@@ -49,10 +60,16 @@ int expression_analysis(Token *token, ht_table_t *symtable_ptr, Symbol *ret_sym,
     else
     {
         output = analysis();
-        *token = act_token;
+        if (!list_read)
+        {
+            *token = act_token;
+        }
     }
     Stack_Dispose(&expression_stack);
-    *ret_sym = return_symbol;
+    if (ret_sym != NULL)
+    {
+        *ret_sym = return_symbol;
+    }
     return output;
 }
 
@@ -76,9 +93,16 @@ int analysis()
 
     case '<':
 
-        Stack_Push(&expression_stack, act_token, true, true);
-
-        output = get_token(&act_token);
+        Stack_Push(&expression_stack, act_token, true, true, false);
+        if (list_read)
+        {
+            /*list = list->next;
+            act_token = list->current;*/
+        }
+        else
+        {
+            output = get_token(&act_token);
+        }
 
         if (output != ERROR_OK)
         {
@@ -90,24 +114,28 @@ int analysis()
     case '>':
         if (expression_stack.top->handle == true) //E -> id
         {
-            
+
             expression_stack.top->terminal = false;
             expression_stack.top->handle = false;
             if (expression_stack.top->token.type == INT)
             {
                 return_symbol.value_type = "integer";
+                return_symbol.value.integer = expression_stack.top->token.value.integer_value;
             }
             else if (expression_stack.top->token.type == STRING)
             {
                 return_symbol.value_type = "string";
+                return_symbol.value.string = expression_stack.top->token.value.string.string;
             }
             else if (expression_stack.top->token.type == NUMBER)
             {
                 return_symbol.value_type = "float";
+                return_symbol.value.number = expression_stack.top->token.value.decimal_value;
             }
             else if (expression_stack.top->token.type == ID)
             {
                 return_symbol.value_type = "id";
+                return_symbol.id = expression_stack.top->token.value.string.string;
             }
             return_symbol.result_type = expression_stack.top->token.type;
             if ((expression_stack.top->terminal == false) && (expression_stack.top->next->token.type == DOLLAR) && (i2 == 7))
@@ -150,9 +178,17 @@ int analysis()
         break;
 
     case '=':
-        Stack_Push(&expression_stack, act_token, false, true);
+        Stack_Push(&expression_stack, act_token, false, true, false);
 
-        output = get_token(&act_token);
+        if (list_read)
+        {
+            /*list = list->next;
+            act_token = list->current;*/
+        }
+        else
+        {
+            output = get_token(&act_token);
+        }
 
         if (output != ERROR_OK)
         {
@@ -181,10 +217,11 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
     new.value.decimal_value = 1;
     int output = ERROR_OK;
     Token_type return_type = ERROR;
+    Symbol op1, op2;
     if (!el2.terminal) //E -> (E)
     {
-        Stack_Push(&expression_stack, el2.token, false, false);
-        if ((el2.terminal == false )&& (exp_reduced== true))
+        Stack_Push(&expression_stack, el2.token, false, false, el2.expression);
+        if ((el2.terminal == false) && (exp_reduced == true))
         {
            
             return_symbol.value_type = "E";
@@ -212,37 +249,29 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
     }
     else
     {
+        output = check_id_and_type(&el1, &el2, &el3, &return_type);
+        if (output != ERROR_OK)
+        {
+            return output;
+        }
+        new.type = return_type;
+        Stack_Push(&expression_stack, new, false, false, true);
+        set_op(&el1, &op1);
+        set_op(&el3, &op2);
+
+
         switch (el2.token.type) //TODO zavolaj code gen
         {
         case PLUS:
-            output = check_id_and_type(&el1, &el2, &el3, &return_type);
-            if (output != ERROR_OK)
-            {
-                return output;
-            }
-            new.type = return_type;
-            Stack_Push(&expression_stack, new, false, false);
+            gen_instruction("+", op1, op2);
             break;
 
         case MINUS:
-            output = check_id_and_type(&el1, &el2, &el3, &return_type);
-            if (output != ERROR_OK)
-            {
-                return output;
-            }
-
-            new.type = return_type;
-            Stack_Push(&expression_stack, new, false, false);
+            gen_instruction("-", op1, op2);
             break;
 
         case MULTIPLY:
-            output = check_id_and_type(&el1, &el2, &el3, &return_type);
-            if (output != ERROR_OK)
-            {
-                return output;
-            }
-            new.type = return_type;
-            Stack_Push(&expression_stack, new, false, false);
+            gen_instruction("*", op1, op2);
             break;
 
         case DIVIDE:
@@ -254,13 +283,7 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
             {
                 return ERROR_RUNTIME_DIVISON_BY_ZERO;
             }
-            output = check_id_and_type(&el1, &el2, &el3, &return_type);
-            if (output != ERROR_OK)
-            {
-                return output;
-            }
-            new.type = return_type;
-            Stack_Push(&expression_stack, new, false, false);
+            gen_instruction("/", op1, op2);
             break;
 
         case INTEGER_DIVIDE:
@@ -268,85 +291,35 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
             {
                 return ERROR_RUNTIME_DIVISON_BY_ZERO;
             }
-            output = check_id_and_type(&el1, &el2, &el3, &return_type);
-            if (output != ERROR_OK)
-            {
-                return output;
-            }
-            new.type = return_type;
-            Stack_Push(&expression_stack, new, false, false);
+            gen_instruction("//", op1, op2);
             break;
 
         case GREATER_THAN:
-            output = check_id_and_type(&el1, &el2, &el3, &return_type);
-            if (output != ERROR_OK)
-            {
-                return output;
-            }
-            new.type = return_type;
-            Stack_Push(&expression_stack, new, false, false);
+            gen_condition(">", op1, op2);
             break;
 
         case LESS_THAN:
-            output = check_id_and_type(&el1, &el2, &el3, &return_type);
-            if (output != ERROR_OK)
-            {
-                return output;
-            }
-            new.type = return_type;
-            Stack_Push(&expression_stack, new, false, false);
+            gen_condition("<", op1, op2);
             break;
 
         case GREATER_or_EQUALS:
-            output = check_id_and_type(&el1, &el2, &el3, &return_type);
-            if (output != ERROR_OK)
-            {
-                return output;
-            }
-            new.type = return_type;
-            Stack_Push(&expression_stack, new, false, false);
+            gen_condition(">=", op1, op2);
             break;
 
         case LESS_or_EQUALS:
-            output = check_id_and_type(&el1, &el2, &el3, &return_type);
-            if (output != ERROR_OK)
-            {
-                return output;
-            }
-            new.type = return_type;
-            Stack_Push(&expression_stack, new, false, false);
+            gen_condition("<=", op1, op2);
             break;
 
         case EQUALS:
-            output = check_id_and_type(&el1, &el2, &el3, &return_type);
-            if (output != ERROR_OK)
-            {
-                return output;
-            }
-            new.type = return_type;
-            Stack_Push(&expression_stack, new, false, false);
+            gen_condition("==", op1, op2);
             break;
 
         case EG_ASSIGN:
-            output = check_id_and_type(&el1, &el2, &el3, &return_type);
-            if (output != ERROR_OK)
-            {
-                return output;
-            }
-            new.type = return_type;
-            Stack_Push(&expression_stack, new, false, false);
+            gen_condition("~=", op1, op2);
             break;
 
         case CONCATENATE:
-            output = check_id_and_type(&el1, &el2, &el3, &return_type);
-
-            if (output != ERROR_OK)
-            {
-                return output;
-            }
-
-            new.type = return_type;
-            Stack_Push(&expression_stack, new, false, false);
+            gen_instruction("..", op1, op2);
             break;
 
         default:
@@ -357,8 +330,6 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
         return_symbol.value_type = "E";
         return_symbol.result_type = return_type;
     }
-
-    
 
     return output;
 }
@@ -413,7 +384,7 @@ int find_index(int *i1, int *i2)
 
     if (popped)
     {
-        Stack_Push(&expression_stack, tmp.token, tmp.handle, tmp.terminal);
+        Stack_Push(&expression_stack, tmp.token, tmp.handle, tmp.terminal, tmp.expression);
     }
 
     if ((act_token.type == PLUS) || (act_token.type == MINUS))
@@ -455,7 +426,15 @@ int find_index(int *i1, int *i2)
 int hash()
 {
     int output = ERROR_OK;
-    output = get_token(&act_token);
+    if (list_read)
+    {
+        /*list = list->next;
+        act_token = list->current;*/
+    }
+    else
+    {
+        output = get_token(&act_token);
+    }
     if (output != ERROR_OK)
     {
         return output;
@@ -788,4 +767,35 @@ int check_id_and_type(TStack_element *el1, TStack_element *el2, TStack_element *
         return ERROR_OK;
     }
     return ERROR_OK;
+}
+
+void set_op(TStack_element *el, Symbol *op)
+{
+    if (el->expression)
+    {
+        op->value_type = "E";
+    }
+    else
+    {
+        if (el->token.type == ID)
+        {
+            op->value_type = "id";
+            op->id = el->token.value.string.string;
+        }
+        else if (el->token.type == INT)
+        {
+            op->value_type = "integer";
+            op->value.integer = el->token.value.integer_value;
+        }
+        else if (el->token.type == NUMBER)
+        {
+            op->value_type = "float";
+            op->value.number = el->token.value.decimal_value;
+        }
+        else if (el->token.type == STRING)
+        {
+            op->value_type = "integer";
+            op->value.string = el->token.value.string.string;
+        }
+    }
 }
