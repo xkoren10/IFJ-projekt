@@ -36,7 +36,7 @@ typedef struct{
     char* id;  // ID of variable
     char* value_type;   // Type of variable (string, float, integer, id, E)
     char* result_type;   // Type of returned expression
-    Values value;   // Value (string, float or integer) of variable or string="%" for stack_pop
+    Values value;   // Value (string, float or integer) of variable
 } Symbol;
 
 /**
@@ -72,7 +72,9 @@ void gen_var_setval(Symbol var);
 
 /**
  * @brief Generates start of an user function
- * @param func_name hmmm
+ * @param func_name ID/name of function
+ * @param args Structure of function arguments
+ * @param returns Structure of function return variables
  */
 void gen_function_start(char* func_name, func_val_t args, func_val_t returns); // TODO rework
 
@@ -83,8 +85,11 @@ void gen_function_end();
 
 /**
  * @brief Generates call of an user function
+ * @param func_name ID/name of function
+ * @param args Structure of function arguments
+ * @param returns Structure of function return variables
  */
-void gen_function_call(char* func_name);
+void gen_function_call(char* func_name, func_val_t args, func_val_t returns);
 
 /**
  * @brief Generates build-in function read
