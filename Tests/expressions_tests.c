@@ -32,9 +32,14 @@ int main(){
 
 ht_init(symtable_ptr);
 
-ht_insert(symtable_ptr,"Hello");
+ht_insert(symtable_ptr,"intengener");
 
-item = ht_search(symtable_ptr,"Hello");
+item = ht_search(symtable_ptr,"intengener");
+item->var_type=INT;
+
+ht_insert(symtable_ptr,"strindger");
+
+item = ht_search(symtable_ptr,"strindger");
 item->var_type=STRING;
 
 
@@ -54,8 +59,25 @@ assert(res==0);
 
 get_token(&token);
 res = expression_analysis(&token,symtable_ptr);
-assert(token.type == STATE_EOF);
+assert(token.type == KEYWORD);
+assert(token.value.keyword == KEYWORD_THEN);
 assert(res==0);
+
+get_token(&token);
+assert(token.type == INT);
+assert(token.value.integer_value == 69);
+res = expression_analysis(&token,symtable_ptr);
+assert(token.type == KEYWORD);
+assert(token.value.keyword == KEYWORD_THEN);
+assert(res==9);
+
+get_token(&token);
+assert(token.type == INT);
+assert(token.value.integer_value == 42);
+res = expression_analysis(&token,symtable_ptr);
+fprintf(stdout,"%d type -- %d res\n", token.type, res);
+assert(token.type == DECIMAL_NUMBER);
+assert(res==2);                                             // Syntax analysis
 
 fclose(file);
 
@@ -140,11 +162,37 @@ fclose(file);
 
 file = fopen("IFJ21_codes/Expressions/concatenate.txt", "r");
 set_source(file);
+//string and int
+get_token(&token);
+assert(token.type == STRING);
+res = expression_analysis(&token,symtable_ptr);
+assert(token.type == KEYWORD);
+assert(token.value.keyword == KEYWORD_THEN);
+assert(res==6);
+
+//string and string
+get_token(&token);
+assert(token.type == STRING);
+res = expression_analysis(&token,symtable_ptr);
+assert(token.type == KEYWORD);
+assert(token.value.keyword == KEYWORD_THEN);
+assert(res==0);
+
+//int and int
+get_token(&token);
+assert(token.type == ID);
+res = expression_analysis(&token,symtable_ptr);
+
+assert(token.type == KEYWORD);
+assert(token.value.keyword == KEYWORD_THEN);
+assert(res==6);
+
+//string and ()
 get_token(&token);
 assert(token.type == STRING);
 res = expression_analysis(&token,symtable_ptr);
 assert(token.type == STATE_EOF);
-assert(res==0);
+assert(res==2);
 
 fclose(file);
 

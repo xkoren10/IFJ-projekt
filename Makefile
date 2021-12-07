@@ -16,6 +16,11 @@ test_exp: Tests/expressions_tests.c dyn_string.c scanner.c symtable.c  expressio
 	./expressions_tests
 	rm -f expressions_tests
 
+test_scan: Tests/scanner_tests.c dyn_string.c scanner.c
+	$(CC) $(CFLAGS) Tests/scanner_tests.c dyn_string.c scanner.c -o scanner_tests
+	./scanner_tests
+	rm -f scanner_tests
+
 
 clean:
 	rm -f *.o 

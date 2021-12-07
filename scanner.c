@@ -340,9 +340,8 @@ int get_token(Token *token)
             }
             else if (next_char == '/')
             {
-                token->type = DIVIDE;
-
-                return free_memory(ERROR_OK, string);
+                state = DIVIDE;
+                
             }
             else if (next_char == '=')
             {

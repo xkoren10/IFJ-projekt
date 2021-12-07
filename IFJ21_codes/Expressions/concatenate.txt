@@ -1,1 +1,4 @@
-"strindger" .. Hello
+"strindger" .. intengener then
+"strindger" .. strindger then
+intengener .. intengener then
+"strindger" .. ()
