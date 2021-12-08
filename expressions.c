@@ -9,6 +9,7 @@
 **/
 
 #include "expressions.h"
+#include <stdbool.h>
 
 const char table[8][8] = {
     //               +-  *///  ..   rel   i    (    )    $
@@ -88,12 +89,30 @@ int analysis()
         return output;
     }
 
+    if((expression_stack.top->token.type != DOLLAR) && (expression_stack.top->terminal == false) && (expression_stack.top->token.type != LEFT_PARENTHESIS) && (expression_stack.top->next->token.type == DOLLAR)
+    && (act_token.type != PLUS)
+    && (act_token.type != MINUS)
+    && (act_token.type != MULTIPLY)
+    && (act_token.type != CONCATENATE)
+    && (act_token.type != DIVIDE)
+    && (act_token.type != INTEGER_DIVIDE)
+    && (act_token.type != EQUALS)
+    && (act_token.type != EG_ASSIGN)
+    && (act_token.type != LESS_THAN)
+    && (act_token.type != LESS_or_EQUALS)
+    && (act_token.type != GREATER_THAN)
+    && (act_token.type != GREATER_or_EQUALS)){
+        return ERROR_OK;
+    }
+
+    bool terminal = true;
     switch (table[i1][i2])
     {
 
     case '<':
 
-        Stack_Push(&expression_stack, act_token, true, true, false);
+        
+        Stack_Push(&expression_stack, act_token, true, terminal, false);
         if (list_read)
         {
             /*list = list->next;
@@ -114,10 +133,6 @@ int analysis()
     case '>':
         if (expression_stack.top->handle == true) //E -> id
         {
-            if((expression_stack.top->next->terminal == false) && (expression_stack.top->token.type != LEFT_PARENTHESIS)){//////////////////////////////////////////////////////////////
-                act_token = expression_stack.top->token;
-                return ERROR_OK;
-            }
             expression_stack.top->terminal = false;
             expression_stack.top->handle = false;
             if (expression_stack.top->token.type == INT)
@@ -208,15 +223,9 @@ int analysis()
         break;
 
     case 'e':///////////////////////////////////////////////////////////////////////////////////
-        if ((expression_stack.top->token.type == ID) && (act_token.type == ID))
-        {
-            ht_item_t *var = ht_search(symtable, expression_stack.top->token.value.string.string);
-            if (var == NULL)
-            {
-                return ERROR_SEMANTIC;
-            }
-            return_symbol.value_type = expression_stack.top->token.value.string.string;
-            return_symbol.result_type = expression_stack.top->token.type;
+        if(i1 == 4 && i2 == 4){
+            return_symbol.value_type = "E";
+            return ERROR_OK;
         }
         return ERROR_SYNTAX_ANALYSIS;
         break;
@@ -358,8 +367,7 @@ int find_index(int *i1, int *i2)
 {
     TStack_element tmp = *(expression_stack.top);
     bool popped = false;
-
-    if (!tmp.terminal)
+    if (tmp.terminal == false)
     {
         Stack_Pop(&expression_stack);
         popped = true;

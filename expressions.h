@@ -16,6 +16,7 @@
 #include "symtable.h"
 #include "code_gen.h"
 
+
 /**
  * @brief Initialization and start of the expresion analysis
  * @param token Structure Token
