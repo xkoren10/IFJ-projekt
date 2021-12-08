@@ -3,7 +3,6 @@
 * 
 * @brief Code generator for IFJ21
 * 
-* @author Matej Koreň <xkoren10>
 * @author Matej Hložek <xhloze02>
 * @file code_gen.h
 *

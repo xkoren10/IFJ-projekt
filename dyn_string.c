@@ -1,10 +1,9 @@
 /**
 * Project - Compiler for IFJ21
 * 
-* @brief Scanner for IFJ21 - Lexical analysis
+* @brief Dynamic string  for IFJ21 - Lexical analysis
 * 
 * @author Matej Koreň <xkoren10
-* @author Matej Hložek <xhloze02>
 * @file dyn_string.c
 *
 **/
@@ -19,7 +18,7 @@ int dyn_string_init(Dyn_string *s)
     if ((s->string = (char *)malloc(DYN_STRING_LENGTH*sizeof(char))) != NULL)                         // Successful allocation
     {
         s->length=0;
-        s->string[0]= '\0';                                                     // Setting parameters
+        s->string[0]= '\0';                                                                           // Setting parameters
         s->size = DYN_STRING_LENGTH;
 
         return ERROR_OK;

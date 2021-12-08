@@ -1,9 +1,9 @@
 /**
 * Project - Compiler for IFJ21
 * 
-* @brief Syntax analysis of expressions
+* @brief Syntax analysis of expressions for IFJ21
 * 
-* @author Marek Krizan <xkriza08>
+* @author Marek Križan <xkriza08>
 * @file expressions.c
 *
 **/
@@ -222,7 +222,7 @@ int analysis()
         }
         break;
 
-    case 'e':///////////////////////////////////////////////////////////////////////////////////
+    case 'e':
         if(i1 == 4 && i2 == 4){
             return_symbol.value_type = "E";
             return ERROR_OK;
@@ -241,7 +241,7 @@ int analysis()
 }
 
 int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
-{ //fprintf(stdout,"\n%d - operand %d - operator %d - operand\n",el1.token.value.integer_value,el2.token.type,el3.token.value.integer_value); test print
+{ 
     Token new;
     new.value.integer_value = 1;
     new.value.decimal_value = 1;
@@ -289,7 +289,7 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
         set_op(&el1, &op1);
         set_op(&el3, &op2);
 
-        switch (el2.token.type) //TODO zavolaj code gen
+        switch (el2.token.type) 
         {
         case PLUS:
             gen_instruction("+", op1, op2);
@@ -485,7 +485,7 @@ int hash()
 
 int check_id_and_type(TStack_element *el1, TStack_element *el2, TStack_element *el3, Token_type *return_type)
 {
-    //fprintf(stdout,"%d-%d-%d\n",el1->token.type,el2->token.type,el3->token.type); Pomocný výpis, ako Marek povedal
+   
     Token_type type1, type2;
     ht_item_t *var = NULL;
     if ((el2->token.type == PLUS) || (el2->token.type == MINUS) || (el2->token.type == MULTIPLY) || (el2->token.type == DIVIDE) || (el2->token.type == INTEGER_DIVIDE)) //+-*///

@@ -1,9 +1,9 @@
 /**
 * Project - Compiler for IFJ21
 * 
-* @brief Stack for syntax analysis of expressions
+* @brief Stack for IFJ21 - syntax analysis of expressions
 * 
-* @author Marek Krizan <xkriza08>
+* @author Marek Križan <xkriza08>
 * @file stack.h
 *
 **/

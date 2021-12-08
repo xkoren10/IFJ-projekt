@@ -3,7 +3,6 @@
 * 
 * @brief Code generator for IFJ21
 * 
-* @author Matej Koreň <xkoren10
 * @author Matej Hložek <xhloze02>
 * @file code_gen.c
 *
@@ -21,7 +20,7 @@ void print_push(Symbol op){
         fprintf(stdout, "int@%d\n", op.value.integer);
     }
     else if ( strcmp(op.value_type, "float")==0 ){
-        fprintf(stdout, "float@%f\n", op.value.number);  // float to string? how many digits?
+        fprintf(stdout, "float@%f\n", op.value.number);  
     }
     else if ( strcmp(op.value_type, "string")==0 ){
         fprintf(stdout, "string@%s\n", op.value.string);
@@ -132,7 +131,7 @@ void gen_function_call(char* func_name, func_val_t args, func_val_t returns){
             fprintf(stdout, "LF@%s\n", iter->var_string);
         }
         else if ( iter->type == INT){
-            fprintf(stdout, "integer@%.0f\n", iter->var_val);   //TODO check to int
+            fprintf(stdout, "integer@%.0f\n", iter->var_val);   
         }
         else if ( iter->type == NUMBER ){
             fprintf(stdout, "float@%a\n", iter->var_val);
@@ -151,7 +150,6 @@ void gen_function_call(char* func_name, func_val_t args, func_val_t returns){
 
 }
 
-// TO CHECK
 
 void gen_condition(char* type, Symbol op_l, Symbol op_r){
     if ( strcmp(op_l.value_type, "E")!=0 ){
@@ -160,7 +158,7 @@ void gen_condition(char* type, Symbol op_l, Symbol op_r){
     if ( strcmp(op_r.value_type, "E")!=0 ){
         print_push(op_r);
     } 
-    fprintf(stdout, "\n");
+
     if ( strcmp(type, ">")==0 ){
         fprintf(stdout, "GTS\n");
     }
@@ -196,7 +194,7 @@ void gen_condition(char* type, Symbol op_l, Symbol op_r){
     }
 }
 
-// DOLU HOTOVKA
+
 
 void gen_header(){
     fprintf(stdout, ".IFJcode21\n");
@@ -308,10 +306,10 @@ void gen_toINT(Symbol var){
     }   
 }
 
-/* DOLE TODO */
+
 
 void gen_substring(Symbol var, Symbol index_from, Symbol index_to){
-    /* TODO */
+    
     fprintf(stdout, "%s\n", var.value_type);
     fprintf(stdout, "%s\n", index_from.value_type);
     fprintf(stdout, "%s\n", index_to.value_type);

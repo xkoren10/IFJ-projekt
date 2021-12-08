@@ -1,26 +1,12 @@
 /**
+ *  Project - Compiler for IFJ21
+ *
+ * @brief Parser for IFJ21 - syntax analysis
+ *
+ * @author Lukasz Pycz <xpyczl00>
  * @file parser.c
- * @author xpyczl00
- * @brief 
- * @version 0.1
- * @date 2021-12-01
- * 
- * @copyright Copyright (c) 2021
- * 
- */
-
-/* POZNAMKY
-vsade pred keywordy overit ze su keywordy lebo koren nevie ani šunku nakrájať -- excuse me
-OSETRENIE ZIADNEHO VYSTUPU
-VSADE OVERENIA EOFOV
-BUDE TREBA SKONROLOVAT SYMTABLE
-HLOZIMU POSIELAT FUNKCIE S PARAMETRAMI
-MAREKOVI BUDEM MUSIET POSIELAT LOKALNU TABULKU NA KONTROLU PREMENNYCH 
-
-CHYBNE SPRAVY MOZU BYT ROZLISNE
-
-VSADE OVERIT CI TOKEN JE OK
-*/
+ *
+ **/
 
 #include "parser.h"
 #include "code_gen.h"
@@ -29,25 +15,24 @@ VSADE OVERIT CI TOKEN JE OK
 int parse()
 {
 
-    //Global symtable for functions
+    // Global symtable for functions
     ht_table_t tmp_global;
     global = &tmp_global;
     ht_init(global);
 
-    //Local symtable for variables
+    // Local symtable for variables
     ht_table_t tmp_local;
     local = &tmp_local;
     ht_init(local);
-    printf("parse\n");
+
     return Program();
 }
 
-int Program() //Program -> <Prolog> <Deklaracie or Definicie> EOF
+int Program() // Program -> <Prolog> <Deklaracie or Definicie> EOF
 {
 
     int output;
     output = get_token(&actToken);
-    printf("program\n");
 
     //<PROLOG> REQUIRE
     if (output != ERROR_OK)
@@ -86,25 +71,25 @@ int Deklaracie_or_Definicie()
 {
     int output;
 
-    //IF EOF-> KONIEC
+    // IF EOF-> KONIEC
     if (actToken.type == STATE_EOF)
     {
-        fprintf(stdout, "KONIEC PROGRAMU"); // TO DEL
+
         return ERROR_OK;
     }
 
-    //IF GLOBAL -> DEKLARACIA_FUNKCIE
-    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_GLOBAL) //KOREN
+    // IF GLOBAL -> DEKLARACIA_FUNKCIE
+    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_GLOBAL)
     {
 
         output = Deklaracie_Funkcie();
     }
-    //IF FUNCTION -> DEFINICIA_FUNKCIE
-    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_FUNCTION) //KOREN
+    // IF FUNCTION -> DEFINICIA_FUNKCIE
+    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_FUNCTION)
     {
         output = Definicia_Funkcie();
     }
-    //ELSE ERROR
+    // ELSE ERROR
     else
     {
         return ERROR_SYNTAX_ANALYSIS;
@@ -113,7 +98,7 @@ int Deklaracie_or_Definicie()
     if (output != ERROR_OK)
         return output;
 
-    //REKURZIVNE VOLANIE
+    // REKURZIVNE VOLANIE
     output = Deklaracie_or_Definicie();
     return output;
 }
@@ -124,7 +109,7 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
     int output;
     ht_item_t *current;
     output = get_token(&actToken);
-    //ID
+    // ID
     if (output != ERROR_OK)
         return ERROR_LEXICAL_ANALISYS;
 
@@ -132,9 +117,9 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
     {
         return ERROR_SYNTAX_ANALYSIS;
     }
-    //SAVING FUNCTION NAME
-    const char *function_name = actToken.value.string.string;
-    const char *func_name = actToken.value.string.string;
+    // SAVING FUNCTION NAME
+    // char *function_name = actToken.value.string.string;
+    char *func_name = actToken.value.string.string;
     output = get_token(&actToken);
     // ":"
     if (output != ERROR_OK)
@@ -164,8 +149,7 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
 
     output = get_token(&actToken);
     // ")" OR <TYPY>
-    fprintf(stdout, "TATO FUNKCIA MA MUSI ZACHRANIT func name %s", func_name);
-    fprintf(stdout, "TATO FUNKCIA MA MUSI ZACHRANIT function name %s", function_name);
+
     if (output != ERROR_OK)
         return ERROR_LEXICAL_ANALISYS;
 
@@ -174,10 +158,10 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
     // <TYPY>
     if (actToken.type != RIGHT_PARENTHESIS)
     {
-        //TEMPORARY LL
+        // TEMPORARY LL
 
         func_val_t *INPUT_TYPES = malloc(sizeof(func_val_t));
-        //INSERTING FUNCTION INTO GLOBAL
+        // INSERTING FUNCTION INTO GLOBAL
         current = ht_search(global, func_name);
 
         if (current != NULL)
@@ -187,14 +171,14 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
         current = ht_insert(global, func_name);
         current->is_defined = false;
 
-        //REWRITING LL IN THE TYPES
+        // REWRITING LL IN THE TYPES
         Token_type typ = Typ();
 
         INPUT_TYPES->type = typ;
         INPUT_TYPES->next = NULL;
         current->inval = INPUT_TYPES;
         get_token(&actToken);
-        //ak je tokentype valid
+        // ak je token.type valid
 
         while (actToken.type == COMMA)
         {
@@ -218,13 +202,11 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
     if (actToken.type != RIGHT_PARENTHESIS)
         return ERROR_SYNTAX_ANALYSIS;
 
-    //TODO FUNKCIA MOZE BYT BEZ VYSTUPU
-
     output = get_token(&actToken);
     // ":"
     if (output != ERROR_OK)
         return ERROR_LEXICAL_ANALISYS;
-    //IF NO OUTPUT
+    // IF NO OUTPUT
     if (actToken.type != COLON)
         return ERROR_OK;
 
@@ -265,7 +247,7 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
     return output;
 }
 
-int Definicia_Funkcie() //DEFINICIA_FUNKCIE -> <HLAVICKA> <TELO>
+int Definicia_Funkcie() // DEFINICIA_FUNKCIE -> <HLAVICKA> <TELO>
 {
     int output;
     output = Hlavicka_Funkcie();
@@ -282,8 +264,8 @@ int Definicia_Funkcie() //DEFINICIA_FUNKCIE -> <HLAVICKA> <TELO>
 
 int Hlavicka_Funkcie() // HLAVICKA-> FUNCTION ID (<ZOZNAM_PARAM>):<TYPY>
 {
-    char *variable;
-    //FUNCTION
+
+    // FUNCTION
     if (actToken.type != KEYWORD)
         return ERROR_SYNTAX_ANALYSIS;
 
@@ -292,38 +274,37 @@ int Hlavicka_Funkcie() // HLAVICKA-> FUNCTION ID (<ZOZNAM_PARAM>):<TYPY>
 
     int output;
     output = get_token(&actToken);
-    //ID
+    // ID
     if (output != ERROR_OK)
         return ERROR_LEXICAL_ANALISYS;
 
     if (actToken.type != ID)
         return ERROR_SYNTAX_ANALYSIS;
 
-    //VAR NAME
+    // VAR NAME
 
-    const char *func_name = actToken.value.string.string;
+    char *func_name = actToken.value.string.string;
     ht_item_t *item = ht_search(global, func_name);
     if (item == NULL)
     {
         item = ht_insert(global, func_name);
     }
-    const char *function_name = "";
+
     /* strcpy(*function_name,*func_name); */
 
     if (strcmp(func_name, "main") == 0)
-    {   
+    {
         get_token(&actToken);
         get_token(&actToken);
         get_token(&actToken);
         gen_main();
-        
-        
+
         return ERROR_OK;
     }
 
     current_item = ht_search(global, func_name);
 
-    //CHECKING IF ID IS IN GLOBAL SYMT
+    // CHECKING IF ID IS IN GLOBAL SYMT
     if (current_item == NULL)
     {
         current_item = ht_insert(global, func_name); // move to end, create new item instead
@@ -376,24 +357,23 @@ int Hlavicka_Funkcie() // HLAVICKA-> FUNCTION ID (<ZOZNAM_PARAM>):<TYPY>
     output = get_token(&actToken);
     //<TYPY>
 
-    current_LL = current_item->outval; // moze byt nieco zle lebo pouzivam ten isty LL ALE JEBA ten uz sa doruti
+    current_LL = current_item->outval;
     output = COMPARE_Typy();
 
     func_val_t *outs = current_item->outval;
     while (current_item->outval != NULL)
     {
-        fprintf(stdout, "\n current typ %s", current_item->outval->var_name);
+
         current_item->outval = current_item->outval->next;
     }
 
-    fprintf(stdout, "%s", current_item->key);
     while (current_item->inval != NULL)
     {
         current_item->inval = current_item->inval->next;
     }
 
     gen_function_start(current_item->key, *outs);
-    //cykli sa
+
     return output;
 }
 
@@ -405,10 +385,10 @@ int COMPARE_Typy()
         return output;
 
     output = get_token(&actToken);
-    //IF , MEANS THERE IS NEXT
+    // IF , MEANS THERE IS NEXT
     if (actToken.type == COMMA)
     {
-        //get token
+        // get token
         output = get_token(&actToken);
         if (output != ERROR_OK)
             return ERROR_SYNTAX_ANALYSIS;
@@ -436,35 +416,24 @@ int COMPARE_Typ()
     default:
         break;
     }
-    //IF THE TYPE IS CORRECT IN FUNCTION
+    // IF THE TYPE IS CORRECT IN FUNCTION
     if (current_type == current_LL->type)
     {
 
-        //ADDS VARIABLE NAME TO TYPE
+        // ADDS VARIABLE NAME TO TYPE
 
         var_name = actToken.value.string.string;
 
-        //INSERTS VARIABLE TO LOCAL TABLE
-        /* ht_item_t *insert = ht_search(local,actToken.value.string.string);
-        if(insert!=NULL){
-            return ERROR_SEMANTIC_PARAMETERS;
-            
-        } */
-
-        //SETS ITS TYPE IN LOCAL TABLE
+        // SETS ITS TYPE IN LOCAL TABLE
         current_LL->var_name = var_name;
 
-        /* fprintf(stdout, "\n %d == %d ", actToken.value.keyword, current_LL->type); */
-
-        //MOVES IN LL
+        // MOVES IN LL
         current_LL = current_LL->next;
         return ERROR_OK;
     }
     else
     {
-        printf("kokotina");
-        printf("TU JE NEZHODA");
-        fprintf(stdout, "\n %d != %d ", actToken.type, current_LL->type);
+
         return ERROR_SEMANTIC;
     }
     return ERROR_OK;
@@ -487,7 +456,7 @@ Token_type Typ()
     }
     else
     {
-        printf("TYP err\n");
+
         return ERROR_SYNTAX_ANALYSIS;
     }
     return 69;
@@ -524,10 +493,10 @@ int Parameter()
 {
     int output;
 
-    //ID
+    // ID
     if (actToken.type != ID)
         return ERROR_SYNTAX_ANALYSIS;
-    //SAVING VARIABLE NAME
+    // SAVING VARIABLE NAME
 
     output = get_token(&actToken);
     // ":"
@@ -543,15 +512,15 @@ int Parameter()
     return output;
 }
 
-int Telo_Funkcie() //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
+int Telo_Funkcie() // TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
 {
     int output;
     if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_END)
     {
-        
-            gen_function_end();
+
+        gen_function_end();
         return ERROR_OK;
-        //KONIEC FUNKCIE
+        // KONIEC FUNKCIE
     }
 
     else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_LOCAL)
@@ -563,8 +532,7 @@ int Telo_Funkcie() //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
         if (actToken.type != ID)
             return ERROR_SYNTAX_ANALYSIS;
         var_name = actToken.value.string.string;
-        /*         ht_insert(local,var_name);
-        gen_var_def(var_name); */
+
         output = get_token(&actToken);
         if (output != ERROR_OK)
             return ERROR_SYNTAX_ANALYSIS;
@@ -599,40 +567,34 @@ int Telo_Funkcie() //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
 
         gen_var_def(var_name);
 
-        //MUSIM PRIDAT DO LOCAL tabulky
+        // MUSIM PRIDAT DO LOCAL tabulky
         Symbol var;
         var.id = var_name;
-        //ulozit premennu niekam
-        //token type
-        
-        
-        if(actToken.type==ASSIGN){
+        // ulozit premennu niekam
+        // token type
 
-        get_token(&actToken);
-        
-        get_token(&actToken);
-
-        /* if(actToken.type==STRING || actToken.type == INT || actToken.type ==NUMBER || actToken.type!=ID){ */
-            
-            
-        output = expression_analysis(&actToken, local, &var, NULL);
-
-        //skontrolovat typ s premennou
-        if (element->var_type != var.result_type)
+        if (actToken.type == ASSIGN)
         {
-            fprintf(stdout, "%d != %d", element->var_type, var.result_type);
-            printf("PRED DEFINICIOU");
-            return ERROR_SEMANTIC;
-        }
 
-        gen_var_setval(var);
-        }
-        else{
             get_token(&actToken);
-            fprintf(stdout,"aCT DOTKEN %d",actToken.type);
-            
-    }
-    
+
+            get_token(&actToken);
+
+            output = expression_analysis(&actToken, local, &var, NULL);
+
+            // skontrolovat typ s premennou
+            if (element->var_type != var.result_type)
+            {
+
+                return ERROR_SEMANTIC;
+            }
+
+            gen_var_setval(var);
+        }
+        else
+        {
+            get_token(&actToken);
+        }
     }
 
     else if (actToken.type == ID)
@@ -641,229 +603,55 @@ int Telo_Funkcie() //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
         get_token(&actToken);
         Symbol s;
         s.id = actToken.value.string.string;
-        expression_analysis(&actToken,local,&s,NULL);
+        expression_analysis(&actToken, local, &s, NULL);
         gen_var_setval(s);
-        /* printf("popici");
-        id_list_t *id_list;
-        id_list_t *p;
-        id_list_t *head;
-        while (actToken.type != ASSIGN)
-        {
-            id_list = malloc(sizeof(id_list_t));
-            id_list->id = actToken.value.string.string;
-            if(p==NULL){
-                printf("NULL");
-                head = id_list;
-            }
-            else{
-                p = head;
-                while (p->next!=NULL)
-                {
-                    p=p->next;
-                }
-                p->next=id_list;
-            }
-
-            if (ht_search(local, id_list->id) == NULL)
-                return ERROR_SEMANTIC;
-
-            output = get_token(&actToken);
-            if (output != ERROR_OK)
-                return ERROR_SYNTAX_ANALYSIS;
-            
-            if (actToken.type == COMMA)
-                get_token(&actToken);
-            
-        }
-        fprintf(stdout,"%s",head->id);
-        id_list_t *k;
-        k= head;
-        output = get_token(&actToken);
-        while (actToken.type == COMMA)
-        {
-            
-            
-            if (output != ERROR_OK)
-                return ERROR_SYNTAX_ANALYSIS;
-
-            Symbol var;
-            var.id = head->id;
-            ht_item_t *searched = ht_search(local, head->id);
-            //ulozit premennu niekam
-            //token type
-            expression_analysis(&actToken, local, &var, NULL); //null ak if
-            printf("som tuj");
-            //skontrolovat typ s premennou
-            if (searched->var_type != var.result_type) //result type
-                return ERROR_SEMANTIC;
-            fprintf(stdout," TZP %d ",actToken.type);
-            gen_var_setval(var);
-            head = head->next;
-            
-        }
-        return ERROR_OK; */
     }
-        //ID UKLADAM DO LISTU
-        //POSTUPNE OVERUJEM CI SU V LOKALNEJ
-        //expressions volanie prvej var, if ciarka expressions volanie dalsiej , atd atd
-        //VIAC ID = VIAC VYRAZOV
-    
+    // ID UKLADAM DO LISTU
+    // POSTUPNE OVERUJEM CI SU V LOKALNEJ
+    // expressions volanie prvej var, if ciarka expressions volanie dalsiej , atd atd
+    // VIAC ID = VIAC VYRAZOV
 
     else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_IF)
     {
-        printf("som v ife");
+
         output = get_token(&actToken);
 
         if (output != ERROR_OK)
             return ERROR_SYNTAX_ANALYSIS;
 
-        //var musi byt nula
+        // var musi byt nula
         expression_analysis(&actToken, local, NULL, NULL);
-        //ak je then inak chyba
+        // ak je then inak chyba
         gen_if_start();
         output = get_token(&actToken);
-        //overit token
+        // overit token
         output = Telo_Funkcie_v_IF();
         if (output != ERROR_OK)
             return ERROR_SYNTAX_ANALYSIS;
-        //if else
+        // if else
         gen_if_else();
         output = get_token(&actToken);
-        //over token
+        // over token
         output = Telo_Funkcie_v_IF();
         return ERROR_OK;
         if (output != ERROR_OK)
             return ERROR_SYNTAX_ANALYSIS;
-        //if END
+        // if END
         gen_if_end();
         return ERROR_OK;
-        //problem treba vymazavat lokalne ifove deklaracie zo stromu
+        // problem treba vymazavat lokalne ifove deklaracie zo stromu
     }
 
-    /*    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_WHILE)
-    {
-        token_list_t tmp,head = Tok;
-        while (//actToken.type!=KEYWORD && actToken.value.keyword != KEYWORD_END)
-        {
-            Tok.current = actToken;
-            if (actToken.value.keyword == KEYWORD_LOCAL && actToken.type == KEYWORD)
-            {
-                output = get_token(&actToken);
-                if (output != ERROR_OK)
-                    return ERROR_SYNTAX_ANALYSIS;
-                if (actToken.type != ID)
-                    return ERROR_SYNTAX_ANALYSIS;
-                var_name = actToken.value.string.string;
-               
-                output = get_token(&actToken);
-                if (output != ERROR_OK)
-                    return ERROR_SYNTAX_ANALYSIS;
-                if (actToken.type != COLON)
-                    return ERROR_SYNTAX_ANALYSIS;
-
-                output = get_token(&actToken);
-                if (output != ERROR_OK)
-                    return ERROR_SYNTAX_ANALYSIS;
-                if (actToken.type != KEYWORD)
-                    return ERROR_SYNTAX_ANALYSIS;
-                if (actToken.value.keyword != KEYWORD_STRING || actToken.value.keyword != KEYWORD_INTEGER || actToken.value.keyword != KEYWORD_NUMBER)
-                    return ERROR_SYNTAX_ANALYSIS;
-
-                ht_item_t *element = ht_insert(local, var_name);
-                element->var_type = actToken.value.keyword;
-
-                gen_var_def(var_name);
-
-                Symbol var;
-                var.id = var_name;
-
-                expression_analysis(&actToken, local, &var); //null ak if
-
-                //skontrolovat typ s premennou
-                if (element->var_type != var.value_type)
-                    return ERROR_SEMANTIC;
-
-                gen_var_setval(var);
-                Tok.current = actToken;
-            }
-            tmp = malloc(sizeof(token_list_t));
-            tmp.current = actToken;
-            Tok.next = tmp;
-            Tok = Tok.next;
-           
-        }
-    Tok = head;
-    if(Tok.current.type!=KEYWORD || Tok.current.value.keyword!= KEYWORD_WHILE)
-        return ERROR_SYNTAX_ANALYSIS;
-    gen_loop_start();
-    Tok=Tok.next;
-    if(actToken.value.keyword != KEYWORD_STRING || actToken.value.keyword != KEYWORD_INTEGER || actToken.value.keyword != KEYWORD_NUMBER)
-        return ERROR_SYNTAX_ANALYSIS;
-    expression_analysis(Tok,local,NULL);
-    Telo_Funkcie_vo_while();
-    gen_loop_end();
-    
-        //WHILE
-        //linked list
-        //vzdy ked bude while zavola podmienku marekovi atd
-    }
- */
-    /*  else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_RETURN) //TODO
-    {
-        //HLOZI MUSI NIECO VYMYSLIET
-    }
-
-    else if (actToken.type == BUILT_IN_READI) //ak nieco ine
-    {
-        output = get_token(&actToken);
-        if (output != ERROR_OK)
-            return ERROR_SYNTAX_ANALYSIS;
-        if (actToken.type != LEFT_PARENTHESIS)
-            return ERROR_SYNTAX_ANALYSIS;
-
-        output = get_token(&actToken);
-        if (output != ERROR_OK)
-            return ERROR_SYNTAX_ANALYSIS;
-        if (actToken.type != RIGHT_PARENTHESIS)
-            return ERROR_SYNTAX_ANALYSIS;
-    }
-    else if (actToken.type == BUILT_IN_READN) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_READS) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_CHR) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_ORD) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_SUBSTR) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_WRITE) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_TOINTEGER) //ak nieco ine
-    {
-    }
-
-    //toto je asi zbytocne
-    if (output != ERROR_OK)
-        return ERROR_SYNTAX_ANALYSIS;
- */
-    //nejaky error ok
     return Telo_Funkcie();
 }
-int Telo_Funkcie_v_IF() //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
+int Telo_Funkcie_v_IF() // TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
 {
     int output;
     if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_END)
     {
         gen_function_end();
         return ERROR_OK;
-        //KONIEC FUNKCIE
+        // KONIEC FUNKCIE
     }
 
     else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_LOCAL)
@@ -875,8 +663,7 @@ int Telo_Funkcie_v_IF() //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
         if (actToken.type != ID)
             return ERROR_SYNTAX_ANALYSIS;
         var_name = actToken.value.string.string;
-        /*         ht_insert(local,var_name);
-        gen_var_def(var_name); */
+
         output = get_token(&actToken);
         if (output != ERROR_OK)
             return ERROR_SYNTAX_ANALYSIS;
@@ -911,94 +698,43 @@ int Telo_Funkcie_v_IF() //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
 
         gen_var_def(var_name);
 
-        //MUSIM PRIDAT DO LOCAL tabulky
+        // MUSIM PRIDAT DO LOCAL tabulky
         Symbol var;
         var.id = var_name;
-        //ulozit premennu niekam
-        //token type
+        // ulozit premennu niekam
+        // token type
         get_token(&actToken);
         get_token(&actToken);
 
         output = expression_analysis(&actToken, local, &var, NULL);
-        //skontrolovat typ s premennou
+        // skontrolovat typ s premennou
         if (element->var_type != var.result_type)
         {
-            fprintf(stdout, "%d != %d", element->var_type, var.result_type);
-            printf("PRED DEFINICIOU");
+
             return ERROR_SEMANTIC;
         }
 
         gen_var_setval(var);
     }
 
-        else if (actToken.type == ID)
+    else if (actToken.type == ID)
     {
-         get_token(&actToken);
+        get_token(&actToken);
         get_token(&actToken);
         Symbol s;
         s.id = actToken.value.string.string;
-        expression_analysis(&actToken,local,&s,NULL);
+        expression_analysis(&actToken, local, &s, NULL);
         gen_var_setval(s);
-
-    }/*
-
-
-
-
-        id_list_t *id_list = malloc(sizeof(id_list_t));
-        id_list_t *head = malloc(sizeof(id_list_t));
-        head = id_list;
-
-        while (actToken.type != ASSIGN)
-        {
-
-            id_list->id = actToken.value.string.string;
-            if (ht_search(local, id_list->id) == NULL)
-                return ERROR_SEMANTIC;
-            id_list = id_list->next;
-            output = get_token(&actToken);
-            if (output != ERROR_OK)
-                return ERROR_SYNTAX_ANALYSIS;
-            if (actToken.type != COMMA && actToken.type != ASSIGN)
-                return ERROR_SYNTAX_ANALYSIS;
-        }
-        while (head != NULL)
-        {
-            output = get_token(&actToken);
-            if (output != ERROR_OK)
-                return ERROR_SYNTAX_ANALYSIS;
-
-            Symbol var;
-            var.id = head->id;
-            ht_item_t *searched = ht_search(local, head->id);
-            var. = searched->var_type;
-            //ulozit premennu niekam
-            //token type
-            expression_analysis(&actToken, local, &var, NULL); //null ak if
-
-            //skontrolovat typ s premennou
-            if (searched->var_type != var.value_type) //result type
-                return ERROR_SEMANTIC;
-
-            gen_var_setval(var);
-            head = head->next;
-        }
-
-        //ID UKLADAM DO LISTU
-        //POSTUPNE OVERUJEM CI SU V LOKALNEJ
-        //expressions volanie prvej var, if ciarka expressions volanie dalsiej , atd atd
-        //VIAC ID = VIAC VYRAZOV
     }
-*/
     else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_IF)
     {
-        printf("IFFF\n");
+
         output = get_token(&actToken);
 
         if (output != ERROR_OK)
             return ERROR_SYNTAX_ANALYSIS;
-        printf("IFFF\n");
-        //var musi byt nula
+
+        // var musi byt nula
         expression_analysis(&actToken, local, NULL, NULL);
         gen_if_start();
 
@@ -1013,355 +749,6 @@ int Telo_Funkcie_v_IF() //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
             return ERROR_SYNTAX_ANALYSIS;
         gen_if_end();
         return ERROR_OK;
-        //problem treba vymazavat lokalne ifove deklaracie zo stromu
     }
-
-    /*    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_WHILE)
-    {
-        token_list_t tmp,head = Tok;
-        while (//actToken.type!=KEYWORD && actToken.value.keyword != KEYWORD_END)
-        {
-            Tok.current = actToken;
-            if (actToken.value.keyword == KEYWORD_LOCAL && actToken.type == KEYWORD)
-            {
-                output = get_token(&actToken);
-                if (output != ERROR_OK)
-                    return ERROR_SYNTAX_ANALYSIS;
-                if (actToken.type != ID)
-                    return ERROR_SYNTAX_ANALYSIS;
-                var_name = actToken.value.string.string;
-               
-                output = get_token(&actToken);
-                if (output != ERROR_OK)
-                    return ERROR_SYNTAX_ANALYSIS;
-                if (actToken.type != COLON)
-                    return ERROR_SYNTAX_ANALYSIS;
-
-                output = get_token(&actToken);
-                if (output != ERROR_OK)
-                    return ERROR_SYNTAX_ANALYSIS;
-                if (actToken.type != KEYWORD)
-                    return ERROR_SYNTAX_ANALYSIS;
-                if (actToken.value.keyword != KEYWORD_STRING || actToken.value.keyword != KEYWORD_INTEGER || actToken.value.keyword != KEYWORD_NUMBER)
-                    return ERROR_SYNTAX_ANALYSIS;
-
-                ht_item_t *element = ht_insert(local, var_name);
-                element->var_type = actToken.value.keyword;
-
-                gen_var_def(var_name);
-
-                Symbol var;
-                var.id = var_name;
-
-                expression_analysis(&actToken, local, &var); //null ak if
-
-                //skontrolovat typ s premennou
-                if (element->var_type != var.value_type)
-                    return ERROR_SEMANTIC;
-
-                gen_var_setval(var);
-                Tok.current = actToken;
-            }
-            tmp = malloc(sizeof(token_list_t));
-            tmp.current = actToken;
-            Tok.next = tmp;
-            Tok = Tok.next;
-           
-        }
-    Tok = head;
-    if(Tok.current.type!=KEYWORD || Tok.current.value.keyword!= KEYWORD_WHILE)
-        return ERROR_SYNTAX_ANALYSIS;
-    gen_loop_start();
-    Tok=Tok.next;
-    if(actToken.value.keyword != KEYWORD_STRING || actToken.value.keyword != KEYWORD_INTEGER || actToken.value.keyword != KEYWORD_NUMBER)
-        return ERROR_SYNTAX_ANALYSIS;
-    expression_analysis(Tok,local,NULL);
-    Telo_Funkcie_vo_while();
-    gen_loop_end();
-    
-        //WHILE
-        //linked list
-        //vzdy ked bude while zavola podmienku marekovi atd
-    }
- */
-    /*  else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_RETURN) //TODO
-    {
-        //HLOZI MUSI NIECO VYMYSLIET
-    }
-
-    else if (actToken.type == BUILT_IN_READI) //ak nieco ine
-    {
-        output = get_token(&actToken);
-        if (output != ERROR_OK)
-            return ERROR_SYNTAX_ANALYSIS;
-        if (actToken.type != LEFT_PARENTHESIS)
-            return ERROR_SYNTAX_ANALYSIS;
-
-        output = get_token(&actToken);
-        if (output != ERROR_OK)
-            return ERROR_SYNTAX_ANALYSIS;
-        if (actToken.type != RIGHT_PARENTHESIS)
-            return ERROR_SYNTAX_ANALYSIS;
-    }
-    else if (actToken.type == BUILT_IN_READN) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_READS) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_CHR) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_ORD) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_SUBSTR) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_WRITE) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_TOINTEGER) //ak nieco ine
-    {
-    }
-
-    //toto je asi zbytocne
-    if (output != ERROR_OK)
-        return ERROR_SYNTAX_ANALYSIS;
- */
-    //nejaky error ok
-    return ERROR_OK; //alebo proste nejaky bool ty cvok
+    return ERROR_OK;
 }
-
-/* int Telo_Funkcie_vo_while()
-{
-    //namiesto TOKEN iterujem TOK.current
-        int output;
-    if (actToken.type = KEYWORD && actToken.value.keyword == KEYWORD_END)
-    {
-        gen_function_end();
-        return ERROR_OK;
-        //KONIEC FUNKCIE
-    }
-
-    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_LOCAL)
-    {
-
-        //VNORENA DEKLARACIA, UNDECLARE KED JE VONKU z ifu whileu funkcie
-        output = get_token(&actToken);
-        if (output != ERROR_OK)
-            return ERROR_SYNTAX_ANALYSIS;
-        if (actToken.type != ID)
-            return ERROR_SYNTAX_ANALYSIS;
-        var_name = actToken.value.string.string;
-        
-        output = get_token(&actToken);
-        if (output != ERROR_OK)
-            return ERROR_SYNTAX_ANALYSIS;
-        if (actToken.type != COLON)
-            return ERROR_SYNTAX_ANALYSIS;
-
-        output = get_token(&actToken);
-        if (output != ERROR_OK)
-            return ERROR_SYNTAX_ANALYSIS;
-        if (actToken.type != KEYWORD)
-            return ERROR_SYNTAX_ANALYSIS;
-        if (actToken.value.keyword != KEYWORD_STRING || actToken.value.keyword != KEYWORD_INTEGER || actToken.value.keyword != KEYWORD_NUMBER)
-            return ERROR_SYNTAX_ANALYSIS;
-
-        ht_item_t *element = ht_insert(local, var_name);
-        element->var_type = actToken.value.keyword;
-
-        gen_var_def(var_name);
-
-        //MUSIM PRIDAT DO LOCAL tabulky
-        Symbol var;
-        var.id = var_name;
-        //ulozit premennu niekam
-        //token type
-        expression_analysis(&actToken, local, &var); //null ak if
-
-        //skontrolovat typ s premennou
-        if (element->var_type != var.value_type)
-            return ERROR_SEMANTIC;
-
-        gen_var_setval(var);
-    }
-
-    else if (actToken.type == ID)
-    {
-        id_list_t *id_list = malloc(sizeof(id_list_t));
-        id_list_t *head = malloc(sizeof(id_list_t));
-        head = id_list;
-
-        while (actToken.type != ASSIGN)
-        {
-
-            id_list->id = actToken.value.string.string;
-            if (ht_search(local, id_list->id) == NULL)
-                return ERROR_SEMANTIC;
-            id_list = id_list->next;
-            output = get_token(&actToken);
-            if (output != ERROR_OK)
-                return ERROR_SYNTAX_ANALYSIS;
-            if (actToken.type != COMMA && actToken.type != ASSIGN)
-                return ERROR_SYNTAX_ANALYSIS;
-        }
-        while (head != NULL)
-        {
-            output = get_token(&actToken);
-            if (output != ERROR_OK)
-                return ERROR_SYNTAX_ANALYSIS;
-
-            Symbol var;
-            var.id = head->id;
-            ht_item_t *searched = ht_search(local, head->id);
-            var.value_type = searched->var_type;
-            //ulozit premennu niekam
-            //token type
-            expression_analysis(&actToken, local, &var); //null ak if
-
-            //skontrolovat typ s premennou
-            if (element->var_type != var.value_type) //result type
-                return ERROR_SEMANTIC;
-
-            gen_var_setval(var);
-            head = head->next;
-        }
-
-        //ID UKLADAM DO LISTU
-        //POSTUPNE OVERUJEM CI SU V LOKALNEJ
-        //expressions volanie prvej var, if ciarka expressions volanie dalsiej , atd atd
-        //VIAC ID = VIAC VYRAZOV
-    }
-
-    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_IF)
-    {
-        output = get_token(&actToken);
-
-        if (output != ERROR_OK)
-            return ERROR_SYNTAX_ANALYSIS;
-        if (actToken.value.keyword != KEYWORD_STRING || actToken.value.keyword != KEYWORD_INTEGER || actToken.value.keyword != KEYWORD_NUMBER)
-            return ERROR_SYNTAX_ANALYSIS;
-        //var musi byt nula
-        expression_analysis(&actToken, local, NULL);
-        gen_if_start();
-
-        output = Telo_Funkcie();
-        .if (output != ERROR_OK) return ERROR_SYNTAX_ANALYSIS;
-        gen_if_else();
-
-        output = Telo_Funkcie();
-        if (output != ERROR_OK)
-            return ERROR_SYNTAX_ANALYSIS;
-        gen_if_end();
-        //problem treba vymazavat lokalne ifove deklaracie zo stromu
-    }
-
-    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_WHILE)
-    {
-        token_list_t head = Tok;
-        while (//actToken.type!=KEYWORD && actToken.value.keyword != KEYWORD_END)
-        {
-            Tok.current = actToken;
-            if (actToken.value.keyword == KEYWORD_LOCAL && actToken.type == KEYWORD)
-            {
-                output = get_token(&actToken);
-                if (output != ERROR_OK)
-                    return ERROR_SYNTAX_ANALYSIS;
-                if (actToken.type != ID)
-                    return ERROR_SYNTAX_ANALYSIS;
-                var_name = actToken.value.string.string;
-               
-                output = get_token(&actToken);
-                if (output != ERROR_OK)
-                    return ERROR_SYNTAX_ANALYSIS;
-                if (actToken.type != COLON)
-                    return ERROR_SYNTAX_ANALYSIS;
-
-                output = get_token(&actToken);
-                if (output != ERROR_OK)
-                    return ERROR_SYNTAX_ANALYSIS;
-                if (actToken.type != KEYWORD)
-                    return ERROR_SYNTAX_ANALYSIS;
-                if (actToken.value.keyword != KEYWORD_STRING || actToken.value.keyword != KEYWORD_INTEGER || actToken.value.keyword != KEYWORD_NUMBER)
-                    return ERROR_SYNTAX_ANALYSIS;
-
-                ht_item_t *element = ht_insert(local, var_name);
-                element->var_type = actToken.value.keyword;
-
-                gen_var_def(var_name);
-
-                Symbol var;
-                var.id = var_name;
-
-                expression_analysis(&actToken, local, &var); //null ak if
-
-                //skontrolovat typ s premennou
-                if (element->var_type != var.value_type)
-                    return ERROR_SEMANTIC;
-
-                gen_var_setval(var);
-                Tok.current = actToken;
-            }
-            Tok = Tok.next;
-           
-        }
-    Tok = head;
-    if(Tok.current.type!=KEYWORD || Tok.current.value.keyword!= KEYWORD_WHILE)
-        return ERROR_SYNTAX_ANALYSIS;
-    gen_loop_start();
-    Tok=Tok.next;
-    if(actToken.value.keyword != KEYWORD_STRING || actToken.value.keyword != KEYWORD_INTEGER || actToken.value.keyword != KEYWORD_NUMBER)
-        return ERROR_SYNTAX_ANALYSIS;
-    expression_analysis(Tok,local,NULL);
-    Telo_Funkcie_vo_while();
-    gen_loop_end();
-    
-        //WHILE
-        //linked list
-        //vzdy ked bude while zavola podmienku marekovi atd
-    }
-
-    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_RETURN) //TODO
-    {
-        //HLOZI MUSI NIECO VYMYSLIET
-    }
-
-    else if (actToken.type == BUILT_IN_READI) //ak nieco ine
-    {
-        output = get_token(&actToken);
-        if (output != ERROR_OK)
-            return ERROR_SYNTAX_ANALYSIS;
-        if (actToken.type != LEFT_PARENTHESIS)
-            return ERROR_SYNTAX_ANALYSIS;
-
-        output = get_token(&actToken);
-        if (output != ERROR_OK)
-            return ERROR_SYNTAX_ANALYSIS;
-        if (actToken.type != RIGHT_PARENTHESIS)
-            return ERROR_SYNTAX_ANALYSIS;
-    }
-    else if (actToken.type == BUILT_IN_READN) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_READS) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_CHR) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_ORD) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_SUBSTR) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_WRITE) //ak nieco ine
-    {
-    }
-    else if (actToken.type == BUILT_IN_TOINTEGER) //ak nieco ine
-    {
-    }
-    return Telo_Funkcie_vo_while();
-} */

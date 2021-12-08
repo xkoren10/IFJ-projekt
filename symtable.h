@@ -1,13 +1,12 @@
 /**
+ *  Project - Compiler for IFJ21
+ *
+ * @brief Table of symbols for IFJ21 - semantic analysis
+ *
+ * @author Lukasz Pycz <xpyczl00>
  * @file symtable.h
- * @author xpyczl00
- * @brief header file for symtable.c
- * @version 0.1
- * @date 2021-11-23
- * 
- * @copyright Copyright (c) 2021
- * 
- */
+ *
+ **/
 
 #ifndef _symtable_
 #define _symtable_

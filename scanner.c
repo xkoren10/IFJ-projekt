@@ -4,7 +4,6 @@
 * @brief Scanner for IFJ21 - Lexical analysis
 * 
 * @author Matej Koreň <xkoren10
-* @author Matej Hložek <xhloze02>
 * @file scanner.c
 *
 **/
@@ -14,11 +13,7 @@
 FILE *source_file;
 bool decimal;
 
-/*
-Fixed enough to be without errors. 
-In special cases we need to check for the succeeding character to determine token type 
-Function to choose keywords would be useful
-*/
+
 void set_source(FILE *f)
 {
     source_file = f;
@@ -206,7 +201,7 @@ int get_token(Token *token)
     token->type = state;
 
     Dyn_string tmpstring;
-    Dyn_string *string = &tmpstring; // question
+    Dyn_string *string = &tmpstring; 
 
     char next_char;
 
@@ -222,17 +217,6 @@ int get_token(Token *token)
 
         next_char = getc(source_file);
 
-        /* if (next_char == '\n')
-            {
-                token->type = EOL;
-                return free_memory(ERROR_OK, string);                       //dunno how
-            }*/
-
-        //------------------------------------------------
-        //fprintf(stdout, "\n--Kontrola---\n");
-        //putc(next_char, stdout);
-        //fprintf(stdout, "\n"); // výpis obsahu tokenu
-        //--------------------------------------------------
 
         switch (state)
 
@@ -251,9 +235,9 @@ int get_token(Token *token)
             else if ((isalpha(next_char) || next_char == '_') && next_char != EOF)
             {
 
-                ungetc(next_char, source_file); // lebo sak si zoberie hned pri starte jedno pismeno tak samozrejme ze nebude nic spravne na zaciatku
-                state = ID_or_KEYWORD;          // dalsia vec, preco sa toto nepouziva cisto ako starting rozcestnik, ale robia sa tu veci aj s dyn_stringom?
-                                                // nebolo by lepsie s tym narabat az v jednotlivych states?
+                ungetc(next_char, source_file); 
+                state = ID_or_KEYWORD;          
+
             }
             else if (isdigit(next_char))
             {
@@ -278,7 +262,7 @@ int get_token(Token *token)
                 return free_memory(ERROR_OK, string);
             }
             else if (next_char == '-')
-            { // maybe check for EOF a bit more?
+            {
 
                 next_char = getc(source_file);
                 if (next_char == '-')
@@ -398,7 +382,7 @@ int get_token(Token *token)
             }
             else
             {
-                ungetc(next_char, source_file); // maybe?
+                ungetc(next_char, source_file); 
                 return identifier_check(string, token);
             }
 
@@ -646,11 +630,11 @@ int get_token(Token *token)
         case (LINE_COMMENTARY):
 
             if (next_char == '\n' || next_char == EOF)
-                state = START; // check line counter
+                state = START; 
             break;
 
         case (BLOCK_COMMENTARY):
-            if (next_char == ']' || next_char == EOF) // idk, seems like does nothing when EOF
+            if (next_char == ']' || next_char == EOF) 
             {
                 next_char = getc(source_file);
                 if (next_char == ']' || next_char == EOF)
@@ -765,5 +749,5 @@ int get_token(Token *token)
             break;
 
         } //switch end
-    }     //while end
+    } //while end
 } //get_token end
