@@ -2,22 +2,37 @@
 require "ifj21"
 
 
+<<<<<<< HEAD
 local x: integer = 5  
 
 function main()   
 
+=======
+global x: integer = 5
+
+function main()     
+>>>>>>> main
 local y : integer
 local z: integer=0
 
 y = x+z 
 x= x * x+5
 z = x - y + 0--ta sranda koment ci?
+<<<<<<< HEAD
 y = x//y *1
 
+=======
+y = x/y *1
+>>>>>>> main
 
 
 
 
+<<<<<<< HEAD
 end
 
 main()
+=======
+
+end
+>>>>>>> main

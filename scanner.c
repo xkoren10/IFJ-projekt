@@ -13,7 +13,6 @@
 FILE *source_file;
 bool decimal;
 
-
 void set_source(FILE *f)
 {
     source_file = f;

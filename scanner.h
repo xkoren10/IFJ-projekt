@@ -102,7 +102,6 @@ typedef enum
     LINE_COMMENTARY,                //  --
     BLOCK_COMMENTARY,               //  --[[ ]]
 
-
     COMMA,                          // ,
     COLON,                          // :
     DOT,                            // .
