@@ -76,7 +76,7 @@ void gen_var_setval(Symbol var);
  * @param args Structure of function arguments
  * @param returns Structure of function return variables
  */
-void gen_function_start(char* func_name, func_val_t args, func_val_t returns); // TODO rework
+void gen_function_start(char* func_name, func_val_t returns); // TODO rework
 
 /**
  * @brief Generates end of an user function
