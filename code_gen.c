@@ -87,6 +87,7 @@ void gen_var_def(char* id){
 void gen_var_setval(Symbol var){
     if ( strcmp(var.value_type, "E")==0){
         fprintf(stdout, "POPS LF@%s\n", var.id);
+
     }
     else if ( strcmp(var.value_type, "integer")==0 ){
         fprintf(stdout, "MOVE LF@%s %s@%d\n", var.id, var.value_type, var.value.integer);
@@ -97,6 +98,7 @@ void gen_var_setval(Symbol var){
     else if ( strcmp(var.value_type, "string")==0 ){
         fprintf(stdout, "MOVE LF@%s %s@%s\n", var.id, var.value_type, var.value.string);
         }
+
     else{
         fprintf(stdout, "MOVE LF@%s LF@%s\n", var.id, var.value_type);
     }
@@ -106,14 +108,13 @@ void gen_var_setval(Symbol var){
 void gen_function_start(char* func_name,func_val_t returns){
     fprintf(stdout, "LABEL $%s\n", func_name);
     fprintf(stdout, "PUSHFRAME\n");
-    func_val_t* iter;
-    iter = returns.next;
-    do{
-        fprintf(stdout, "DEFVAR LF@%s\n", iter->var_name);
+    func_val_t *iter = &returns;
+    while(iter!=NULL){
+        fprintf(stdout, "DEFVAR LF@%s\n",iter ->var_name);
         fprintf(stdout, "MOVEVAR LF@%s nil@nil\n", iter->var_name);
-        iter = returns.next;
+        iter = iter->next;
     }
-    while(iter!=NULL);
+    
 }
 
 void gen_function_end(){
@@ -131,7 +132,9 @@ void gen_function_call(char* func_name, func_val_t args, func_val_t returns){
             fprintf(stdout, "LF@%s\n", iter->var_string);
         }
         else if ( iter->type == INT){
+
             fprintf(stdout, "integer@%.0f\n", iter->var_val);   
+
         }
         else if ( iter->type == NUMBER ){
             fprintf(stdout, "float@%a\n", iter->var_val);

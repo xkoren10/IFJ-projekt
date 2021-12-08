@@ -46,6 +46,12 @@ func_val_t *current_LL2;
 char *func_name;
 char *var_name;
 
+
+ char *func_name;
+char *var_name;
+
+//ALEBO AJ TOKEN
+
 Token_type current;
 
 int Next_token();
@@ -83,6 +89,9 @@ int Vyraz();
 int Viac_ID();
 
 int Prikaz();
+
+
+
 
 Token_type Typ();
 
