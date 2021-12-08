@@ -67,6 +67,11 @@ int Program() //Program -> <Prolog> <Deklaracie or Definicie> EOF
     if (actToken.type != STRING)
         return ERROR_SYNTAX_ANALYSIS;
 
+    if (dyn_string_compare(actToken.value.string, "ifj21") != 0)
+    {
+        return ERROR_SYNTAX_ANALYSIS;
+    }
+
     gen_header();
     output = get_token(&actToken);
 
@@ -83,21 +88,19 @@ int Deklaracie_or_Definicie()
     //IF EOF-> KONIEC
     if (actToken.type == STATE_EOF)
     {
-        fprintf(stdout, "KONIEC PROGRAMU");
+        fprintf(stdout, "KONIEC PROGRAMU"); // TO DEL
         return ERROR_OK;
     }
 
     //IF GLOBAL -> DEKLARACIA_FUNKCIE
-    else if (actToken.value.keyword == KEYWORD_GLOBAL) //KOREN
+    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_GLOBAL) //KOREN
     {
         output = Deklaracie_Funkcie();
-        return output;
     }
-    //IF LOCAL -> DEFINICIA_FUNKCIE
-    else if (actToken.value.keyword == KEYWORD_FUNCTION) //KOREN
+    //IF FUNCTION -> DEFINICIA_FUNKCIE
+    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_FUNCTION) //KOREN
     {
         output = Definicia_Funkcie();
-        return ERROR_OK;
     }
     //ELSE ERROR
     else
@@ -117,6 +120,7 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
 {
 
     int output;
+    ht_item_t *current;
     output = get_token(&actToken);
     //ID
     if (output != ERROR_OK)
@@ -167,12 +171,20 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
     if (actToken.type != RIGHT_PARENTHESIS)
     {
         //TEMPORARY LL
-        func_val_t *INPUT_TYPES;
+        func_val_t *INPUT_TYPES = NULL;
         //INSERTING FUNCTION INTO GLOBAL
-        ht_item_t *current = ht_insert(global, func_name);
-        
+        current = ht_search(global, func_name);
+        if(current == NULL){
+            return ERROR_SYNTAX_ANALYSIS;
+        }
+        current = ht_insert(global, func_name);
+        current->is_defined = false;
+
         //REWRITING LL IN THE TYPES
         output = Typy(INPUT_TYPES);
+        if (output != ERROR_OK)
+            return output;
+        current->inval = INPUT_TYPES;
     }
 
     if (output != ERROR_OK)
@@ -192,14 +204,18 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
     if (actToken.type != COLON)
         return ERROR_OK;
 
+    if (actToken.type == STATE_EOF)
+        return ERROR_SYNTAX_ANALYSIS;
     //<TYPY>
-    func_val_t *OUTPUT_TYPES;
-    //INSERTING INTO TABLE
-    ht_item_t *current2 = ht_search(global, func_name);
+    func_val_t *OUTPUT_TYPES = NULL;
 
     output = get_token(&actToken);
-    output = Typy(outTypes);
-
+    if (output != ERROR_OK)
+        return output;
+    output = Typy(OUTPUT_TYPES);
+    if (output != ERROR_OK)
+        return output;
+    current->outval = OUTPUT_TYPES;
 
     return output;
 }
@@ -240,12 +256,21 @@ int Hlavicka_Funkcie() // HLAVICKA-> FUNCTION ID (<ZOZNAM_PARAM>):<TYPY>
     //TMP LL FOR INPUT VALS
     func_name = actToken.value.string.string;
     current_item = ht_search(global, func_name);
-    current_LL = current_item->inval->next;
+    
 
     //CHECKING IF ID IS IN GLOBAL SYMT
-    if (current_item == NULL)
-        return ERROR_SEMANTIC;
+    if (current_item == NULL){
+        current_item = ht_insert(global, func_name);  // move to end, create new item instead
+        current_item->is_defined = true;
+    }
+    else{
+        if(current_item->is_defined == true){
+            return ERROR_SYNTAX_ANALYSIS;
+        }
+    }
 
+
+    
     output = get_token(&actToken);
     //"("
     if (output != ERROR_OK)
@@ -261,11 +286,15 @@ int Hlavicka_Funkcie() // HLAVICKA-> FUNCTION ID (<ZOZNAM_PARAM>):<TYPY>
 
     if (actToken.type != RIGHT_PARENTHESIS)
     {
+        if (actToken.type == STATE_EOF)
+        {
+            return ERROR_SYNTAX_ANALYSIS;
+        }
         output = Zoznam_parametrov();
+        if (output != ERROR_OK)
+            return output;
     }
 
-    if (output != ERROR_OK)
-        return output;
     //")"
     if (actToken.type != RIGHT_PARENTHESIS)
         return ERROR_SYNTAX_ANALYSIS;
@@ -313,7 +342,7 @@ int COMPARE_Typ()
 {
 
     //IF THE TYPE IS CORRECT IN FUNCTION
-    if (actToken.value.keyword == current_LL->typp)
+    if (actToken.value.keyword == current_LL->type)
     {
         //ADDS VARIABLE NAME TO TYPE
         current_LL->var_name = var_name;
@@ -322,7 +351,7 @@ int COMPARE_Typ()
         //SETS ITS TYPE IN LOCAL TABLE
         insert->var_type = actToken.value.keyword;
 
-        fprintf(stdout, "\n %d == %d ", actToken.value.keyword, current_LL->typp);
+        fprintf(stdout, "\n %d == %d ", actToken.value.keyword, current_LL->type);
 
         //MOVES IN LL
         current_LL = current_LL->next;
@@ -332,7 +361,7 @@ int COMPARE_Typ()
     {
         printf("kokotina");
         printf("TU JE NEZHODA");
-        fprintf(stdout, "\n %d != %d ", actToken.value.keyword, current_LL->typp);
+        fprintf(stdout, "\n %d != %d ", actToken.value.keyword, current_LL->type);
         return ERROR_SEMANTIC;
     }
     return ERROR_OK;
@@ -344,16 +373,18 @@ int Typy(func_val_t *Types)
     output = Typ(Types);
 
     if (output != ERROR_OK)
-        return ERROR_SYNTAX_ANALYSIS;
+        return output;
 
     output = get_token(&actToken);
+    if (output != ERROR_OK)
+        return output;
     //IF COMA, THERE IS MORE
     if (actToken.type == COMMA)
     {
 
         output = get_token(&actToken);
         if (output != ERROR_OK)
-            return ERROR_SYNTAX_ANALYSIS;
+            return output;
 
         return Typy(Types);
     }
@@ -362,33 +393,38 @@ int Typy(func_val_t *Types)
     return 69;
 }
 
-int Typ(func_val_t **Types)
+int Typ(func_val_t *Types)
 {
-    func_val_t *new = malloc(sizeof(func_val_t));
-    func_val_t *last = *Types;
-    
-    if(actToken.value.keyword == KEYWORD_INTEGER){
-        new->var_type = INT;
+    func_val_t *new = (func_val_t *)malloc(sizeof(func_val_t));
+    if (new == NULL)
+        return ERROR_INTERN;
+    func_val_t *last = Types;
+
+    if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_INTEGER)
+    {
+        new->type = INT;
     }
-    else if(actToken.value.keyword == KEYWORD_NUMBER){
-        new->var_type = NUMBER;
+    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_NUMBER)
+    {
+        new->type = NUMBER;
     }
-    else if(actToken.value.keyword == KEYWORD_STRING){
-        new->var_type = STRING;
+    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_STRING)
+    {
+        new->type = STRING;
     }
     new->next = NULL;
 
-    if(*Types==NULL){
-        *Types = new;
-    return ERROR_OK;
+    if (Types == NULL)
+    {
+        Types = new;
+        return ERROR_OK;
     }
-    while (last->next!=NULL)
+    while (last->next != NULL)
     {
         last = last->next;
     }
     last->next = new;
-    return;
-    
+    return ERROR_OK;
 }
 
 int Zoznam_parametrov()
@@ -434,7 +470,7 @@ int Parameter()
         return ERROR_SYNTAX_ANALYSIS;
 
     get_token(&actToken);
-
+    
     if (output != ERROR_OK)
         return ERROR_SYNTAX_ANALYSIS;
 
@@ -506,7 +542,7 @@ int Telo_Funkcie() //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
         var.id = var_name;
         //ulozit premennu niekam
         //token type
-        fpr
+        
             output = expression_analysis(&actToken, local, &var, NULL);
         fprintf(stdout, "%d", output); //null ak if
         fprintf(stdout, "%d", var.result_type);

@@ -88,21 +88,6 @@ void gen_var_def(char* id){
 
 void gen_var_setval(Symbol var){
     if ( strcmp(var.value_type, "E")==0){
-<<<<<<< HEAD
-        if ( strcmp(var.value_type, "integer")==0 ){
-            fprintf(stdout, "POPS LF@%s\n", var.id);
-        }
-        else if ( strcmp(var.value_type, "float")==0 ){
-            fprintf(stdout, "POPS LF@%s\n", var.id);
-        }
-        else if ( strcmp(var.value_type, "string")==0 ){
-            fprintf(stdout, "POPS LF@%s\n", var.id);
-        }
-        else{
-            fprintf(stderr, "\n!\nSETVAL ERROR - STACK - WRONG TYPE\n!\n");
-            return;
-        }
-=======
         fprintf(stdout, "POPS LF@%s\n", var.id);
     }
     else if ( strcmp(var.value_type, "integer")==0 ){
@@ -113,7 +98,6 @@ void gen_var_setval(Symbol var){
     }
     else if ( strcmp(var.value_type, "string")==0 ){
         fprintf(stdout, "MOVE LF@%s %s@%s\n", var.id, var.value_type, var.value.string);
->>>>>>> f6bb2dcc7173de1ad312fe0ec7a115bb1bb60cd7
     }
     else{
         fprintf(stdout, "MOVE LF@%s LF@%s\n", var.id, var.value_type);

@@ -80,7 +80,7 @@ int Prikaz();
 
 int Typy(struct func_val *f);
 
-int Typ(struct func_val **f);
+int Typ(struct func_val *f);
 
 int COMPARE_Typy();
 
