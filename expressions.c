@@ -32,7 +32,7 @@ bool exp_reduced = false;
 bool list_read;
 
 int expression_analysis(Token *token, ht_table_t *symtable_ptr, Symbol *ret_sym, token_list_t *l)
-{ 
+{
     list_read = false;
     list = l;
     if (list != NULL)
@@ -114,6 +114,10 @@ int analysis()
     case '>':
         if (expression_stack.top->handle == true) //E -> id
         {
+            if((expression_stack.top->next->terminal == false) && (expression_stack.top->token.type != LEFT_PARENTHESIS)){//////////////////////////////////////////////////////////////
+                act_token = expression_stack.top->token;
+                return ERROR_OK;
+            }
             expression_stack.top->terminal = false;
             expression_stack.top->handle = false;
             if (expression_stack.top->token.type == INT)
@@ -171,7 +175,8 @@ int analysis()
                 return ERROR_SYNTAX_ANALYSIS;
             }
             output = reduce(el1, el2, el3); //E -> E ? E  alebo E -> (E)
-            if(output != ERROR_OK){
+            if (output != ERROR_OK)
+            {
                 return output;
             }
 
@@ -202,7 +207,17 @@ int analysis()
         }
         break;
 
-    case 'e':
+    case 'e':///////////////////////////////////////////////////////////////////////////////////
+        if ((expression_stack.top->token.type == ID) && (act_token.type == ID))
+        {
+            ht_item_t *var = ht_search(symtable, expression_stack.top->token.value.string.string);
+            if (var == NULL)
+            {
+                return ERROR_SEMANTIC;
+            }
+            return_symbol.value_type = expression_stack.top->token.value.string.string;
+            return_symbol.result_type = expression_stack.top->token.type;
+        }
         return ERROR_SYNTAX_ANALYSIS;
         break;
     }
@@ -229,7 +244,7 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
         Stack_Push(&expression_stack, el2.token, false, false, el2.expression);
         if ((el2.terminal == false) && (exp_reduced == true))
         {
-           
+
             return_symbol.value_type = "E";
         }
         else
@@ -264,7 +279,6 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
         Stack_Push(&expression_stack, new, false, false, true);
         set_op(&el1, &op1);
         set_op(&el3, &op2);
-
 
         switch (el2.token.type) //TODO zavolaj code gen
         {
