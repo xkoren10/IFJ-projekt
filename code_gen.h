@@ -3,7 +3,7 @@
 * 
 * @brief Code generator for IFJ21
 * 
-* @author Matej Koreň <xkoren10
+* @author Matej Koreň <xkoren10>
 * @author Matej Hložek <xhloze02>
 * @file code_gen.h
 *
@@ -13,6 +13,8 @@
 #define _CODE_GEN_H
 
 #include "parser.h"
+
+
 /** @brief Iterator for ifs*/
 unsigned if_i;
 /** @brief Iterator for loops*/
@@ -76,7 +78,7 @@ void gen_var_setval(Symbol var);
  * @param args Structure of function arguments
  * @param returns Structure of function return variables
  */
-void gen_function_start(char* func_name, func_val_t args, func_val_t returns); // TODO rework
+void gen_function_start(char* func_name, func_val_t returns); // TODO rework
 
 /**
  * @brief Generates end of an user function

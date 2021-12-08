@@ -1,4 +1,14 @@
 require "ifj21"
 
+function main()
+local x : integer
+local y : string
+x = 5
 
-global sofia : function(integer,string)
+if x<6 then 
+    y = "pes" 
+else 
+    y= "macka" 
+end
+
+end

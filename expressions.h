@@ -7,6 +7,8 @@
 * @file expressions.h
 *
 **/
+#ifndef _EXPR_H
+#define _EXPR_H
 
 #include "scanner.h"
 #include "stack.h"
@@ -54,3 +56,5 @@ int hash();
 int check_id_and_type(TStack_element *el1, TStack_element *el2, TStack_element *el3, Token_type *return_type);
 
 void set_op(TStack_element *el, Symbol *op);
+
+#endif
