@@ -32,7 +32,7 @@ float var_val;
 char* var_string;
 char* var_name;
 Token_type typp;
-struct func_val *next;
+struct func_val_t *next;
 }func_val_t;
 
 

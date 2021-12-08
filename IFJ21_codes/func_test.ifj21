@@ -1,9 +1,9 @@
 require "ifj21"
 
-global kokot : function( integer , string , string ): string
 
-function kokot ( x : integer, y:string ,z : string): string
-
-local t: integer = 4
+function main()
+local  x : integer = 4
 
 end
+
+main()
