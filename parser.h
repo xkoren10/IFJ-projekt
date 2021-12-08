@@ -34,10 +34,11 @@ ht_item_t *current_item;
 
 func_val_t *current_LL;
 
+func_val_t *current_LL2;
 
 
-char* func_name;
-char* var_name;
+ char *func_name;
+char *var_name;
 
 //ALEBO AJ TOKEN
 Token_type current;
@@ -60,6 +61,8 @@ int Hlavicka_Funkcie();
 
 int Telo_Funkcie();
 
+int Telo_Funkcie_v_IF();
+
 int Zoznam_parametrov();
 
 int Parameter();
@@ -76,9 +79,8 @@ int Viac_ID();
 
 int Prikaz();
 
-int Typy(struct func_val *f);
 
-int Typ(struct func_val *f);
+Token_type Typ();
 
 int COMPARE_Typy();
 
