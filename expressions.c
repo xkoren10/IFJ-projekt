@@ -138,8 +138,7 @@ int analysis()
                 {
                     return ERROR_SEMANTIC;
                 }
-                return_symbol.value_type = "id";
-                return_symbol.id = expression_stack.top->token.value.string.string;
+                return_symbol.value_type = expression_stack.top->token.value.string.string;
             }
             return_symbol.result_type = expression_stack.top->token.type;
             if ((expression_stack.top->terminal == false) && (expression_stack.top->next->token.type == DOLLAR) && (i2 == 7))
@@ -249,7 +248,7 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
             }
             else if (el2.token.type == ID)
             {
-                return_symbol.value_type = "id";
+                return_symbol.value_type = el2.token.value.string.string;
             }
         }
         return_symbol.result_type = el2.token.type;
@@ -801,7 +800,7 @@ void set_op(TStack_element *el, Symbol *op)
         }
         else if (el->token.type == STRING)
         {
-            op->value_type = "integer";
+            op->value_type = "string";
             op->value.string = el->token.value.string.string;
         }
     }
