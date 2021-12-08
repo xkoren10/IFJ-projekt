@@ -97,7 +97,11 @@ void gen_var_setval(Symbol var){
         }
     else if ( strcmp(var.value_type, "string")==0 ){
         fprintf(stdout, "MOVE LF@%s %s@%s\n", var.id, var.value_type, var.value.string);
+<<<<<<< HEAD
         }
+=======
+    }
+>>>>>>> 94a93a0d28818f3555f1aca2f0d287ee60e16d52
     else{
         fprintf(stdout, "MOVE LF@%s LF@%s\n", var.id, var.value_type);
     }
