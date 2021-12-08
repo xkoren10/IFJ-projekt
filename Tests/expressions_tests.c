@@ -182,9 +182,19 @@ get_token(&token);
 assert(dyn_string_compare(token.value.string, "janko")==0);
 res = expression_analysis(&token,symtable_ptr,symptr,t_list_ptr);
 assert(res==0);
-assert(strcmp(sym.value_type,"id")==0);
+assert(strcmp(sym.value_type,"janko")==0);
+assert(token.type == KEYWORD);
+assert(token.value.keyword == KEYWORD_THEN);
+
+assert(sym.result_type==ID);
+
+get_token(&token);
+assert(dyn_string_compare(token.value.string, "janko")==0);
+res = expression_analysis(&token,symtable_ptr,symptr,t_list_ptr);
+assert(res==0);
+assert(strcmp(sym.value_type,"janko")==0);
 assert(token.type == STATE_EOF);
-assert(strcmp(sym.id,"janko")==0);
+
 assert(sym.result_type==ID);
 
 fclose(file);
@@ -267,12 +277,10 @@ assert(res==2);
 get_token(&token);
 assert(token.type == GET_LENGTH);
 res = expression_analysis(&token,symtable_ptr,symptr,t_list_ptr);
-//assert(token.type == KEYWORD);
-//assert(token.value.keyword == KEYWORD_THEN);
-//assert(res==0);
+assert(token.type == KEYWORD);
+assert(token.value.keyword == KEYWORD_THEN);
+assert(res==0);
 
-//token=token_janko;
- // WHY HERE
 
 
 
