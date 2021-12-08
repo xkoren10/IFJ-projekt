@@ -3,11 +3,12 @@
 
 #include "error_codes.h"
 #include "dyn_string.h"
-/* #include "stack.h" */
+#include "stack.h"
 #include "symtable.h"
 #include "scanner.h"
-/* #include "expressions.h" */
+#include "expressions.h"
 #include <stdbool.h>
+#include "code_gen.h"
 
 typedef struct token_list{
     Token current;
@@ -79,7 +80,7 @@ int Prikaz();
 
 int Typy(struct func_val *f);
 
-int Typ(struct func_val *f);
+int Typ(struct func_val **f);
 
 int COMPARE_Typy();
 

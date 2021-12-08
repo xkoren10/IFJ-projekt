@@ -1,9 +1,4 @@
 require "ifj21"
 
 
-function main()
-local  x : integer = 4
-
-end
-
-main()
+global sofia : function(integer,string)
