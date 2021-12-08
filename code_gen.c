@@ -11,23 +11,25 @@
 
 #include "code_gen.h"
 #include "parser.h"
-#include "parser.h"
+#include "scanner.h"
 
 unsigned if_i = 0;
 unsigned loop_i = 0;
 
 void print_push(Symbol op){
-    fprintf(stdout, "PUSHS");
+    fprintf(stdout, "PUSHS ");
     if ( strcmp(op.value_type, "integer")==0 ){
         fprintf(stdout, "int@%d\n", op.value.integer);
     }
-    else if( strcmp(op.value_type, "float")==0 ){
+    else if ( strcmp(op.value_type, "float")==0 ){
         fprintf(stdout, "float@%f\n", op.value.number);  // float to string? how many digits?
     }
-    else if( strcmp(op.value_type, "string")==0 ){
+    else if ( strcmp(op.value_type, "string")==0 ){
         fprintf(stdout, "string@%s\n", op.value.string);
     }
-    //else if (strcmp(op.value_type, "E")==0) fprintf(stdout, "EEEEEEEE\n");
+    else if ( strcmp(op.value_type, "id")==0 ){
+        fprintf(stdout, "LF@%s\n", op.id);
+    }
     else{
         fprintf(stderr, "\n!\nPUSHS ERROR - WRONG INPUT VAR TYPE\n!\n");
         return;
@@ -69,9 +71,13 @@ void print_type(char* type){
 }
 void gen_instruction(char* type, Symbol op_l, Symbol op_r){
     // First operand PUSH to stack
-    print_push(op_l);
+    if ( strcmp(op_l.value_type, "E")!=0 ){
+        print_push(op_l);
+    }
     // Second operand PUSH to stack if it exists
-    if ( strcmp(op_r.value_type, "E")!=0 ) print_push(op_r);
+    if ( strcmp(op_r.value_type, "E")!=0 ){
+        print_push(op_r);
+    }
     // Print operation
     print_type(type);
 }
@@ -82,6 +88,7 @@ void gen_var_def(char* id){
 
 void gen_var_setval(Symbol var){
     if ( strcmp(var.value_type, "E")==0){
+<<<<<<< HEAD
         if ( strcmp(var.value_type, "integer")==0 ){
             fprintf(stdout, "POPS LF@%s\n", var.id);
         }
@@ -95,21 +102,21 @@ void gen_var_setval(Symbol var){
             fprintf(stderr, "\n!\nSETVAL ERROR - STACK - WRONG TYPE\n!\n");
             return;
         }
+=======
+        fprintf(stdout, "POPS LF@%s\n", var.id);
+    }
+    else if ( strcmp(var.value_type, "integer")==0 ){
+        fprintf(stdout, "MOVE LF@%s %s@%d\n", var.id, var.value_type, var.value.integer);
+    }
+    else if ( strcmp(var.value_type, "float")==0 ){
+        fprintf(stdout, "MOVE LF@%s %s@%f\n", var.id, var.value_type, var.value.number);
+    }
+    else if ( strcmp(var.value_type, "string")==0 ){
+        fprintf(stdout, "MOVE LF@%s %s@%s\n", var.id, var.value_type, var.value.string);
+>>>>>>> f6bb2dcc7173de1ad312fe0ec7a115bb1bb60cd7
     }
     else{
-        if ( strcmp(var.value_type, "integer")==0 ){
-            fprintf(stdout, "MOVE LF@%s %s@%d\n", var.id, var.value_type, var.value.integer);
-        }
-        else if ( strcmp(var.value_type, "float")== 0 ){
-            fprintf(stdout, "MOVE LF@%s %s@%f\n", var.id, var.value_type, var.value.number);
-        }
-        else if ( strcmp(var.value_type, "string")==0 ){
-            fprintf(stdout, "MOVE LF@%s %s@%s\n", var.id, var.value_type, var.value.string);
-        }
-        else{
-            fprintf(stderr, "\n!\nSETVAL ERROR - NONSTACK - WRONG TYPE\n!\n");
-            return;
-        }
+        fprintf(stdout, "MOVE LF@%s LF@%s\n", var.id, var.value_type);
     }
 }
 
@@ -120,7 +127,7 @@ void gen_function_start(char* func_name, func_val_t args, func_val_t returns){
     iter = returns.next;
     do{
         fprintf(stdout, "DEFVAR LF@%s\n", iter->var_name);
-        fprintf(stdout, "MOVEVAR LF@%s nil@nil\n");
+        fprintf(stdout, "MOVEVAR LF@%s nil@nil\n", iter->var_name);
         iter = returns.next;
     }
     while(iter!=NULL);
@@ -163,14 +170,25 @@ void gen_function_call(char* func_name, func_val_t args, func_val_t returns){
 // TO CHECK
 
 void gen_condition(char* type, Symbol op_l, Symbol op_r){
+    if ( strcmp(op_l.value_type, "E")!=0 ){
+        print_push(op_l);
+    }
+    if ( strcmp(op_r.value_type, "E")!=0 ){
+        print_push(op_r);
+    } 
+    fprintf(stdout, "\n");
     if ( strcmp(type, ">")==0 ){
         fprintf(stdout, "GTS\n");
     }
     else if ( strcmp(type, "<")==0 ){
         fprintf(stdout, "LTS\n");
     }
-    else if ( strcmp(type, "=")==0 ){
+    else if ( strcmp(type, "==")==0 ){
         fprintf(stdout, "EQS\n");
+    }
+    else if ( strcmp(type, "~=")==0 ){
+        fprintf(stdout, "EQS\n");
+        fprintf(stdout, "NOTS\n");
     }
     else if ( strcmp(type, ">=")==0 ){
         fprintf(stdout, "POPS GF@EXP_L\n");
@@ -221,7 +239,7 @@ void gen_loop_end(){
     loop_i++;
 }
 
-void gen_if_start(char* type){
+void gen_if_start(){
     fprintf(stdout, "JUMPIFEQS $IF%d\n", if_i);
     fprintf(stdout, "JUMPIFNEQS $ELSE%d\n", if_i);
     fprintf(stdout, "LABEL $IF%i\n", if_i);
@@ -310,6 +328,8 @@ void gen_toINT(Symbol var){
 
 void gen_substring(Symbol var, Symbol index_from, Symbol index_to){
     /* TODO */
-    fprintf(stdout, "\n");
+    fprintf(stdout, "%s\n", var.value_type);
+    fprintf(stdout, "%s\n", index_from.value_type);
+    fprintf(stdout, "%s\n", index_to.value_type);
 }
 
