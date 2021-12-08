@@ -6,7 +6,6 @@
 /* #include "stack.h" */
 #include "symtable.h"
 #include "scanner.h"
-/* #include "expressions.h" */
 #include <stdbool.h>
 
 typedef struct token_list{

@@ -10,7 +10,6 @@
 **/
 
 #include "code_gen.h"
-#include "parser.h"
 #include "scanner.h"
 
 unsigned if_i = 0;
@@ -88,38 +87,24 @@ void gen_var_def(char* id){
 
 void gen_var_setval(Symbol var){
     if ( strcmp(var.value_type, "E")==0){
-        if ( strcmp(var.value_type, "integer")==0 ){
-            fprintf(stdout, "POPS LF@%s\n", var.id);
-        }
-        else if ( strcmp(var.value_type, "float")==0 ){
-            fprintf(stdout, "POPS LF@%s\n", var.id);
-        }
-        else if ( strcmp(var.value_type, "string")==0 ){
-            fprintf(stdout, "POPS LF@%s\n", var.id);
-        }
-        else{
-            fprintf(stderr, "\n!\nSETVAL ERROR - STACK - WRONG TYPE\n!\n");
-            return;
-        }
+        fprintf(stdout, "POPS LF@%s\n", var.id);
     }
+    else if ( strcmp(var.value_type, "integer")==0 ){
+        fprintf(stdout, "MOVE LF@%s %s@%d\n", var.id, var.value_type, var.value.integer);
+        }
+    else if ( strcmp(var.value_type, "float")== 0 ){
+        fprintf(stdout, "MOVE LF@%s %s@%f\n", var.id, var.value_type, var.value.number);
+        }
+    else if ( strcmp(var.value_type, "string")==0 ){
+        fprintf(stdout, "MOVE LF@%s %s@%s\n", var.id, var.value_type, var.value.string);
+        }
     else{
-        if ( strcmp(var.value_type, "integer")==0 ){
-            fprintf(stdout, "MOVE LF@%s %s@%d\n", var.id, var.value_type, var.value.integer);
-        }
-        else if ( strcmp(var.value_type, "float")== 0 ){
-            fprintf(stdout, "MOVE LF@%s %s@%f\n", var.id, var.value_type, var.value.number);
-        }
-        else if ( strcmp(var.value_type, "string")==0 ){
-            fprintf(stdout, "MOVE LF@%s %s@%s\n", var.id, var.value_type, var.value.string);
-        }
-        else{
-            fprintf(stderr, "\n!\nSETVAL ERROR - NONSTACK - WRONG TYPE\n!\n");
-            return;
-        }
+        fprintf(stdout, "MOVE LF@%s LF@%s\n", var.id, var.value_type);
     }
+    
 }
 
-void gen_function_start(char* func_name, func_val_t args, func_val_t returns){
+void gen_function_start(char* func_name,func_val_t returns){
     fprintf(stdout, "LABEL $%s\n", func_name);
     fprintf(stdout, "PUSHFRAME\n");
     func_val_t* iter;
@@ -143,16 +128,16 @@ void gen_function_call(char* func_name, func_val_t args, func_val_t returns){
     do{
         fprintf(stdout, "DEFVAR LF@%s\n", iter->var_name);
         fprintf(stdout, "MOVEVAR LF@%s ", iter->var_name);
-        if ( iter->typp == ID ){
+        if ( iter->type == ID ){
             fprintf(stdout, "LF@%s\n", iter->var_string);
         }
-        else if ( iter->typp == INT){
+        else if ( iter->type == INT){
             fprintf(stdout, "integer@%.0f\n", iter->var_val);   //TODO check to int
         }
-        else if ( iter->typp == NUMBER ){
+        else if ( iter->type == NUMBER ){
             fprintf(stdout, "float@%a\n", iter->var_val);
         }
-        else if ( iter->typp == STRING ){
+        else if ( iter->type == STRING ){
             fprintf(stdout, "string@%s\n", iter->var_string);
         }
         else{
