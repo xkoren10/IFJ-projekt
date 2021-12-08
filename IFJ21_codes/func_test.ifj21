@@ -1,9 +1,14 @@
 require "ifj21"
 
-global kokot : function( integer , string , string ):string
+function main()
+local x : integer
+local y : string
+x = 5
 
-function kokot ( x : integer, y:string ,z : string): string
+if x<6 then 
+    y = "pes" 
+else 
+    y= "macka" 
+end
 
-global penis : function( integer , string , string ):string
-
-function penis ( x : integer, y:string ,z : string):string
+end
