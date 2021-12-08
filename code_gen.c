@@ -87,7 +87,7 @@ void gen_var_def(char* id){
 }
 
 void gen_var_setval(Symbol var){
-    if ( strcmp(var.value.string, "%%")==0 && var.id!=NULL){
+    if ( strcmp(var.value_type, "E")==0){
         if ( strcmp(var.value_type, "integer")==0 ){
             fprintf(stdout, "POPS LF@%s\n", var.id);
         }
