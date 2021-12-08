@@ -1,13 +1,12 @@
 /**
+ *  Project - Compiler for IFJ21
+ *
+ * @brief Table of symbols for IFJ21 - semantic analysis
+ *
+ * @author Lukasz Pycz <xpyczl00>
  * @file symtable.c
- * @author xpyczl00
- * @brief Symtable using hashtable
- * @version 0.1
- * @date 2021-11-23
- * 
- * @copyright Copyright (c) 2021
- * 
- */
+ *
+ **/
 
 #include "symtable.h"
 #include <stdlib.h>
@@ -52,7 +51,7 @@ void item_null(ht_item_t *item){
   item->next=NULL;
   item->outval=NULL;
   item->string_val=NULL;
-  /* item->var_value = NULL; */
+
   
 }
 /**
@@ -93,27 +92,12 @@ ht_item_t *ht_insert(ht_table_t *table, char *key)
     insert->next = NULL;
     int hash_index = get_hash(key);
 
-    /* insert->next = (*table)[hash_index];    //teoreticky netreba ani toto, vlastne vobec */
+
     (*table)[hash_index] = insert;
     return insert;
   }
 
 
-/**
- * @brief Getting a pointer of the item with given key, if not found returns NULL
- * 
- * @param table 
- * @param key 
- * @return float* 
- */
-
-//CELKOM ZBYTOCNE
-/* float *ht_get(ht_table_t *table, char *key)
-{
-  ht_item_t *get = ht_search(table, key);
-
-  return get ? &(get->value) : NULL;
-} */
 
 /**
  * @brief Deleting an item with given key
@@ -122,7 +106,7 @@ ht_item_t *ht_insert(ht_table_t *table, char *key)
  * @param key 
  */
 
-//ESTE NEVIEM
+
 void ht_delete(ht_table_t *table, char *key)
 {
   int hash_index = get_hash(key);
@@ -156,7 +140,7 @@ void ht_delete(ht_table_t *table, char *key)
  * @param table 
  */
 
-//NEVIEM
+
 void ht_delete_all(ht_table_t *table)
 {
   ht_item_t *tmp, *delete;

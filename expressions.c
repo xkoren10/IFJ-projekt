@@ -1,14 +1,15 @@
 /**
 * Project - Compiler for IFJ21
 * 
-* @brief Syntax analysis of expressions
+* @brief Syntax analysis of expressions for IFJ21
 * 
-* @author Marek Krizan <xkriza08>
+* @author Marek Križan <xkriza08>
 * @file expressions.c
 *
 **/
 
 #include "expressions.h"
+#include <stdbool.h>
 
 const char table[8][8] = {
     //               +-  *///  ..   rel   i    (    )    $
@@ -32,7 +33,7 @@ bool exp_reduced = false;
 bool list_read;
 
 int expression_analysis(Token *token, ht_table_t *symtable_ptr, Symbol *ret_sym, token_list_t *l)
-{ 
+{
     list_read = false;
     list = l;
     if (list != NULL)
@@ -88,12 +89,30 @@ int analysis()
         return output;
     }
 
+    if((expression_stack.top->token.type != DOLLAR) && (expression_stack.top->terminal == false) && (expression_stack.top->token.type != LEFT_PARENTHESIS) && (expression_stack.top->next->token.type == DOLLAR)
+    && (act_token.type != PLUS)
+    && (act_token.type != MINUS)
+    && (act_token.type != MULTIPLY)
+    && (act_token.type != CONCATENATE)
+    && (act_token.type != DIVIDE)
+    && (act_token.type != INTEGER_DIVIDE)
+    && (act_token.type != EQUALS)
+    && (act_token.type != EG_ASSIGN)
+    && (act_token.type != LESS_THAN)
+    && (act_token.type != LESS_or_EQUALS)
+    && (act_token.type != GREATER_THAN)
+    && (act_token.type != GREATER_or_EQUALS)){
+        return ERROR_OK;
+    }
+
+    bool terminal = true;
     switch (table[i1][i2])
     {
 
     case '<':
 
-        Stack_Push(&expression_stack, act_token, true, true, false);
+        
+        Stack_Push(&expression_stack, act_token, true, terminal, false);
         if (list_read)
         {
             /*list = list->next;
@@ -171,7 +190,8 @@ int analysis()
                 return ERROR_SYNTAX_ANALYSIS;
             }
             output = reduce(el1, el2, el3); //E -> E ? E  alebo E -> (E)
-            if(output != ERROR_OK){
+            if (output != ERROR_OK)
+            {
                 return output;
             }
 
@@ -203,6 +223,10 @@ int analysis()
         break;
 
     case 'e':
+        if(i1 == 4 && i2 == 4){
+            return_symbol.value_type = "E";
+            return ERROR_OK;
+        }
         return ERROR_SYNTAX_ANALYSIS;
         break;
     }
@@ -217,7 +241,7 @@ int analysis()
 }
 
 int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
-{ //fprintf(stdout,"\n%d - operand %d - operator %d - operand\n",el1.token.value.integer_value,el2.token.type,el3.token.value.integer_value); test print
+{ 
     Token new;
     new.value.integer_value = 1;
     new.value.decimal_value = 1;
@@ -229,7 +253,7 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
         Stack_Push(&expression_stack, el2.token, false, false, el2.expression);
         if ((el2.terminal == false) && (exp_reduced == true))
         {
-           
+
             return_symbol.value_type = "E";
         }
         else
@@ -265,8 +289,7 @@ int reduce(TStack_element el1, TStack_element el2, TStack_element el3)
         set_op(&el1, &op1);
         set_op(&el3, &op2);
 
-
-        switch (el2.token.type) //TODO zavolaj code gen
+        switch (el2.token.type) 
         {
         case PLUS:
             gen_instruction("+", op1, op2);
@@ -344,8 +367,7 @@ int find_index(int *i1, int *i2)
 {
     TStack_element tmp = *(expression_stack.top);
     bool popped = false;
-
-    if (!tmp.terminal)
+    if (tmp.terminal == false)
     {
         Stack_Pop(&expression_stack);
         popped = true;
@@ -463,7 +485,7 @@ int hash()
 
 int check_id_and_type(TStack_element *el1, TStack_element *el2, TStack_element *el3, Token_type *return_type)
 {
-    //fprintf(stdout,"%d-%d-%d\n",el1->token.type,el2->token.type,el3->token.type); Pomocný výpis, ako Marek povedal
+   
     Token_type type1, type2;
     ht_item_t *var = NULL;
     if ((el2->token.type == PLUS) || (el2->token.type == MINUS) || (el2->token.type == MULTIPLY) || (el2->token.type == DIVIDE) || (el2->token.type == INTEGER_DIVIDE)) //+-*///

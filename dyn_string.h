@@ -1,10 +1,9 @@
 /**
 * Project - Compiler for IFJ21
 * 
-* @brief Scanner for IFJ21 - Lexical analysis
+* @brief Dynamic string for IFJ21 - Lexical analysis
 * 
 * @author Matej Koreň <xkoren10
-* @author Matej Hložek <xhloze02>
 * @file dyn_string.h
 *
 **/

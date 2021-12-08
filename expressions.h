@@ -1,9 +1,9 @@
 /**
 * Project - Compiler for IFJ21
 * 
-* @brief Syntax analysis of expressions
+* @brief Syntax analysis of expressions for IFJ21
 * 
-* @author Marek Krizan <xkriza08>
+* @author Marek Križan <xkriza08>
 * @file expressions.h
 *
 **/
@@ -15,6 +15,7 @@
 #include "error_codes.h"
 #include "symtable.h"
 #include "code_gen.h"
+
 
 /**
  * @brief Initialization and start of the expresion analysis

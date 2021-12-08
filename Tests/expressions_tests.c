@@ -77,8 +77,9 @@ get_token(&token);
 assert(token.type == INT);
 assert(token.value.integer_value == 5);
 res = expression_analysis(&token,symtable_ptr,symptr,t_list_ptr);
-assert(token.type == KEYWORD);
-assert(token.value.keyword == KEYWORD_THEN);
+assert(strcmp(sym.value_type,"E")==0);
+assert(token.type == ID);
+assert(dyn_string_compare(token.value.string, "a")==0);
 assert(res==0);
 
 get_token(&token);
@@ -99,7 +100,9 @@ get_token(&token);
 assert(token.type == INT);
 assert(token.value.integer_value == 42);
 res = expression_analysis(&token,symtable_ptr,symptr,t_list_ptr);
+fprintf(stdout,"%d---- token\n ",token.type);
 assert(token.type == DECIMAL_NUMBER);
+fprintf(stdout,"%d type -- %d res -- %s --id %s string\n", token.type, res, sym.value_type, sym.id);
 assert(res==2);                                             // Syntax analysis
 
 fclose(file);
@@ -148,6 +151,9 @@ get_token(&token);
 assert(token.type == INT);
 assert(token.value.integer_value == 20);
 res = expression_analysis(&token,symtable_ptr,symptr,t_list_ptr);
+
+fprintf(stdout,"%d type -- %d res -- %s --id %s string\n", token.type, res, sym.value_type, sym.id);
+r
 assert(token.type == KEYWORD);
 assert(token.value.keyword == KEYWORD_THEN);
 assert(res==0);
@@ -191,11 +197,13 @@ assert(sym.result_type==ID);
 get_token(&token);
 assert(dyn_string_compare(token.value.string, "janko")==0);
 res = expression_analysis(&token,symtable_ptr,symptr,t_list_ptr);
+
+fprintf(stdout,"%d type -- %d res -- %s --id %s string\n", token.type, res, sym.value_type, sym.id);
 assert(res==0);
 assert(strcmp(sym.value_type,"janko")==0);
 assert(token.type == STATE_EOF);
-
 assert(sym.result_type==ID);
+
 
 fclose(file);
 
@@ -212,16 +220,16 @@ get_token(&token);
 assert(token.type == INT);
 assert(token.value.integer_value == 5);
 res = expression_analysis(&token,symtable_ptr,symptr,t_list_ptr);
-assert(strcmp(sym.value_type,"integer")==0);
-assert(token.type == KEYWORD);
-assert(token.value.keyword == KEYWORD_THEN);
+fprintf(stdout,"%d type -- %d res -- %s --id %s string\n", token.type, res, sym.value_type, sym.id);
+assert(strcmp(sym.value_type,"E")==0);
+assert(token.type == ID);
 assert(res==0);
-assert(sym.value.integer==5);
 assert(sym.result_type==INT);
 
 get_token(&token);
 assert(token.type == LEFT_PARENTHESIS);
 res = expression_analysis(&token,symtable_ptr,symptr,t_list_ptr);
+
 assert(strcmp(sym.value_type,"integer")==0);
 assert(token.type == STATE_EOF);
 assert(res==0);
@@ -233,7 +241,8 @@ fclose(file);
 
 
 
-file = fopen("IFJ21_codes/Expressions/concatenate.txt", "r");
+/*file = fopen("IFJ21_codes/Expressions/concatenate.txt", "r");
+
 set_source(file);
 //string and int
 get_token(&token);
@@ -244,7 +253,9 @@ assert(token.value.keyword == KEYWORD_THEN);
 //fprintf(stdout,"%d type -- %d res -- %s\n", token.type, res, sym.value_type);
 assert(res==6);
 
+
 //string and string
+
 
 get_token(&token);
 assert(token.type == STRING);
@@ -290,5 +301,7 @@ fclose(file);
 
                         fprintf(stdout,"--> IFJ21_codes/Expressions/concatenate.txt => ");
                         fprintf(stdout,"\x1B[32m"" PASSED \n""\x1B[0m"); 
-ht_delete_all(symtable_ptr);
+
+ht_delete_all(symtable_ptr);*/
+
 }

@@ -1,30 +1,37 @@
+/**
+ *  Project - Compiler for IFJ21
+ *
+ * @brief Parser for IFJ21 - syntax analysis
+ *
+ * @author Lukasz Pycz <xpyczl00>
+ * @file parser.h
+ *
+ **/
+
 #ifndef _PARSER_H
 #define _PARSER_H
 
 #include "error_codes.h"
 #include "dyn_string.h"
-/* #include "stack.h" */
 #include "symtable.h"
 #include "scanner.h"
 #include <stdbool.h>
 
-typedef struct token_list{
+typedef struct token_list
+{
     Token current;
     struct token_list_t *next;
-}token_list_t;
+} token_list_t;
 
-typedef struct id_list{
+typedef struct id_list
+{
     char *id;
-    struct id_list_t* next;
-}id_list_t;
+    struct id_list_t *next;
+} id_list_t;
 
-//current token
 token_list_t Tok;
 
 Token actToken;
-
-/* //next token ehm bud toto alebo nejaka funkcia
-Token nextToken; */
 
 ht_table_t *global;
 
@@ -36,11 +43,15 @@ func_val_t *current_LL;
 
 func_val_t *current_LL2;
 
+char *func_name;
+char *var_name;
+
 
  char *func_name;
 char *var_name;
 
 //ALEBO AJ TOKEN
+
 Token_type current;
 
 int Next_token();
@@ -78,6 +89,8 @@ int Vyraz();
 int Viac_ID();
 
 int Prikaz();
+
+
 
 
 Token_type Typ();

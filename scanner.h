@@ -4,7 +4,6 @@
 * @brief Scanner for IFJ21 - Lexical analysis
 * 
 * @author Matej Koreň <xkoren10
-* @author Matej Hložek <xhloze02>
 * @file scanner.h
 *
 **/
@@ -121,7 +120,7 @@ typedef enum
 
 
 /**
- * @union Token_value
+ * @struct Token_value
  * @brief Definition of token values - word (id), keyword, integer or float
  */
 typedef struct
