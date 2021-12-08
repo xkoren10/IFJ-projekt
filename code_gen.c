@@ -10,7 +10,6 @@
 **/
 
 #include "code_gen.h"
-#include "parser.h"
 #include "scanner.h"
 
 unsigned if_i = 0;

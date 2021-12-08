@@ -3,7 +3,7 @@
 * 
 * @brief Code generator for IFJ21
 * 
-* @author Matej Koreň <xkoren10
+* @author Matej Koreň <xkoren10>
 * @author Matej Hložek <xhloze02>
 * @file code_gen.h
 *
@@ -13,6 +13,8 @@
 #define _CODE_GEN_H
 
 #include "parser.h"
+
+
 /** @brief Iterator for ifs*/
 unsigned if_i;
 /** @brief Iterator for loops*/
