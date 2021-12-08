@@ -3,6 +3,11 @@ CC=gcc
 
 .PHONY: clean 
 
+
+
+
+
+
 make: *.c *.h
 	$(CC) $(CFLAGS) *.c *.h -o compiler
 
@@ -20,6 +25,10 @@ test_scan: Tests/scanner_tests.c dyn_string.c scanner.c
 	$(CC) $(CFLAGS) Tests/scanner_tests.c dyn_string.c scanner.c -o scanner_tests
 	./scanner_tests
 	rm -f scanner_tests
+
+like_main:          ifj21_compiler.c dyn_string.c scanner.c parser.c symtable.c  expressions.c code_gen.c stack.c
+	$(CC) $(CFLAGS) ifj21_compiler.c dyn_string.c scanner.c parser.c  symtable.c expressions.c code_gen.c stack.c -o ifj21_compiler
+
 
 
 clean:
