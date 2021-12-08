@@ -175,7 +175,6 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
     if (actToken.type != RIGHT_PARENTHESIS)
     {
         //TEMPORARY LL
-<<<<<<< HEAD
 
         func_val_t *INPUT_TYPES = malloc(sizeof(func_val_t));
         //INSERTING FUNCTION INTO GLOBAL
@@ -183,19 +182,12 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
 
         if (current != NULL)
         {
-=======
-        func_val_t *INPUT_TYPES = NULL;
-        //INSERTING FUNCTION INTO GLOBAL
-        current = ht_search(global, func_name);
-        if(current == NULL){
->>>>>>> 94a93a0d28818f3555f1aca2f0d287ee60e16d52
             return ERROR_SYNTAX_ANALYSIS;
         }
         current = ht_insert(global, func_name);
         current->is_defined = false;
 
         //REWRITING LL IN THE TYPES
-<<<<<<< HEAD
         Token_type typ = Typ();
 
         INPUT_TYPES->type = typ;
@@ -217,12 +209,6 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
             INPUT_TYPES = INPUT_TYPES->next;
             get_token(&actToken);
         }
-=======
-        output = Typy(INPUT_TYPES);
-        if (output != ERROR_OK)
-            return output;
-        current->inval = INPUT_TYPES;
->>>>>>> 94a93a0d28818f3555f1aca2f0d287ee60e16d52
     }
 
     if (output != ERROR_OK)
@@ -245,7 +231,6 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
     if (actToken.type == STATE_EOF)
         return ERROR_SYNTAX_ANALYSIS;
     //<TYPY>
-<<<<<<< HEAD
     func_val_t *OUTPUT_TYPES = malloc(sizeof(func_val_t));
     output = get_token(&actToken);
 
@@ -276,17 +261,6 @@ int Deklaracie_Funkcie() //  DEKLARACIE_FUNKCIE -> GLOBAL ID : FUNCTION (<TYPY>)
     /* output = Typy(OUTPUT_TYPES); */
     if (output != ERROR_OK)
         return output;
-=======
-    func_val_t *OUTPUT_TYPES = NULL;
-
-    output = get_token(&actToken);
-    if (output != ERROR_OK)
-        return output;
-    output = Typy(OUTPUT_TYPES);
-    if (output != ERROR_OK)
-        return output;
-    current->outval = OUTPUT_TYPES;
->>>>>>> 94a93a0d28818f3555f1aca2f0d287ee60e16d52
 
     return output;
 }
@@ -348,7 +322,6 @@ int Hlavicka_Funkcie() // HLAVICKA-> FUNCTION ID (<ZOZNAM_PARAM>):<TYPY>
     }
 
     current_item = ht_search(global, func_name);
-<<<<<<< HEAD
 
     //CHECKING IF ID IS IN GLOBAL SYMT
     if (current_item == NULL)
@@ -363,23 +336,7 @@ int Hlavicka_Funkcie() // HLAVICKA-> FUNCTION ID (<ZOZNAM_PARAM>):<TYPY>
             return ERROR_SYNTAX_ANALYSIS;
         }
     }
-=======
-    
 
-    //CHECKING IF ID IS IN GLOBAL SYMT
-    if (current_item == NULL){
-        current_item = ht_insert(global, func_name);  // move to end, create new item instead
-        current_item->is_defined = true;
-    }
-    else{
-        if(current_item->is_defined == true){
-            return ERROR_SYNTAX_ANALYSIS;
-        }
-    }
-
->>>>>>> 94a93a0d28818f3555f1aca2f0d287ee60e16d52
-
-    
     output = get_token(&actToken);
     //"("
     if (output != ERROR_OK)
@@ -399,11 +356,8 @@ int Hlavicka_Funkcie() // HLAVICKA-> FUNCTION ID (<ZOZNAM_PARAM>):<TYPY>
         {
             return ERROR_SYNTAX_ANALYSIS;
         }
-<<<<<<< HEAD
 
         current_LL = current_item->inval;
-=======
->>>>>>> 94a93a0d28818f3555f1aca2f0d287ee60e16d52
         output = Zoznam_parametrov();
         if (output != ERROR_OK)
             return output;
@@ -483,11 +437,7 @@ int COMPARE_Typ()
         break;
     }
     //IF THE TYPE IS CORRECT IN FUNCTION
-<<<<<<< HEAD
     if (current_type == current_LL->type)
-=======
-    if (actToken.value.keyword == current_LL->type)
->>>>>>> 94a93a0d28818f3555f1aca2f0d287ee60e16d52
     {
 
         //ADDS VARIABLE NAME TO TYPE
@@ -504,11 +454,7 @@ int COMPARE_Typ()
         //SETS ITS TYPE IN LOCAL TABLE
         current_LL->var_name = var_name;
 
-<<<<<<< HEAD
         /* fprintf(stdout, "\n %d == %d ", actToken.value.keyword, current_LL->type); */
-=======
-        fprintf(stdout, "\n %d == %d ", actToken.value.keyword, current_LL->type);
->>>>>>> 94a93a0d28818f3555f1aca2f0d287ee60e16d52
 
         //MOVES IN LL
         current_LL = current_LL->next;
@@ -518,11 +464,7 @@ int COMPARE_Typ()
     {
         printf("kokotina");
         printf("TU JE NEZHODA");
-<<<<<<< HEAD
         fprintf(stdout, "\n %d != %d ", actToken.type, current_LL->type);
-=======
-        fprintf(stdout, "\n %d != %d ", actToken.value.keyword, current_LL->type);
->>>>>>> 94a93a0d28818f3555f1aca2f0d287ee60e16d52
         return ERROR_SEMANTIC;
     }
     return ERROR_OK;
@@ -531,7 +473,6 @@ int COMPARE_Typ()
 Token_type Typ()
 {
 
-<<<<<<< HEAD
     if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_INTEGER)
     {
         return INT;
@@ -545,66 +486,11 @@ Token_type Typ()
         return STRING;
     }
     else
-=======
-    if (output != ERROR_OK)
-        return output;
-
-    output = get_token(&actToken);
-    if (output != ERROR_OK)
-        return output;
-    //IF COMA, THERE IS MORE
-    if (actToken.type == COMMA)
-    {
-
-        output = get_token(&actToken);
-        if (output != ERROR_OK)
-            return output;
-
-        return Typy(Types);
-    }
-    else
-        return ERROR_OK;
-    return 69;
-}
-
-int Typ(func_val_t *Types)
-{
-    func_val_t *new = (func_val_t *)malloc(sizeof(func_val_t));
-    if (new == NULL)
-        return ERROR_INTERN;
-    func_val_t *last = Types;
-
-    if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_INTEGER)
-    {
-        new->type = INT;
-    }
-    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_NUMBER)
-    {
-        new->type = NUMBER;
-    }
-    else if (actToken.type == KEYWORD && actToken.value.keyword == KEYWORD_STRING)
-    {
-        new->type = STRING;
-    }
-    new->next = NULL;
-
-    if (Types == NULL)
-    {
-        Types = new;
-        return ERROR_OK;
-    }
-    while (last->next != NULL)
->>>>>>> 94a93a0d28818f3555f1aca2f0d287ee60e16d52
     {
         printf("TYP err\n");
         return ERROR_SYNTAX_ANALYSIS;
     }
-<<<<<<< HEAD
     return 69;
-=======
-    last->next = new;
-    return ERROR_OK;
->>>>>>> 94a93a0d28818f3555f1aca2f0d287ee60e16d52
 }
 
 int Zoznam_parametrov()
@@ -649,7 +535,7 @@ int Parameter()
         return ERROR_SYNTAX_ANALYSIS;
 
     get_token(&actToken);
-    
+
     if (output != ERROR_OK)
         return ERROR_SYNTAX_ANALYSIS;
 
@@ -1030,17 +916,10 @@ int Telo_Funkcie_v_IF() //TELO_FUNKCIE -> <SEKVENCIA_PRIKAZOV> END
         var.id = var_name;
         //ulozit premennu niekam
         //token type
-<<<<<<< HEAD
         get_token(&actToken);
         get_token(&actToken);
 
         output = expression_analysis(&actToken, local, &var, NULL);
-=======
-        
-            output = expression_analysis(&actToken, local, &var, NULL);
-        fprintf(stdout, "%d", output); //null ak if
-        fprintf(stdout, "%d", var.result_type);
->>>>>>> 94a93a0d28818f3555f1aca2f0d287ee60e16d52
         //skontrolovat typ s premennou
         if (element->var_type != var.result_type)
         {

@@ -80,11 +80,7 @@ int Viac_ID();
 int Prikaz();
 
 
-<<<<<<< HEAD
 Token_type Typ();
-=======
-int Typ(struct func_val *f);
->>>>>>> 94a93a0d28818f3555f1aca2f0d287ee60e16d52
 
 int COMPARE_Typy();
 
